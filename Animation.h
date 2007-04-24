@@ -13,9 +13,22 @@ public:
 	int framesPerSecond;
 };
 
-// Load function goes into AnimationList/Map
-
 typedef vector<Animation> AnimationList;
 typedef map<string, Animation> AnimationMap;
+
+class AnimationLoader
+{
+public:
+	bool load( const string &filename );
+
+	const AnimationList &getLowerAnimations() { return mLowerAnimations; }
+	const AnimationList &getUpperAnimations() { return mUpperAnimations; }
+
+private:
+	const char *getNextToken( const char *src, char *dest, int destLen );
+
+	AnimationList mLowerAnimations;
+	AnimationList mUpperAnimations;
+};
 
 #endif

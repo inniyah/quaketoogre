@@ -97,6 +97,7 @@ public:
 	MD3Mesh		*meshes;
 };
 
+typedef vector<const MD3Structure *> MD3StructureList;
 typedef map<string, const MD3Structure *> MD3StructureMap;
 
 #endif

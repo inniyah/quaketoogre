@@ -14,11 +14,13 @@ public:
 		int referenceFrame = 0,
 		bool convertCoordinates = false );
 		
-	Q3ModelToMesh(
-		const MD3StructureMap &models,
-		const AnimationMap &animations,
+	// only works for lower+upper+head combination
+	// otherwise we don't know how the tag dependencies work out
+/*	Q3ModelToMesh(
+		const MD3StructureList &models,
+		const AnimationList &animations,
 		int referenceFrame = 0,
-		bool convertCoordinates = false );
+		bool convertCoordinates = false );*/
 
 private:
 	void convert();
@@ -41,5 +43,20 @@ private:
 	bool mConvertCoordinates;
 	int mReferenceFrame;
 };
+/*
+class Q3MeshToSubMesh: public XmlWriter
+{
+public:
+	Q3MeshToSubMesh( const MD3Mesh &mesh, int referenceFrame = 0 );
+
+private:
+	void buildSubMesh( const MD3Mesh &mesh );
+	void buildFace( const MD3Triangle &triangle );
+	void buildVertexBuffers( const MD3Mesh &mesh );
+	void buildVertex( const MD3Vertex &vert );
+	void buildTexCoord( const MD3TexCoord &texCoord );
+
+	int mReferenceFrame;
+};*/
 
 #endif
