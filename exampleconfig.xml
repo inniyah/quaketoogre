@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!DOCTYPE conversion SYSTEM "../config.dtd">
+
+<conversion>
+	<convertcoordinates/>
+
+	<md3mesh>
+		<inputfile>
+			<filename>models/players/visor/lower.md3</filename>
+		</inputfile>
+		<outputfile>
+			<filename>lower.mesh.xml</filename>
+		</outputfile>
+		
+		<animationfile>
+			<filename>models/players/visor/animation.cfg</filename>
+			<animationgroup><grouplower/></animationgroup>
+			<convertall/>
+			<!--<animationname>LEGS_WALK</animationname>
+			<animationname>LEGS_RUN</animationname>-->
+		</animationfile>
+		
+		<!--<animations>
+			<animationsequence>
+				<animationname>swim</animationname>
+				<startframe>0</startframe>
+				<numframes>20</numframes>
+				<fps>15</fps>
+			</animationsequence>
+			<animationsequence>
+				<animationname>die</animationname>
+				<startframe>40</startframe>
+				<numframes>30</numframes>
+				<fps>20</fps>
+			</animationsequence>
+		</animations>-->
+		
+		<materials>
+			<material>
+				<materialname>visor/lower</materialname>
+				<submeshname>l_legs</submeshname>
+				<texture>
+					<filename>visor.tga</filename>
+				</texture>
+			</material>
+		</materials>
+	</md3mesh>
+</conversion>
