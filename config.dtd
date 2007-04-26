@@ -1,12 +1,12 @@
 <!-- Root element -->
-<!ELEMENT conversion (md2mesh|md3mesh)>
-
-<!-- This element determines type of conversion -->
-<!ELEMENT md2mesh (inputfile, outputfile, convertcoordinates?, animations?, materials?)>
-<!ELEMENT md3mesh (inputfile, outputfile, convertcoordinates?, animationfile?, animations?, materials?)>
+<!ELEMENT conversion (convertcoordinates?, (md2mesh|md3mesh))>
 
 <!-- Convert vectors to Ogre coordinate system -->
 <!ELEMENT convertcoordinates EMPTY>
+
+<!-- This element determines type of conversion -->
+<!ELEMENT md2mesh (inputfile, outputfile, animations?, materials?)>
+<!ELEMENT md3mesh (inputfile, outputfile, animationfile?, animations?, materials?)>
 
 <!-- Filenames -->
 <!ELEMENT inputfile (filename)>
@@ -14,7 +14,10 @@
 <!ELEMENT filename (#PCDATA)>
 
 <!-- Quake 3 animation file -->
-<!ELEMENT animationfile (filename, (convertall|animationname+))>
+<!ELEMENT animationfile (filename, animationgroup, (convertall|animationname+))>
+<!ELEMENT animationgroup (grouplower|groupupper)>
+<!ELEMENT grouplower EMPTY>
+<!ELEMENT groupupper EMPTY>
 <!ELEMENT convertall EMPTY>
 <!ELEMENT animationname (#PCDATA)>
 
@@ -30,7 +33,9 @@
 <!ELEMENT material (materialname, submeshname, texture?)>
 <!ELEMENT materialname (#PCDATA)>
 <!ELEMENT submeshname (#PCDATA)>
-<!ELEMENT texture (filename)>	<!-- If left out, no material script will be written -->
+<!-- If left out, no material script will be written -->
+<!-- Texture file path doesn't actually have to correct either -->
+<!ELEMENT texture (filename)>
 
 <!-- TODO: Add MD3 player models (lower, upper, head) -->
 <!-- TODO: Add tag-to-skeleton support -->
