@@ -1,6 +1,5 @@
 #include "Common.h"
 #include "MD3Structure.h"
-#include "MD3XmlWriter.h"
 #include "Q3ModelToMesh.h"
 #include "Animation.h"
 
@@ -57,7 +56,7 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		AnimationLoader animLoader;
 		if ( animLoader.load( animFile ) )
 		{
-			const AnimationList &(AnimationLoader::*retrievalFunc)() = NULL;
+			const AnimationMap &(AnimationLoader::*retrievalFunc)() = NULL;
 			TiXmlElement *animGroupNode = animGroupHandle.FirstChild().ToElement();
 			if ( animGroupNode )
 			{
@@ -70,15 +69,15 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 			
 			if ( retrievalFunc )
 			{
-				const AnimationList &loadedAnims = (animLoader.*retrievalFunc)();
+				const AnimationMap &loadedAnims = (animLoader.*retrievalFunc)();
 				if ( animFileHandle.FirstChild( "convertall" ).ToElement() )
 				{
 					printf( "Converting all animations from animation file\n" );
 					
-					for ( AnimationList::const_iterator i = loadedAnims.begin();
+					for ( AnimationMap::const_iterator i = loadedAnims.begin();
 						i != loadedAnims.end(); ++i )
 					{
-						animList.push_back( *i );
+						animList.push_back( i->second );
 					}
 				}
 				else

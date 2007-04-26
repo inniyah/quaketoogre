@@ -79,20 +79,20 @@ bool AnimationLoader::load( const string &filename )
 		{
 			// BOTH_ animation
 			numBothFrames = anim.startFrame + anim.numFrames;
-			mLowerAnimations.push_back( anim );
-			mUpperAnimations.push_back( anim );
+			mLowerAnimations[anim.name] = anim;
+			mUpperAnimations[anim.name] = anim;
 		}
 		else if ( animationIndex < pmLegsStart )
 		{
 			// TORSO_ animation
 			numTorsoFrames = anim.startFrame + anim.numFrames;
-			mUpperAnimations.push_back( anim );
+			mUpperAnimations[anim.name] = anim;
 		}
 		else
 		{
 			// LEGS_ animation
 			anim.startFrame -= (numTorsoFrames - numBothFrames);
-			mLowerAnimations.push_back( anim );
+			mLowerAnimations[anim.name] = anim;
 		}
 
 		animationIndex++;

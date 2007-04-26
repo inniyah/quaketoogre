@@ -21,14 +21,14 @@ class AnimationLoader
 public:
 	bool load( const string &filename );
 
-	const AnimationList &getLowerAnimations() { return mLowerAnimations; }
-	const AnimationList &getUpperAnimations() { return mUpperAnimations; }
+	const AnimationMap &getLowerAnimations() { return mLowerAnimations; }
+	const AnimationMap &getUpperAnimations() { return mUpperAnimations; }
 
 private:
 	const char *getNextToken( const char *src, char *dest, int destLen );
 
-	AnimationList mLowerAnimations;
-	AnimationList mUpperAnimations;
+	AnimationMap mLowerAnimations;
+	AnimationMap mUpperAnimations;
 };
 
 #endif
