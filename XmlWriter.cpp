@@ -1,63 +1,62 @@
 #include "Common.h"
 #include "XmlWriter.h"
 
-XmlWriter::XmlWriter(): 
-	mIndent(0)
+static char tmp[32];
+
+XmlWriter::XmlWriter()
 {
+	mDoc.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );
+	mNodeStack.push_back( &mDoc );
 }
 
 XmlWriter::operator string() const
 {
-	return mStream.str();
+	TiXmlPrinter printer;
+	printer.SetIndent( "    " );
+	mDoc.Accept( &printer );
+	return printer.Str();
 }
 
 ostream &operator<<( ostream &os, const XmlWriter &xw )
 {
-	os << (string)xw;
+	os << xw.mDoc;
 	return os;
-}
-
-string XmlWriter::getIndent( int indent )
-{
-	string result = "";
-	while ( indent-- )
-		result += "    ";
-	return result;
 }
 
 void XmlWriter::openTag( const string &tagName )
 {
-	mStream << endl << getIndent(mIndent) << "<" << tagName << ">";
-	mTagStack.push_back( tagName );
-	mIndent++;
+	TiXmlElement *element = new TiXmlElement( tagName );
+	
+	TiXmlNode *parent = mNodeStack.back();
+	parent->LinkEndChild( element );
+	mNodeStack.push_back( element );
 }
 
 void XmlWriter::openTag( const string &tagName, const XmlWriter::Attributes &attributes )
 {
-	mStream << endl << getIndent(mIndent) << "<" << tagName << " ";
+	TiXmlElement *element = new TiXmlElement( tagName );
 
-	const AttributeMap &atts = attributes.getAttributes();
-	AttributeMap::const_iterator i;
+	const Attributes::AttributeMap &atts = attributes.getAttributes();
+	Attributes::AttributeMap::const_iterator i;
 	for ( i = atts.begin(); i != atts.end(); ++i )
 	{
-		mStream << i->first << "=\"" << i->second << "\" ";
+		element->SetAttribute( i->first, i->second );
 	}
 
-	mStream << ">";
-	mTagStack.push_back( tagName );
-	mIndent++;
+	TiXmlNode *parent = mNodeStack.back();
+	parent->LinkEndChild( element );
+	mNodeStack.push_back( element );
 }
 
 void XmlWriter::closeTag()
 {
-	mIndent--;
-	mStream << endl << getIndent(mIndent) << "</" << mTagStack.back() << ">";
-	mTagStack.pop_back();
+	mNodeStack.pop_back();
 }
 
 void XmlWriter::writeData( const string &data )
 {
-	mStream << data;
+	TiXmlNode *parent = mNodeStack.back();
+	parent->LinkEndChild( new TiXmlText( data ) );
 }
 
 void XmlWriter::writeData( const char *data, size_t len )
@@ -67,17 +66,20 @@ void XmlWriter::writeData( const char *data, size_t len )
 
 void XmlWriter::writeData( const short &data )
 {
-	mStream << data;
+	sprintf( tmp, "%i", data );
+	writeData( tmp );
 }
 
 void XmlWriter::writeData( const int &data )
 {
-	mStream << data;
+	sprintf( tmp, "%i", data );
+	writeData( tmp );
 }
 
 void XmlWriter::writeData( const float &data )
 {
-	mStream << data;
+	sprintf( tmp, "%f", data );
+	writeData( tmp );
 }
 
 void XmlWriter::Attributes::set( const string &name, const string &value )
@@ -92,21 +94,18 @@ void XmlWriter::Attributes::set( const string &name, const char *value, size_t l
 
 void XmlWriter::Attributes::set( const string &name, const short &value )
 {
-	char tmp[16];
 	sprintf( tmp, "%i", value );
 	mAtts[name] = tmp;
 }
 
 void XmlWriter::Attributes::set( const string &name, const int &value )
 {
-	char tmp[32];
 	sprintf( tmp, "%i", value );
 	mAtts[name] = tmp;
 }
 
 void XmlWriter::Attributes::set( const string &name, const float &value )
 {
-	char tmp[32];
 	sprintf( tmp, "%f", value );
 	mAtts[name] = tmp;
 }
@@ -116,7 +115,7 @@ const string &XmlWriter::Attributes::get( const string &name ) const
 	return mAtts.find( name )->second;
 }
 
-const XmlWriter::AttributeMap &XmlWriter::Attributes::getAttributes() const
+const XmlWriter::Attributes::AttributeMap &XmlWriter::Attributes::getAttributes() const
 {
 	return mAtts;
 }

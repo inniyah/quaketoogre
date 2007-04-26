@@ -1,0 +1,37 @@
+<!-- Root element -->
+<!ELEMENT conversion (md2mesh|md3mesh)>
+
+<!-- This element determines type of conversion -->
+<!ELEMENT md2mesh (inputfile, outputfile, convertcoordinates?, animations?, materials?)>
+<!ELEMENT md3mesh (inputfile, outputfile, convertcoordinates?, animationfile?, animations?, materials?)>
+
+<!-- Convert vectors to Ogre coordinate system -->
+<!ELEMENT convertcoordinates EMPTY>
+
+<!-- Filenames -->
+<!ELEMENT inputfile (filename)>
+<!ELEMENT outputfile (filename)>
+<!ELEMENT filename (#PCDATA)>
+
+<!-- Quake 3 animation file -->
+<!ELEMENT animationfile (filename, (convertall|animationname+))>
+<!ELEMENT convertall EMPTY>
+<!ELEMENT animationname (#PCDATA)>
+
+<!-- Individual animation definitions -->
+<!ELEMENT animations (animationsequence+)>
+<!ELEMENT animationsequence (animationname, startframe, numframes, fps)>
+<!ELEMENT startframe (#PCDATA)>
+<!ELEMENT numframes (#PCDATA)>
+<!ELEMENT fps (#PCDATA)>
+
+<!-- Materials -->
+<!ELEMENT materials (material+)>
+<!ELEMENT material (materialname, submeshname, texture?)>
+<!ELEMENT materialname (#PCDATA)>
+<!ELEMENT submeshname (#PCDATA)>
+<!ELEMENT texture (filename)>	<!-- If left out, no material script will be written -->
+
+<!-- TODO: Add MD3 player models (lower, upper, head) -->
+<!-- TODO: Add tag-to-skeleton support -->
+<!-- TODO: Check if 'materials' tag is appropriate for MD2 -->

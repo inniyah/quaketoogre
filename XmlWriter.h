@@ -10,11 +10,11 @@ public:
 	friend ostream &operator<<( ostream &os, const XmlWriter &xw );
 
 protected:
-	typedef map<string,string> AttributeMap;
-
 	class Attributes
 	{
 	public:
+		typedef map<string,string> AttributeMap;
+	
 		void set( const string &name, const string &value );
 		void set( const string &name, const char *value, size_t len );
 		void set( const string &name, const short &value );
@@ -26,8 +26,6 @@ protected:
 		AttributeMap mAtts;
 	};
 
-	string getIndent( int indent );
-
 	void openTag( const string &tagName );
 	void openTag( const string &tagName, const Attributes &attributes );
 	void closeTag();
@@ -37,10 +35,9 @@ protected:
 	void writeData( const short &data );
 	void writeData( const int &data );
 	void writeData( const float &data );
-
-	stringstream mStream;
-	vector<string> mTagStack;
-	int mIndent;
+	
+	TiXmlDocument mDoc;
+	vector<TiXmlNode*> mNodeStack;
 };
 
 #endif
