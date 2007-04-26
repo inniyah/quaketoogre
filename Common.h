@@ -1,6 +1,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include "tinyxml.h"
+
 #include <iostream>
 #include <string>
 #include <sstream>

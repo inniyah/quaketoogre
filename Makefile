@@ -1,6 +1,9 @@
 OUTDIR = out
 BIN = QuakeToOgre
 OBJ = \
+	tinyxml.o \
+	tinyxmlerror.o \
+	tinyxmlparser.o \
 	Main.o \
 	Quake.o \
 	MD2Structure.o \
@@ -14,6 +17,7 @@ OBJ = \
 CC = g++
 INCLUDE =
 LIB = -lm
+DEFS = -DTIXML_USE_STL
 
 all : $(OBJ)
 	$(CC) -o $(OUTDIR)/$(BIN) $(OBJ) $(LIB)
@@ -25,4 +29,4 @@ clean:
 	rm -rf $(OUTDIR)/*
 
 %.o : %.cpp
-	$(CC) -c $< $(INCLUDE) -o $@
+	$(CC) -c $< $(INCLUDE) $(DEFS) -o $@
