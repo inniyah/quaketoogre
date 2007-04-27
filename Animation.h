@@ -22,12 +22,14 @@ class AnimationFile
 public:
 	bool load( const string &filename );
 
-	const AnimationMap &getLowerAnimations() { return mLowerAnimations; }
-	const AnimationMap &getUpperAnimations() { return mUpperAnimations; }
+	const AnimationMap &getAnimations() const { return mAnimations; }
+	const AnimationMap &getLowerAnimations() const { return mLowerAnimations; }
+	const AnimationMap &getUpperAnimations() const { return mUpperAnimations; }
 
 private:
 	const char *getNextToken( const char *src, char *dest, int destLen );
 
+	AnimationMap mAnimations;
 	AnimationMap mLowerAnimations;
 	AnimationMap mUpperAnimations;
 };

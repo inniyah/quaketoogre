@@ -84,6 +84,8 @@ bool AnimationFile::load( const string &filename )
 			anim.startFrame -= (numTorsoFrames - numBothFrames);
 			mLowerAnimations[anim.name] = anim;
 		}
+		
+		mAnimations[anim.name] = anim;
 
 		animationIndex++;
 	}

@@ -16,67 +16,60 @@ bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 		return false;
 	}
 
-	string animFilename = filenameNode->GetText();
 	AnimationFile animFile;
+	string animFilename = filenameNode->GetText();
 	if ( !animFile.load( animFilename ) )
 	{
 		cout << "[Warning] Could not load animation file '" << animFilename << "'" << endl;
 		return false;
 	}
 
-	// FIXME doesn't check if animationgroup node exists
-	TiXmlElement *groupNode = animFileNode->FirstChildElement( "animationgroup" )->FirstChildElement();
-	if ( !groupNode )
+	for ( TiXmlElement *node = animFileNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{
-		cout << "[Warning] Animation file declaration misses animation group" << endl;
-		return false;
-	}
-
-	const AnimationMap *loadedAnims = NULL;
-	const string &group = groupNode->ValueStr();
-	if ( group == "grouplower" )
-		loadedAnims = &animFile.getLowerAnimations();
-	else if ( group == "groupupper" )
-		loadedAnims = &animFile.getUpperAnimations();
-
-	if ( !loadedAnims )
-	{
-		cout << "[Warning] Invalid animation group '" << group << "'" << endl;
-		return false;
-	}
-	
-	// Either convert all animations, or a selection
-	if ( animFileNode->FirstChildElement( "convertall" ) )
-	{
-		cout << "Converting all animations from animation file" << endl;
-		
-		for ( AnimationMap::const_iterator i = loadedAnims->begin();
-			i != loadedAnims->end(); ++i )
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "convertlegs" )
 		{
-			dest.push_back( i->second );
-		}
-	}
-	else
-	{
-		cout << "Converting a selection of animations from animation file" << endl;
-
-		for ( TiXmlElement *child = animFileNode->FirstChildElement(); child; child = child->NextSiblingElement() )
-		{
-			const string &nodeName = child->ValueStr();
-			if ( nodeName == "animationname" )
+			cout << "Converting all legs animations from animation file" << endl;
+			const AnimationMap &animMap = animFile.getLowerAnimations();
+			for ( AnimationMap::const_iterator i = animMap.begin(); i != animMap.end(); ++i )
 			{
-				string animName = child->GetText();
-				AnimationMap::const_iterator i = loadedAnims->find( animName );
-				if ( i != loadedAnims->end() )
+				dest.push_back( i->second );
+			}
+			break;
+		}
+		else if ( nodeName == "converttorso" )
+		{
+			cout << "Converting all torso animations from animation file" << endl;
+			const AnimationMap &animMap = animFile.getUpperAnimations();
+			for ( AnimationMap::const_iterator i = animMap.begin(); i != animMap.end(); ++i )
+			{
+				dest.push_back( i->second );
+			}
+			break;
+		}
+		else if ( nodeName == "convertselection" )
+		{
+			cout << "Converting a selection of animations from animation file" << endl;
+			const AnimationMap &animMap = animFile.getAnimations();
+			for ( TiXmlElement *child = node->FirstChildElement(); child; child = child->NextSiblingElement() )
+			{
+				const string &childName = child->ValueStr();
+				if ( childName == "animationname" )
 				{
-					cout << "Adding animation '" << animName << "'" << endl;
-					dest.push_back( i->second );
-				}
-				else
-				{
-					cout << "[Warning] Cannot find animation '" << animName << "'" << endl;
+					string animName = child->GetText();
+					AnimationMap::const_iterator i = animMap.find( animName );
+					if ( i != animMap.end() )
+					{
+						cout << "Adding animation '" << animName << "'" << endl;
+						dest.push_back( i->second );
+					}
+					else
+					{
+						cout << "[Warning] Cannot find animation '" << animName << "'" << endl;
+					}
 				}
 			}
+			break;
 		}
 	}
 

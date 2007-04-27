@@ -14,10 +14,11 @@
 		
 		<animationfile>
 			<filename>models/players/visor/animation.cfg</filename>
-			<animationgroup><grouplower/></animationgroup>
-			<convertall/>
-			<!--<animationname>LEGS_WALK</animationname>
-			<animationname>LEGS_RUN</animationname>-->
+			<convertlegs/>
+			<!--<convertselection>
+				<animationname>LEGS_WALK</animationname>
+				<animationname>LEGS_RUN</animationname>
+			</convertselection>-->
 		</animationfile>
 		
 		<animations>

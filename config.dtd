@@ -17,11 +17,11 @@
 <!ELEMENT referenceframe (#PCDATA)>
 
 <!-- Quake 3 animation file -->
-<!ELEMENT animationfile (filename, animationgroup, (convertall|animationname+))>
-<!ELEMENT animationgroup (grouplower|groupupper)>
-<!ELEMENT grouplower EMPTY>		<!-- LEGS_ and BOTH_ animations -->
-<!ELEMENT groupupper EMPTY>		<!-- TORSO_ and BOTH_ animations -->
-<!ELEMENT convertall EMPTY>
+<!ELEMENT animationfile (filename, (convertlegs|converttorso|convertselection))>
+<!ELEMENT convertlegs EMPTY>	<!-- Convert all LEGS_ and BOTH_ animations -->
+<!ELEMENT converttorso EMPTY>	<!-- Convert all TORSO_ and BOTH_ animations -->
+<!ELEMENT convertselection (animationname+)>		<!-- Convert specific animations -->
+<!ELEMENT animationname (#PCDATA)>
 
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>
