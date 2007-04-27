@@ -11,16 +11,9 @@ public:
 	Q3ModelToMesh( 
 		const MD3Structure &model,
 		const AnimationList &animations,
+		const StringMap &materials,
 		int referenceFrame = 0,
 		bool convertCoordinates = false );
-		
-	// only works for lower+upper+head combination
-	// otherwise we don't know how the tag dependencies work out
-/*	Q3ModelToMesh(
-		const MD3StructureList &models,
-		const AnimationList &animations,
-		int referenceFrame = 0,
-		bool convertCoordinates = false );*/
 
 private:
 	void convert();
@@ -40,6 +33,7 @@ private:
 
 	const MD3Structure &mModel;
 	const AnimationList &mAnimations;
+	const StringMap &mMaterials;
 	bool mConvertCoordinates;
 	int mReferenceFrame;
 };

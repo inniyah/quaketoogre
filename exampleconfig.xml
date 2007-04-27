@@ -8,9 +8,12 @@
 		<inputfile>
 			<filename>models/players/visor/lower.md3</filename>
 		</inputfile>
+		
 		<outputfile>
 			<filename>lower.mesh.xml</filename>
 		</outputfile>
+		
+		<referenceframe>0</referenceframe>
 		
 		<animationfile>
 			<filename>models/players/visor/animation.cfg</filename>
@@ -24,22 +27,22 @@
 		<animations>
 			<animationsequence>
 				<animationname>swim</animationname>
-				<startframe>0</startframe>
-				<numframes>20</numframes>
+				<startframe>129</startframe>
+				<numframes>10</numframes>
 				<fps>15</fps>
 			</animationsequence>
 			<animationsequence>
 				<animationname>die</animationname>
-				<startframe>40</startframe>
+				<startframe>0</startframe>
 				<numframes>30</numframes>
-				<fps>20</fps>
+				<fps>25</fps>
 			</animationsequence>
 		</animations>
 		
 		<materials>
 			<material>
-				<materialname>visor/lower</materialname>
 				<submeshname>l_legs</submeshname>
+				<materialname>visor/lower</materialname>
 				<texture>
 					<filename>visor.tga</filename>
 				</texture>

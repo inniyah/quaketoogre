@@ -4,11 +4,13 @@
 Q3ModelToMesh::Q3ModelToMesh( 
 	const MD3Structure &model,
 	const AnimationList &animations,
+	const StringMap &materials,
 	int referenceFrame, 
 	bool convertCoordinates ):
 	
 	mModel( model ),
 	mAnimations( animations ),
+	mMaterials( materials ),
 	mReferenceFrame( referenceFrame ), 
 	mConvertCoordinates( convertCoordinates )
 {
@@ -54,8 +56,17 @@ void Q3ModelToMesh::buildSubMesh( const MD3Mesh &mesh )
 {
 	cout << "Building SubMesh '" << mesh.header.name << "'" << endl;
 
+	// Determine what submesh's material name should be
+	// Either straight from the MD3 structure, or from the supplied material names
+	string materialName;
+	StringMap::const_iterator iter = mMaterials.find( mesh.header.name );
+	if ( iter != mMaterials.end() )
+		materialName = iter->second;	
+	else
+		materialName = toStr( mesh.shaders[0].name, 64 );
+
 	TiXmlElement *submeshNode = openTag( "submesh" );
-	submeshNode->SetAttribute( "material", toStr( mesh.shaders[0].name, 64 ) );
+	submeshNode->SetAttribute( "material", materialName );
 	submeshNode->SetAttribute( "usesharedvertices", "false" );
 	submeshNode->SetAttribute( "operationtype", "triangle_list" );
 

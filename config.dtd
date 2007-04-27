@@ -32,9 +32,9 @@
 
 <!-- Materials -->
 <!ELEMENT materials (material+)>
-<!ELEMENT material (materialname, submeshname, texture?)>
-<!ELEMENT materialname (#PCDATA)>
+<!ELEMENT material (submeshname, materialname, texture?)>
 <!ELEMENT submeshname (#PCDATA)>
+<!ELEMENT materialname (#PCDATA)>
 <!ELEMENT texture (filename)>	<!-- If left out, no material script will be written -->
 
 <!-- TODO: Add MD3 player models (lower, upper, head) -->

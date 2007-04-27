@@ -3,8 +3,6 @@
 #include "Q3ModelToMesh.h"
 #include "Animation.h"
 
-using namespace std;
-
 bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 {
 	cout << "Processing animation file" << endl;
@@ -109,6 +107,49 @@ bool processAnimations( TiXmlElement *animsNode, AnimationList &dest )
 	return true;
 }
 
+bool processMaterials( TiXmlElement *matsNode, StringMap &dest )
+{
+	cout << "Processing materials" << endl;
+	
+	for ( TiXmlElement *node = matsNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "material" )
+		{
+			string key, value;
+		
+			for ( TiXmlElement *child = node->FirstChildElement(); 
+				child; child = child->NextSiblingElement() )
+			{
+				const string &childName = child->ValueStr();
+				if ( childName == "submeshname" )
+				{
+					key = child->GetText();
+				}
+				else if ( childName == "materialname" )
+				{
+					value = child->GetText();
+				}
+				else if ( childName == "texture" )
+				{
+					// TODO not sure if material script output should be done by this program
+				}
+			}
+			
+			if ( key.empty() )
+			{
+				cout << "[Warning] Material found without submesh name" << endl;
+				continue;
+			}
+			
+			cout << "Using material '" << value << "' for submesh '" << key << "'" << endl;
+			dest[key] = value;
+		}
+	}
+	
+	return true;
+}
+
 bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
 {
 	cout << "Doing MD2 Mesh conversion" << endl;
@@ -121,8 +162,9 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 	cout << "Doing MD3 Mesh conversion" << endl;
 	
 	string inputFile, outputFile;
-	int referenceFrame = 0;
 	AnimationList animList;
+	StringMap materialNames;
+	int referenceFrame = 0;
 	
 	// Process the configuration XML tree
 	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
@@ -155,7 +197,7 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		}
 		else if ( nodeName == "materials" )
 		{
-			// TODO
+			processMaterials( node, materialNames );
 		}
 	}
 	
@@ -167,7 +209,7 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		return false;
 	}
 	
-	Q3ModelToMesh converter( md3Struct, animList, referenceFrame, convertCoordinates );
+	Q3ModelToMesh converter( md3Struct, animList, materialNames, referenceFrame, convertCoordinates );
 	if ( !converter.saveFile( outputFile ) )
 	{
 		cout << "[Error] Could not save to file '" << outputFile << "'" << endl;

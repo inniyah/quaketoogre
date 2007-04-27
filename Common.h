@@ -25,4 +25,6 @@
 
 using namespace std;
 
+typedef map<string, string> StringMap;
+
 #endif
