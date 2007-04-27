@@ -5,19 +5,22 @@
 <!ELEMENT convertcoordinates EMPTY>
 
 <!-- This element determines type of conversion -->
-<!ELEMENT md2mesh (inputfile, outputfile, animations?, materials?)>
-<!ELEMENT md3mesh (inputfile, outputfile, animationfile?, animations?, materials?)>
+<!ELEMENT md2mesh (inputfile, outputfile, referenceframe?, animations?, materials?)>
+<!ELEMENT md3mesh (inputfile, outputfile, referenceframe?, animationfile?, animations?, materials?)>
 
 <!-- Filenames -->
 <!ELEMENT inputfile (filename)>
 <!ELEMENT outputfile (filename)>
 <!ELEMENT filename (#PCDATA)>
 
+<!-- Frame that will be used for the non-animated pose -->
+<!ELEMENT referenceframe (#PCDATA)>
+
 <!-- Quake 3 animation file -->
 <!ELEMENT animationfile (filename, animationgroup, (convertall|animationname+))>
 <!ELEMENT animationgroup (grouplower|groupupper)>
-<!ELEMENT grouplower EMPTY>
-<!ELEMENT groupupper EMPTY>
+<!ELEMENT grouplower EMPTY>		<!-- LEGS_ and BOTH_ animations -->
+<!ELEMENT groupupper EMPTY>		<!-- TORSO_ and BOTH_ animations -->
 <!ELEMENT convertall EMPTY>
 <!ELEMENT animationname (#PCDATA)>
 
@@ -33,9 +36,7 @@
 <!ELEMENT material (materialname, submeshname, texture?)>
 <!ELEMENT materialname (#PCDATA)>
 <!ELEMENT submeshname (#PCDATA)>
-<!-- If left out, no material script will be written -->
-<!-- Texture file path doesn't actually have to correct either -->
-<!ELEMENT texture (filename)>
+<!ELEMENT texture (filename)>	<!-- If left out, no material script will be written -->
 
 <!-- TODO: Add MD3 player models (lower, upper, head) -->
 <!-- TODO: Add tag-to-skeleton support -->

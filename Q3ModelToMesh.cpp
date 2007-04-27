@@ -31,10 +31,9 @@ void Q3ModelToMesh::convert()
 	openTag( "submeshnames" );
 	for ( int i = 0; i < mModel.header.numMeshes; i++ )
 	{
-		Attributes smnameAtts;
-		smnameAtts.set( "name", mModel.meshes[i].header.name, 64 );
-		smnameAtts.set( "index", i );
-		openTag( "submeshname", smnameAtts );
+		TiXmlElement *smnameNode = openTag( "submeshname" );
+		smnameNode->SetAttribute( "name", toStr( mModel.meshes[i].header.name, 64 ) );
+		smnameNode->SetAttribute( "index", i );
 		closeTag();
 	}
 	closeTag();
@@ -55,16 +54,14 @@ void Q3ModelToMesh::buildSubMesh( const MD3Mesh &mesh )
 {
 	cout << "Building SubMesh '" << mesh.header.name << "'" << endl;
 
-	Attributes submeshAtts;
-	submeshAtts.set( "material", mesh.shaders[0].name, 64 );
-	submeshAtts.set( "usesharedvertices", "false" );
-	submeshAtts.set( "operationtype", "triangle_list" );
-	openTag( "submesh", submeshAtts );
+	TiXmlElement *submeshNode = openTag( "submesh" );
+	submeshNode->SetAttribute( "material", toStr( mesh.shaders[0].name, 64 ) );
+	submeshNode->SetAttribute( "usesharedvertices", "false" );
+	submeshNode->SetAttribute( "operationtype", "triangle_list" );
 
 	// Faces
-	Attributes facesAtts;
-	facesAtts.set( "count", mesh.header.numTriangles );
-	openTag( "faces", facesAtts );
+	TiXmlElement *facesNode = openTag( "faces" );
+	facesNode->SetAttribute( "count", mesh.header.numTriangles );
 	for ( int i = 0; i < mesh.header.numTriangles; i++ )
 	{
 		buildFace( mesh.triangles[i] );
@@ -72,9 +69,8 @@ void Q3ModelToMesh::buildSubMesh( const MD3Mesh &mesh )
 	closeTag();
 
 	// Geometry
-	Attributes geomAtts;
-	geomAtts.set( "vertexcount", mesh.header.numVertices );
-	openTag( "geometry", geomAtts );
+	TiXmlElement *geomNode = openTag( "geometry" );
+	geomNode->SetAttribute( "vertexcount", mesh.header.numVertices );
 	buildVertexBuffers( mesh );
 	closeTag();
 
@@ -83,12 +79,11 @@ void Q3ModelToMesh::buildSubMesh( const MD3Mesh &mesh )
 
 void Q3ModelToMesh::buildFace( const MD3Triangle &triangle )
 {
-	// For some reason we need to flip the index order
-	Attributes faceAtts;
-	faceAtts.set( "v1", triangle.indices[0] );
-	faceAtts.set( "v2", triangle.indices[2] );
-	faceAtts.set( "v3", triangle.indices[1] );
-	openTag( "face", faceAtts );
+	TiXmlElement *faceNode = openTag( "face" );
+	// Quake 3 has its face direction the other way round, so flip the index order
+	faceNode->SetAttribute( "v1", triangle.indices[0] );
+	faceNode->SetAttribute( "v2", triangle.indices[2] );
+	faceNode->SetAttribute( "v3", triangle.indices[1] );
 	closeTag();
 }
 
@@ -97,10 +92,9 @@ void Q3ModelToMesh::buildVertexBuffers( const MD3Mesh &mesh )
 	const MD3Vertex *verts = &mesh.vertices[mReferenceFrame * mesh.header.numVertices];
 
 	// Vertices and normals
-	Attributes vbAtts;
-	vbAtts.set( "positions", "true" );
-	vbAtts.set( "normals", "true" );
-	openTag( "vertexbuffer", vbAtts );
+	TiXmlElement *vbNode = openTag( "vertexbuffer" );
+	vbNode->SetAttribute( "positions", "true" );
+	vbNode->SetAttribute( "normals", "true" );
 	for ( int i = 0; i < mesh.header.numVertices; i++ )
 	{
 		buildVertex( verts[i] );
@@ -108,10 +102,9 @@ void Q3ModelToMesh::buildVertexBuffers( const MD3Mesh &mesh )
 	closeTag();
 
 	// Texture coordinates
-	Attributes tcAtts;
-	tcAtts.set( "texture_coords", "1" );
-	tcAtts.set( "texture_coord_dimensions_0", "2" );
-	openTag( "vertexbuffer", tcAtts );
+	TiXmlElement *tcNode = openTag( "vertexbuffer" );
+	tcNode->SetAttribute( "texture_coords", 1 );
+	tcNode->SetAttribute( "texture_coord_dimensions_0", 2 );
 	for ( int i = 0; i < mesh.header.numVertices; i++ )
 	{
 		buildTexCoord( mesh.texCoords[i] );
@@ -128,19 +121,17 @@ void Q3ModelToMesh::buildVertex( const MD3Vertex &vert )
 	openTag( "vertex" );
 
 	// Position
-	Attributes posAtts;
-	posAtts.set( "x", position[0] );
-	posAtts.set( "y", position[1] );
-	posAtts.set( "z", position[2] );
-	openTag( "position", posAtts );
+	TiXmlElement *posNode = openTag( "position" );
+	posNode->SetAttribute( "x", toStr( position[0] ) );
+	posNode->SetAttribute( "y", toStr( position[1] ) );
+	posNode->SetAttribute( "z", toStr( position[2] ) );
 	closeTag();
 	
 	// Normal
-	Attributes normAtts;
-	normAtts.set( "x", normal[0] );
-	normAtts.set( "y", normal[1] );
-	normAtts.set( "z", normal[2] );
-	openTag( "normal", normAtts );
+	TiXmlElement *normNode = openTag( "normal" );
+	normNode->SetAttribute( "x", toStr( normal[0] ) );
+	normNode->SetAttribute( "y", toStr( normal[1] ) );
+	normNode->SetAttribute( "z", toStr( normal[2] ) );
 	closeTag();
 
 	closeTag();
@@ -150,10 +141,9 @@ void Q3ModelToMesh::buildTexCoord( const MD3TexCoord &texCoord )
 {
 	openTag( "vertex" );
 
-	Attributes tcAtts;
-	tcAtts.set( "u", texCoord.uv[0] );
-	tcAtts.set( "v", texCoord.uv[1] );
-	openTag( "texcoord", tcAtts );
+	TiXmlElement *tcNode = openTag( "texcoord" );
+	tcNode->SetAttribute( "u", toStr( texCoord.uv[0] ) );
+	tcNode->SetAttribute( "v", toStr( texCoord.uv[1] ) );
 	closeTag();
 
 	closeTag();
@@ -163,10 +153,9 @@ void Q3ModelToMesh::buildAnimation( const string &name, int startFrame, int numF
 {
 	cout << "Building animation '" << name << "'" << endl;
 
-	Attributes animAtts;
-	animAtts.set( "name", name );
-	animAtts.set( "length", (float)numFrames / (float)fps );
-	openTag( "animation", animAtts );
+	TiXmlElement *animNode = openTag( "animation" );
+	animNode->SetAttribute( "name", name );
+	animNode->SetAttribute( "length", toStr( (float)numFrames / (float)fps ) );
 
 	openTag( "tracks" );
 	for ( int i = 0; i < mModel.header.numMeshes; i++ )
@@ -182,11 +171,10 @@ void Q3ModelToMesh::buildTrack( int meshIndex, int startFrame, int numFrames, in
 {
 	const MD3Mesh &mesh = mModel.meshes[meshIndex];
 
-	Attributes trackAtts;
-	trackAtts.set( "target", "submesh" );
-	trackAtts.set( "type", "morph" );
-	trackAtts.set( "index", meshIndex );
-	openTag( "track", trackAtts );
+	TiXmlElement *trackNode = openTag( "track" );
+	trackNode->SetAttribute( "target", "submesh" );
+	trackNode->SetAttribute( "type", "morph" );
+	trackNode->SetAttribute( "index", meshIndex );
 
 	float time = 0.0f;
 	float timePerFrame = 1.0f / (float)fps;
@@ -206,9 +194,8 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 {
 	cout << "Building frame " << frame << " for SubMesh '" << mesh.header.name << "'" << endl;
 
-	Attributes kfAtts;
-	kfAtts.set( "time", time );
-	openTag( "keyframe", kfAtts );
+	TiXmlElement *kfNode = openTag( "keyframe" );
+	kfNode->SetAttribute( "time", toStr( time ) );
 
 	const MD3Vertex *verts = &mesh.vertices[frame * mesh.header.numVertices];
 	float position[3];
@@ -218,11 +205,10 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 		const MD3Vertex &vertex = verts[i];
 		convertPosition( vertex.position, position );
 
-		Attributes posAtts;
-		posAtts.set( "x", position[0] );
-		posAtts.set( "y", position[1] );
-		posAtts.set( "z", position[2] );
-		openTag( "position", posAtts );
+		TiXmlElement *posNode = openTag( "position" );
+		posNode->SetAttribute( "x", toStr( position[0] ) );
+		posNode->SetAttribute( "y", toStr( position[1] ) );
+		posNode->SetAttribute( "z", toStr( position[2] ) );
 		closeTag();
 	}
 
