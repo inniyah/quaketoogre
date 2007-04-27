@@ -22,7 +22,6 @@
 <!ELEMENT grouplower EMPTY>		<!-- LEGS_ and BOTH_ animations -->
 <!ELEMENT groupupper EMPTY>		<!-- TORSO_ and BOTH_ animations -->
 <!ELEMENT convertall EMPTY>
-<!ELEMENT animationname (#PCDATA)>
 
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>

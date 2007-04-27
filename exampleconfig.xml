@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE conversion SYSTEM "../config.dtd">
+<!DOCTYPE conversion SYSTEM "config.dtd">
 
 <conversion>
 	<convertcoordinates/>
@@ -20,7 +20,7 @@
 			<animationname>LEGS_RUN</animationname>-->
 		</animationfile>
 		
-		<!--<animations>
+		<animations>
 			<animationsequence>
 				<animationname>swim</animationname>
 				<startframe>0</startframe>
@@ -33,7 +33,7 @@
 				<numframes>30</numframes>
 				<fps>20</fps>
 			</animationsequence>
-		</animations>-->
+		</animations>
 		
 		<materials>
 			<material>

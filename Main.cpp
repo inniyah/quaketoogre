@@ -5,26 +5,27 @@
 
 using namespace std;
 
-bool processAnimationFile( TiXmlHandle animFileHandle, AnimationList &dest )
+bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 {
 	cout << "Processing animation file" << endl;
 
-	TiXmlElement *filenameNode = animFileHandle.FirstChild( "filename" ).ToElement();
+	TiXmlElement *filenameNode = animFileNode->FirstChildElement( "filename" );
 	if ( !filenameNode )
 	{
 		cout << "[Warning] Animation file declaration misses filename" << endl;
 		return false;
 	}
 
-	string animFile = filenameNode->GetText();
-	AnimationLoader animLoader;
-	if ( !animLoader.load( animFile ) )
+	string animFilename = filenameNode->GetText();
+	AnimationFile animFile;
+	if ( !animFile.load( animFilename ) )
 	{
-		cout << "[Warning] Could not load animation file '" << animFile << "'" << endl;
+		cout << "[Warning] Could not load animation file '" << animFilename << "'" << endl;
 		return false;
 	}
 
-	TiXmlElement *groupNode = animFileHandle.FirstChild( "animationgroup" ).FirstChild().ToElement();
+	// FIXME doesn't check if animationgroup node exists
+	TiXmlElement *groupNode = animFileNode->FirstChildElement( "animationgroup" )->FirstChildElement();
 	if ( !groupNode )
 	{
 		cout << "[Warning] Animation file declaration misses animation group" << endl;
@@ -34,9 +35,9 @@ bool processAnimationFile( TiXmlHandle animFileHandle, AnimationList &dest )
 	const AnimationMap *loadedAnims = NULL;
 	const string &group = groupNode->ValueStr();
 	if ( group == "grouplower" )
-		loadedAnims = &animLoader.getLowerAnimations();
+		loadedAnims = &animFile.getLowerAnimations();
 	else if ( group == "groupupper" )
-		loadedAnims = &animLoader.getUpperAnimations();
+		loadedAnims = &animFile.getUpperAnimations();
 
 	if ( !loadedAnims )
 	{
@@ -45,7 +46,7 @@ bool processAnimationFile( TiXmlHandle animFileHandle, AnimationList &dest )
 	}
 	
 	// Either convert all animations, or a selection
-	if ( animFileHandle.FirstChild( "convertall" ).ToElement() )
+	if ( animFileNode->FirstChildElement( "convertall" ) )
 	{
 		cout << "Converting all animations from animation file" << endl;
 		
@@ -57,57 +58,113 @@ bool processAnimationFile( TiXmlHandle animFileHandle, AnimationList &dest )
 	}
 	else
 	{
-		cout << "Converting individual animations" << endl;
+		cout << "Converting a selection of animations from animation file" << endl;
 
-		TiXmlHandle childHandle = animFileHandle.FirstChildElement( "animationname" );
-		for ( TiXmlElement *child = childHandle.ToElement(); child; 
-			child = child->NextSiblingElement( "animationname" ) )
+		for ( TiXmlElement *child = animFileNode->FirstChildElement(); child; child = child->NextSiblingElement() )
 		{
-			string animName = child->GetText();
-			AnimationMap::const_iterator i = loadedAnims->find( animName );
-			if ( i != loadedAnims->end() )
-				dest.push_back( i->second );
-			else
-				cout << "[Warning] Cannot find animation '" << animName << "'" << endl;
+			const string &nodeName = child->ValueStr();
+			if ( nodeName == "animationname" )
+			{
+				string animName = child->GetText();
+				AnimationMap::const_iterator i = loadedAnims->find( animName );
+				if ( i != loadedAnims->end() )
+				{
+					cout << "Adding animation '" << animName << "'" << endl;
+					dest.push_back( i->second );
+				}
+				else
+				{
+					cout << "[Warning] Cannot find animation '" << animName << "'" << endl;
+				}
+			}
 		}
 	}
 
 	return true;
 }
 
-bool processAnimations( TiXmlHandle animsHandle, AnimationList &dest )
+bool processAnimations( TiXmlElement *animsNode, AnimationList &dest )
 {
-	// TODO
-	return false;
+	cout << "Processing manual animation definitions" << endl;
+
+	for ( TiXmlElement *node = animsNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "animationsequence" )
+		{
+			TiXmlElement *animNameNode = node->FirstChildElement( "animationname" );
+			TiXmlElement *startFrameNode = node->FirstChildElement( "startframe" );
+			TiXmlElement *numFramesNode = node->FirstChildElement( "numframes" );
+			TiXmlElement *fpsNode = node->FirstChildElement( "fps" );
+			if ( !animNameNode || !startFrameNode || !numFramesNode || !fpsNode )
+			{
+				cout << "[Warning] Invalid animation sequence" << endl;
+				continue;
+			}
+			
+			Animation anim;
+			anim.name = animNameNode->GetText();
+			anim.startFrame = atoi( startFrameNode->GetText() );
+			anim.numFrames = atoi( numFramesNode->GetText() );
+			anim.framesPerSecond = atoi( fpsNode->GetText() );
+			
+			cout << "Adding animation '" << anim.name << "'" << endl;
+			dest.push_back( anim );
+		}
+	}
+
+	return true;
 }
 
-bool convertMD2Mesh( TiXmlHandle configHandle, bool convertCoordinates )
+bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
 {
 	cout << "Doing MD2 Mesh conversion" << endl;
 			
 	return false;
 }
 
-bool convertMD3Mesh( TiXmlHandle configHandle, bool convertCoordinates )
+bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 {
 	cout << "Doing MD3 Mesh conversion" << endl;
 	
-	// Find input and output file names
-	TiXmlElement *inputFileNode = configHandle.FirstChild( "inputfile" ).FirstChild( "filename" ).ToElement();
-	if ( !inputFileNode )
-	{
-		cout << "[Error] No input file defined" << endl;
-		return false;
-	}
-	TiXmlElement *outputFileNode = configHandle.FirstChild( "outputfile" ).FirstChild( "filename" ).ToElement();
-	if ( !outputFileNode )
-	{
-		cout << "[Error] No output file defined" << endl;
-		return false;
-	}
+	string inputFile, outputFile;
+	int referenceFrame = 0;
+	AnimationList animList;
 	
-	string inputFile = inputFileNode->GetText();
-	string outputFile = outputFileNode->GetText();
+	// Process the configuration XML tree
+	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "inputfile" )
+		{
+			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
+			if ( filenameNode )
+				inputFile = filenameNode->GetText();
+		}
+		else if ( nodeName == "outputfile" )
+		{
+			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
+			if ( filenameNode )
+				outputFile = filenameNode->GetText();		
+		}
+		else if ( nodeName == "referenceframe" )
+		{
+			referenceFrame = atoi( node->GetText() );
+		}
+		else if ( nodeName == "animationfile" )
+		{
+			if ( !processAnimationFile( node, animList ) )
+				cout << "[Warning] Failed to process animation file" << endl;
+		}
+		else if ( nodeName == "animations" )
+		{
+			processAnimations( node, animList );
+		}
+		else if ( nodeName == "materials" )
+		{
+			// TODO
+		}
+	}
 	
 	// Try to load the MD3 file
 	MD3Structure md3Struct;
@@ -117,35 +174,13 @@ bool convertMD3Mesh( TiXmlHandle configHandle, bool convertCoordinates )
 		return false;
 	}
 	
-	// Process animations
-	AnimationList animList;
-	
-	// Try to load animations from an animation file
-	TiXmlHandle animFileHandle = configHandle.FirstChild( "animationfile" );
-	if ( animFileHandle.ToElement() )
-	{
-		if ( !processAnimationFile( animFileHandle, animList ) )
-		{
-			cout << "[Warning] Failed to process animation file" << endl;
-		}
-	}
-	
-	// Process animation definitions
-	TiXmlHandle animsHandle = configHandle.FirstChild( "animations" );
-	if ( animsHandle.ToElement() )
-	{
-		processAnimations( animsHandle, animList );
-	}
-	
-	// TODO process materials
-
-	Q3ModelToMesh converter( md3Struct, animList, 0, convertCoordinates );
+	Q3ModelToMesh converter( md3Struct, animList, referenceFrame, convertCoordinates );
 	if ( !converter.saveFile( outputFile ) )
 	{
 		cout << "[Error] Could not save to file '" << outputFile << "'" << endl;
 		return false;
 	}
-		
+	
 	return true;
 }
 
@@ -166,50 +201,31 @@ int main( int argc, char **argv )
 		return 1;
 	}
 	
-	const TiXmlElement *root = config.RootElement();
+	// Yes, casting away const is evil, but it's convenient in this case
+	TiXmlElement *root = const_cast<TiXmlElement*>(config.RootElement());
 	if ( !root || root->ValueStr() != "conversion" )
 	{
 		cout << "[Error] This is not a valid QuakeToOgre configuration file" << endl;
 		return 1;
 	}
 	
-	bool convertCoordinates = false;
-	bool (*conversionFunc)( TiXmlHandle, bool ) = NULL;
-	const TiXmlElement *configNode = NULL;
+	bool convertCoordinates = root->FirstChildElement( "convertcoordinates" ) ? true : false;
+	bool success = false;
 	
-	for ( const TiXmlNode *child = root->FirstChild(); child; child = child->NextSibling() )
-	{
-		const TiXmlElement *node = child->ToElement();
-		if ( !node )
-			continue;
-			
-		const string &name = node->ValueStr();
-		if ( name == "convertcoordinates" )
+	for ( TiXmlElement *node = root->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{			
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "md2mesh" )
 		{
-			convertCoordinates = true;
+			success = convertMD2Mesh( node, convertCoordinates );
 		}
-		else if ( name == "md2mesh" )
+		else if ( nodeName == "md3mesh" )
 		{
-			conversionFunc = &convertMD2Mesh;
-			configNode = node;
-		}
-		else if ( name == "md3mesh" )
-		{
-			conversionFunc = &convertMD3Mesh;
-			configNode = node;
+			success = convertMD3Mesh( node, convertCoordinates );
 		}
 	}
-
-	if ( !conversionFunc || !configNode )
-	{
-		cout << "[Error] No conversion method found" << endl;
-		return 1;
-	}
-
-	// Casting away const is evil, but it is necessary if we want to use TiXmlHandles
-	TiXmlHandle configHandle( const_cast<TiXmlElement*>(configNode) );
-
-	if ( conversionFunc( configHandle, convertCoordinates ) )
+	
+	if ( success )
 	{
 		cout << "Conversion succeeded!" << endl;
 		return 0;
@@ -220,58 +236,3 @@ int main( int argc, char **argv )
 		return 1;
 	}
 }
-
-#if 0
-int main( int argc, char **argv )
-{
-	if ( argc < 4 )
-	{
-		printf( "Usage: QuakeToOgre [infile] [animation file] [outfile]\n" );
-		return 1;
-	}
-
-	char *infile = argv[1];
-	char *animfile = argv[2];
-	char *outfile = argv[3];
-
-	MD3Structure md3Struct;
-	if ( !md3Struct.load( infile ) )
-	{
-		printf( "Failed to load MD3 model from file '%s'\n", infile );
-		return 1;
-	}
-
-	AnimationLoader animLoader;
-	if ( !animLoader.load( animfile ) )
-	{
-		printf( "Failed to load animation definitions from file '%s'\n", animfile );
-		return 1;
-	}
-
-	FILE *f;
-	f = fopen( "md3.xml", "w" );
-	if ( f )
-	{
-		string str = MD3XmlWriter( md3Struct );
-		fputs( str.c_str(), f );
-		fclose( f );
-	}
-
-	f = fopen( outfile, "w" );
-	if ( f )
-	{
-//		AnimationList animations;
-//		animations.push_back( Animation( "walk", 98, 12, 20 ) );		// visor walk
-//		animations.push_back( Animation( "idle", 1666, 990, 35 ) );		// dragon idle
-//		animations.push_back( Animation( "idlecr", 2656, 495, 30 ) );	// dragon idle crouched
-		
-		const AnimationList &animList = animLoader.getLowerAnimations();
-
-		string str = Q3ModelToMesh( md3Struct, animList, 0, true );
-		fputs( str.c_str(), f );
-		fclose( f );
-	}
-
-	return 0;
-}
-#endif

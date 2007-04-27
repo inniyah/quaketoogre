@@ -14,17 +14,7 @@ static const char *pmAnimationNames[PM_ANIMATION_COUNT] =
 static const int pmTorsoStart = 6;
 static const int pmLegsStart = 13;
 
-Animation::Animation():
-	name(""), startFrame(0), numFrames(0), framesPerSecond(10)
-{
-}
-
-Animation::Animation( const string &name, int startFrame, int numFrames, int fps ):
-	name(name), startFrame(startFrame), numFrames(numFrames), framesPerSecond(fps)
-{
-}
-
-bool AnimationLoader::load( const string &filename )
+bool AnimationFile::load( const string &filename )
 {
 	FILE *f = fopen( filename.c_str(), "r" );
 	if ( !f )
@@ -59,8 +49,8 @@ bool AnimationLoader::load( const string &filename )
 		{
 			// With proper animation files we shouldn't get here
 			// Let's just give off a warning
-			cout << "Warning: Too many animations in animation file, "
-				<< "the resulting animations may not be correct." << endl;
+			cout << "[Warning] Too many animations in animation file, "
+				<< "the resulting animation list may not be correct." << endl;
 			break;
 		}
 
@@ -102,7 +92,7 @@ bool AnimationLoader::load( const string &filename )
 	return true;
 }
 
-const char *AnimationLoader::getNextToken( const char *src, char *dest, int destLen )
+const char *AnimationFile::getNextToken( const char *src, char *dest, int destLen )
 {
 	while ( *src && isspace( *src ) )
 		*src++;

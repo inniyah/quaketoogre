@@ -4,8 +4,9 @@
 class Animation
 {
 public:
-	Animation();
-	Animation( const string &name, int startFrame, int numFrames, int fps );
+	Animation(): name(""), startFrame(0), numFrames(0), framesPerSecond(10) {}
+	Animation( const string &name, int startFrame, int numFrames, int fps ):
+		name(name), startFrame(startFrame), numFrames(numFrames), framesPerSecond(fps) {}
 	
 	string name;
 	int startFrame;
@@ -16,7 +17,7 @@ public:
 typedef vector<Animation> AnimationList;
 typedef map<string, Animation> AnimationMap;
 
-class AnimationLoader
+class AnimationFile
 {
 public:
 	bool load( const string &filename );

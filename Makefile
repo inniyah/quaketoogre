@@ -10,14 +10,11 @@ OBJ = \
 	MD3Structure.o \
 	Animation.o \
 	XmlWriter.o \
-	MD3XmlWriter.o \
-	Q3ModelToMesh.o \
-	Q3ModelToSkeleton.o
+	Q3ModelToMesh.o
 
 CC = g++
 INCLUDE =
 LIB = -lm
-DEFS = -DTIXML_USE_STL
 
 all : $(OBJ)
 	$(CC) -o $(OUTDIR)/$(BIN) $(OBJ) $(LIB)
@@ -29,4 +26,4 @@ clean:
 	rm -rf $(OUTDIR)/*
 
 %.o : %.cpp
-	$(CC) -c $< $(INCLUDE) $(DEFS) -o $@
+	$(CC) -c $< $(INCLUDE) -o $@

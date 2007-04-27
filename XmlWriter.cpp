@@ -54,3 +54,4 @@ string XmlWriter::toStr( float f )
 	sprintf( tmp, "%f", f );
 	return string( tmp );
 }
+
