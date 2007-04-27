@@ -23,7 +23,6 @@ rebuild: clean all
 
 clean:
 	rm -rf $(OBJ)
-	rm -rf $(OUTDIR)/*
 
 %.o : %.cpp
 	$(CC) -c $< $(INCLUDE) -o $@
