@@ -1,0 +1,6 @@
+- Short introduction
+- Installation
+- Explanation convert coordinates
+- Explanation animation file
+- Explanation materials (or lack thereof)
+- Disclaimer
