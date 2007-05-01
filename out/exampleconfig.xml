@@ -43,9 +43,6 @@
 			<material>
 				<submeshname>l_legs</submeshname>
 				<materialname>visor/lower</materialname>
-				<texture>
-					<filename>visor.tga</filename>
-				</texture>
 			</material>
 		</materials>
 	</md3mesh>

@@ -5,7 +5,7 @@
 <!ELEMENT convertcoordinates EMPTY>
 
 <!-- This element determines type of conversion -->
-<!ELEMENT md2mesh (inputfile, outputfile, referenceframe?, animations?, materials?)>
+<!ELEMENT md2mesh (inputfile, outputfile, referenceframe?, animations?, materialname?)>
 <!ELEMENT md3mesh (inputfile, outputfile, referenceframe?, animationfile?, animations?, materials?)>
 
 <!-- Filenames -->
@@ -32,11 +32,9 @@
 
 <!-- Materials -->
 <!ELEMENT materials (material+)>
-<!ELEMENT material (submeshname, materialname, texture?)>
+<!ELEMENT material (submeshname, materialname)>
 <!ELEMENT submeshname (#PCDATA)>
 <!ELEMENT materialname (#PCDATA)>
-<!ELEMENT texture (filename)>	<!-- If left out, no material script will be written -->
 
 <!-- TODO: Add MD3 player models (lower, upper, head) -->
 <!-- TODO: Add tag-to-skeleton support -->
-<!-- TODO: Check if 'materials' tag is appropriate for MD2 -->
