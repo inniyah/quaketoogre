@@ -1,5 +1,7 @@
 #include "Common.h"
+#include "MD2Structure.h"
 #include "MD3Structure.h"
+#include "Q2ModelToMesh.h"
 #include "Q3ModelToMesh.h"
 #include "Animation.h"
 
@@ -130,10 +132,6 @@ bool processMaterials( TiXmlElement *matsNode, StringMap &dest )
 				{
 					value = child->GetText();
 				}
-				else if ( childName == "texture" )
-				{
-					// TODO not sure if material script output should be done by this program
-				}
 			}
 			
 			if ( key.empty() )
@@ -154,7 +152,57 @@ bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
 {
 	cout << "Doing MD2 Mesh conversion" << endl;
 			
-	return false;
+	string inputFile, outputFile;
+	AnimationList animList;
+	const char *material;
+	int referenceFrame = 0;
+	
+	// Process the configuration XML tree
+	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "inputfile" )
+		{
+			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
+			if ( filenameNode )
+				inputFile = filenameNode->GetText();
+		}
+		else if ( nodeName == "outputfile" )
+		{
+			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
+			if ( filenameNode )
+				outputFile = filenameNode->GetText();		
+		}
+		else if ( nodeName == "referenceframe" )
+		{
+			referenceFrame = atoi( node->GetText() );
+		}
+		else if ( nodeName == "animations" )
+		{
+			processAnimations( node, animList );
+		}
+		else if ( nodeName == "materialname" )
+		{
+			material = node->GetText();
+		}
+	}
+	
+	// Try to load the MD3 file
+	MD2Structure md2Struct;
+	if ( !md2Struct.load( inputFile ) )
+	{
+		cout << "[Error] Could not load input file '" << inputFile << "'" << endl;
+		return false;
+	}
+	
+	Q2ModelToMesh converter( md2Struct, animList, material, referenceFrame, convertCoordinates );
+	if ( !converter.saveFile( outputFile ) )
+	{
+		cout << "[Error] Could not save to file '" << outputFile << "'" << endl;
+		return false;
+	}
+			
+	return true;
 }
 
 bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
@@ -232,7 +280,7 @@ int main( int argc, char **argv )
 	{
 		cout << "[Error] Could not load configuration from file '" << argv[1] << "', reason:" 
 			<< endl << "Error " << config.ErrorId() << " on row " << config.ErrorRow() 
-			<< " column " << config.ErrorCol() << ":" << endl << config.ErrorDesc();
+			<< " column " << config.ErrorCol() << ":" << endl << config.ErrorDesc() << endl;
 		return 1;
 	}
 	

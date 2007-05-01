@@ -54,8 +54,13 @@ bool MD2Structure::load( const string &filename )
 
 	fclose( f );
 
-	printf( "MD2Structure::load() - Loaded %i vertices, %i triangles, %i frames\n", 
-		header.numVertices, header.numTriangles, header.numFrames );
+	printf( "MD2Structure::load() - Loaded %i skins, %i vertices, %i texture coordinates, %i triangles, %i frames\n", 
+		header.numSkins, header.numVertices, header.numTexCoords, header.numTriangles, header.numFrames );
+
+/*	for ( int i = 0; i < header.numFrames; i++ )
+	{
+		printf( "MD2Structure::load() - Frame %i = '%s'\n", i, frames[i].header.name );
+	}*/
 
 	return true;
 }

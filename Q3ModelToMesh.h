@@ -37,20 +37,5 @@ private:
 	bool mConvertCoordinates;
 	int mReferenceFrame;
 };
-/*
-class Q3MeshToSubMesh: public XmlWriter
-{
-public:
-	Q3MeshToSubMesh( const MD3Mesh &mesh, int referenceFrame = 0 );
-
-private:
-	void buildSubMesh( const MD3Mesh &mesh );
-	void buildFace( const MD3Triangle &triangle );
-	void buildVertexBuffers( const MD3Mesh &mesh );
-	void buildVertex( const MD3Vertex &vert );
-	void buildTexCoord( const MD3TexCoord &texCoord );
-
-	int mReferenceFrame;
-};*/
 
 #endif

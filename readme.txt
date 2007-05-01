@@ -20,7 +20,7 @@ Building
 --------
 
 - Windows (VC7.1)
-- Linux
+- Linux (dependencies = G++ & libmath)
 
 Usage
 -----

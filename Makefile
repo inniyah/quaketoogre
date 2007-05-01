@@ -10,6 +10,7 @@ OBJ = \
 	MD3Structure.o \
 	Animation.o \
 	XmlWriter.o \
+	Q2ModelToMesh.o \
 	Q3ModelToMesh.o
 
 CC = g++
