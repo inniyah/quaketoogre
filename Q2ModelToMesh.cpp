@@ -85,8 +85,8 @@ void Q2ModelToMesh::buildSubMesh()
 	string materialName = "";
 	if ( mMaterial )
 		materialName = mMaterial;
-//	else if ( mModel.header.numSkins > 0 )
-//		materialName = string( mModel.skins[0].name );	// FIXME signed/unsigned mismatch, *sigh*
+	else if ( mModel.header.numSkins > 0 )
+		materialName = string( (const char*)mModel.skins[0].name );
 		
 	TiXmlElement *submeshNode = openTag( "submesh" );
 	submeshNode->SetAttribute( "material", materialName );
@@ -95,7 +95,7 @@ void Q2ModelToMesh::buildSubMesh()
 	
 	// Faces
 	TiXmlElement *facesNode = openTag( "faces" );
-	facesNode->SetAttribute( "count", mNewTriangles.size() );
+	facesNode->SetAttribute( "count", (int)mNewTriangles.size() );
 	for ( NewTriangleList::const_iterator i = mNewTriangles.begin(); i != mNewTriangles.end(); ++i )
 	{
 		buildFace( *i );
@@ -104,7 +104,7 @@ void Q2ModelToMesh::buildSubMesh()
 
 	// Geometry
 	TiXmlElement *geomNode = openTag( "geometry" );
-	geomNode->SetAttribute( "vertexcount", mNewVertices.size() );
+	geomNode->SetAttribute( "vertexcount", (int)mNewVertices.size() );
 	buildVertexBuffers( mModel.frames[mReferenceFrame] );
 	closeTag();	
 	
@@ -127,7 +127,7 @@ void Q2ModelToMesh::buildVertexBuffers( const MD2Frame &frame )
 	TiXmlElement *vbNode = openTag( "vertexbuffer" );
 	vbNode->SetAttribute( "positions", "true" );
 	vbNode->SetAttribute( "normals", "true" );
-	for ( int i = 0; i < mNewVertices.size(); i++ )
+	for ( int i = 0; i < (int)mNewVertices.size(); i++ )
 	{
 		buildVertex( frame, i );
 	}
@@ -137,7 +137,7 @@ void Q2ModelToMesh::buildVertexBuffers( const MD2Frame &frame )
 	TiXmlElement *tcNode = openTag( "vertexbuffer" );
 	tcNode->SetAttribute( "texture_coords", 1 );
 	tcNode->SetAttribute( "texture_coord_dimensions_0", 2 );
-	for ( int i = 0; i < mNewVertices.size(); i++ )
+	for ( int i = 0; i < (int)mNewVertices.size(); i++ )
 	{
 		const NewVertex &newVert = mNewVertices[i];
 		buildTexCoord( mModel.texCoords[newVert.second] );
@@ -231,7 +231,7 @@ void Q2ModelToMesh::buildKeyframe( int frameIndex, float time )
 	const MD2Frame &frame = mModel.frames[frameIndex];
 	float position[3];
 
-	for ( int i = 0; i < mNewVertices.size(); i++ )
+	for ( int i = 0; i < (int)mNewVertices.size(); i++ )
 	{
 		const NewVertex &newVert = mNewVertices[i];
 		const MD2Vertex &vert = frame.vertices[newVert.first];
