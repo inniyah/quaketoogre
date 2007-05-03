@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuakeToOgre", "QuakeToOgre.vcproj", "{CC547D29-5568-4A49-ACA0-0F5F64F59930}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{CC547D29-5568-4A49-ACA0-0F5F64F59930}.Debug.ActiveCfg = Debug|Win32
+		{CC547D29-5568-4A49-ACA0-0F5F64F59930}.Debug.Build.0 = Debug|Win32
+		{CC547D29-5568-4A49-ACA0-0F5F64F59930}.Release.ActiveCfg = Release|Win32
+		{CC547D29-5568-4A49-ACA0-0F5F64F59930}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
