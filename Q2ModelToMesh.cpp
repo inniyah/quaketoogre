@@ -17,7 +17,44 @@ Q2ModelToMesh::Q2ModelToMesh(
 	if ( mReferenceFrame >= mModel.header.numFrames )
 		mReferenceFrame = 0;
 
+	restructureVertices();
 	convert();
+}
+
+void Q2ModelToMesh::restructureVertices()
+{
+	typedef map<NewVertex, int> NewIndexMap;
+	NewIndexMap newIndices;
+
+	int curIndex = 0;
+
+	for ( int i = 0; i < mModel.header.numTriangles; i++ )
+	{
+		const MD2Triangle &triangle = mModel.triangles[i];
+		NewTriangle newTriangle;
+		
+		for ( int j = 0; j < 3; j++ )
+		{
+			const int &vertIndex = triangle.vertexIndices[j];
+			const int &tcIndex = triangle.textureIndices[j];
+			int newIndex;
+			
+			NewVertex newVert = make_pair<int, int>( vertIndex, tcIndex );
+			NewIndexMap::iterator iter = newIndices.find( newVert );
+			if ( iter != newIndices.end() )
+			{
+				newIndex = iter->second;
+			}
+			else
+			{
+				newIndex = curIndex++;
+				mNewVertices.push_back( newVert );
+				newIndices[newVert] = newIndex;
+			}			
+			newTriangle.indices[j] = newIndex;
+		}		
+		mNewTriangles.push_back( newTriangle );
+	}	
 }
 
 void Q2ModelToMesh::convert()
@@ -49,7 +86,7 @@ void Q2ModelToMesh::buildSubMesh()
 	if ( mMaterial )
 		materialName = mMaterial;
 //	else if ( mModel.header.numSkins > 0 )
-//		materialName = string( mModel.skins[0].name );	// signed/unsigned mismatch, *sigh*
+//		materialName = string( mModel.skins[0].name );	// FIXME signed/unsigned mismatch, *sigh*
 		
 	TiXmlElement *submeshNode = openTag( "submesh" );
 	submeshNode->SetAttribute( "material", materialName );
@@ -58,29 +95,29 @@ void Q2ModelToMesh::buildSubMesh()
 	
 	// Faces
 	TiXmlElement *facesNode = openTag( "faces" );
-	facesNode->SetAttribute( "count", mModel.header.numTriangles );
-	for ( int i = 0; i < mModel.header.numTriangles; i++ )
+	facesNode->SetAttribute( "count", mNewTriangles.size() );
+	for ( NewTriangleList::const_iterator i = mNewTriangles.begin(); i != mNewTriangles.end(); ++i )
 	{
-		buildFace( mModel.triangles[i] );
+		buildFace( *i );
 	}
 	closeTag();
 
 	// Geometry
 	TiXmlElement *geomNode = openTag( "geometry" );
-	geomNode->SetAttribute( "vertexcount", mModel.header.numVertices );
+	geomNode->SetAttribute( "vertexcount", mNewVertices.size() );
 	buildVertexBuffers( mModel.frames[mReferenceFrame] );
 	closeTag();	
 	
 	closeTag();		
 }
 
-void Q2ModelToMesh::buildFace( const MD2Triangle &triangle )
+void Q2ModelToMesh::buildFace( const Q2ModelToMesh::NewTriangle &triangle )
 {
 	TiXmlElement *faceNode = openTag( "face" );
 	// Flip the index order
-	faceNode->SetAttribute( "v1", triangle.vertexIndices[0] );
-	faceNode->SetAttribute( "v2", triangle.vertexIndices[2] );
-	faceNode->SetAttribute( "v3", triangle.vertexIndices[1] );
+	faceNode->SetAttribute( "v1", triangle.indices[0] );
+	faceNode->SetAttribute( "v2", triangle.indices[2] );
+	faceNode->SetAttribute( "v3", triangle.indices[1] );
 	closeTag();
 }
 
@@ -90,27 +127,29 @@ void Q2ModelToMesh::buildVertexBuffers( const MD2Frame &frame )
 	TiXmlElement *vbNode = openTag( "vertexbuffer" );
 	vbNode->SetAttribute( "positions", "true" );
 	vbNode->SetAttribute( "normals", "true" );
-	for ( int i = 0; i < mModel.header.numVertices; i++ )
+	for ( int i = 0; i < mNewVertices.size(); i++ )
 	{
 		buildVertex( frame, i );
 	}
 	closeTag();
 
 	// Texture coordinates
-/*	TiXmlElement *tcNode = openTag( "vertexbuffer" );
+	TiXmlElement *tcNode = openTag( "vertexbuffer" );
 	tcNode->SetAttribute( "texture_coords", 1 );
 	tcNode->SetAttribute( "texture_coord_dimensions_0", 2 );
-	for ( int i = 0; i < mModel.header.numVertices; i++ )
+	for ( int i = 0; i < mNewVertices.size(); i++ )
 	{
-		// TODO this is going to be weird...
-		buildTexCoord( mesh.texCoords[i] );
+		const NewVertex &newVert = mNewVertices[i];
+		buildTexCoord( mModel.texCoords[newVert.second] );
 	}
-	closeTag();*/
+	closeTag();
 }
 
 void Q2ModelToMesh::buildVertex( const MD2Frame &frame, int vertIndex )
 {
-	const MD2Vertex &vert = frame.vertices[vertIndex];
+	const NewVertex &newVert = mNewVertices[vertIndex];
+	const MD2Vertex &vert = frame.vertices[newVert.first];
+	
 	float position[3], normal[3];
 	convertPosition( vert.vertex, frame.header, position );
 	convertNormal( vert.normalIndex, normal );
@@ -192,10 +231,11 @@ void Q2ModelToMesh::buildKeyframe( int frameIndex, float time )
 	const MD2Frame &frame = mModel.frames[frameIndex];
 	float position[3];
 
-	for ( int i = 0; i < mModel.header.numVertices; i++ )
+	for ( int i = 0; i < mNewVertices.size(); i++ )
 	{
-		const MD2Vertex &vertex = frame.vertices[i];
-		convertPosition( vertex.vertex, frame.header, position );
+		const NewVertex &newVert = mNewVertices[i];
+		const MD2Vertex &vert = frame.vertices[newVert.first];
+		convertPosition( vert.vertex, frame.header, position );
 
 		TiXmlElement *posNode = openTag( "position" );
 		posNode->SetAttribute( "x", toStr( position[0] ) );
