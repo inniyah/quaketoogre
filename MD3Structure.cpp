@@ -100,3 +100,28 @@ void MD3Structure::free()
 		meshes = NULL;
 	}
 }
+
+void MD3Structure::printInfo() const
+{
+	cout << "MD3 file info" << endl;
+	for ( int i = 0; i < header.numFrames; i++ )
+	{
+		cout << "Frame " << i << " = " << frames[i].name << endl;
+	}
+	cout << header.numFrames << " frames total" << endl;
+	for ( int i = 0; i < header.numTags; i++ )
+	{
+		cout << "Tag " << i << " = " << tags[i].name << endl;
+	}
+	cout << header.numTags << " tags total" << endl;
+	for ( int i = 0; i < header.numMeshes; i++ )
+	{
+		cout << "Mesh " << i << " = " << meshes[i].header.name << endl;
+		for ( int j = 0; j < meshes[i].header.numShaders; j++ )
+		{
+			cout << "Mesh " << i << " shader " << j << " = " << meshes[i].shaders[j].name << endl;
+		}
+		cout << "Mesh " << i << " has " << meshes[i].header.numShaders << " shaders total" << endl;
+	}
+	cout << header.numMeshes << " meshes total" << endl;
+}

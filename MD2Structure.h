@@ -68,7 +68,7 @@ public:
 	bool load( const string &filename );
 	void free();
 	
-	void printInfo();
+	void printInfo() const;
 	
 	MD2Header	header;
 	MD2Skin		*skins;

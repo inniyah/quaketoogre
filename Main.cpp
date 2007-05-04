@@ -341,19 +341,17 @@ int main( int argc, char **argv )
 		MD3Structure md3Struct;
 		if ( md2Struct.load( argv[2] ) )
 		{
-			cout << "Printing MD2 info" << endl;
 			md2Struct.printInfo();
 			return 0;
 		}
 		else if ( md3Struct.load( argv[2] ) )
 		{
-			cout << "Printing MD3 info" << endl;
-			//md3Struct.printInfo();	// TODO
+			md3Struct.printInfo();
 			return 0;
 		}
 		else
 		{
-			cout << "[Error] Cannot determine mesh type" << endl;
+			cout << "[Error] Unknown mesh file format" << endl;
 			return 1;
 		}
 	}

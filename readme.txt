@@ -43,12 +43,24 @@ Usage
 
 The program is run from the command line as follows:
 
-QuakeToOgre [configfile]
+QuakeToOgre [config file]
 
 With 'configfile' being the name of a valid configuration XML file (more on
 that later). The resulting mesh XML file can be converted to a binary Ogre mesh
 using the standard 'OgreXmlConverter' tool, with the usual options (generate 
 edge lists, compute tangent vectors, etc).
+
+To aid in configuration, it is also possible to print some basic information
+about a Quake mesh by running the program as follows:
+
+QuakeToOgre -i [mesh file]
+
+This will list the names of every frame, submesh, tag and shader contained in
+the mesh file.
+
+-------------
+Configuration
+-------------
 
 The configuration file is an XML document containing conversion parameters as
 defined by the Document Type Definition in the 'config.dtd' file. Most of the

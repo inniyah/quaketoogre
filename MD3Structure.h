@@ -91,6 +91,8 @@ public:
 	bool load( const string &filename );
 	void free();
 
+	void printInfo() const;
+
 	MD3Header	header;
 	MD3Frame	*frames;
 	MD3Tag		*tags;

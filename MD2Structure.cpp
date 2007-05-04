@@ -1,7 +1,8 @@
 #include "Common.h"
 #include "MD2Structure.h"
 
-MD2Structure::MD2Structure()
+MD2Structure::MD2Structure():
+	skins(NULL), frames(NULL), texCoords(NULL), triangles(NULL)
 {
 }
 
@@ -91,7 +92,7 @@ void MD2Structure::free()
 	}
 }
 
-void MD2Structure::printInfo()
+void MD2Structure::printInfo() const
 {
 	cout << "MD2 file info" << endl;
 	for ( int i = 0; i < header.numSkins; i++ )
