@@ -267,21 +267,15 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 	return true;
 }
 
-int main( int argc, char **argv )
+bool processConfigFile( const char *filename )
 {
-	if ( argc < 2 )
+	TiXmlDocument config;
+	if ( !config.LoadFile( filename ) )
 	{
-		cout << "Usage: QuakeToOgre [config file]" << endl;
-		return 1;
-	}
-	
-	TiXmlDocument config( argv[1] );
-	if ( !config.LoadFile() )
-	{
-		cout << "[Error] Could not load configuration from file '" << argv[1] << "', reason:" 
+		cout << "[Error] Could not load configuration from file '" << filename << "', reason:" 
 			<< endl << "Error " << config.ErrorId() << " on row " << config.ErrorRow() 
 			<< " column " << config.ErrorCol() << ":" << endl << config.ErrorDesc() << endl;
-		return 1;
+		return false;
 	}
 	
 	// Yes, casting away const is evil, but it's convenient in this case
@@ -289,7 +283,7 @@ int main( int argc, char **argv )
 	if ( !root || root->ValueStr() != "conversion" )
 	{
 		cout << "[Error] This is not a valid QuakeToOgre configuration file" << endl;
-		return 1;
+		return false;
 	}
 	
 	bool convertCoordinates = root->FirstChildElement( "convertcoordinates" ) ? true : false;
@@ -311,11 +305,60 @@ int main( int argc, char **argv )
 	if ( success )
 	{
 		cout << "Conversion succeeded!" << endl;
-		return 0;
+		return true;
 	}
 	else
 	{
 		cout << "Conversion failed..." << endl;
+		return false;
+	}
+}
+
+void printUsage()
+{
+	cout << "Usage:" << endl;
+	cout << "QuakeToOgre [config file]" << endl;
+	cout << "QuakeToOgre -i [mesh file]" << endl;
+}
+
+int main( int argc, char **argv )
+{
+	if ( argc < 2 )
+	{
+		printUsage();
 		return 1;
+	}
+	
+	if ( !strcmp( argv[1], "-i" ) )
+	{
+		if ( argc < 3 )
+		{
+			printUsage();
+			return 1;
+		}
+		
+		MD2Structure md2Struct;
+		MD3Structure md3Struct;
+		if ( md2Struct.load( argv[2] ) )
+		{
+			cout << "Printing MD2 info" << endl;
+			md2Struct.printInfo();
+			return 0;
+		}
+		else if ( md3Struct.load( argv[2] ) )
+		{
+			cout << "Printing MD3 info" << endl;
+			//md3Struct.printInfo();	// TODO
+			return 0;
+		}
+		else
+		{
+			cout << "[Error] Cannot determine mesh type" << endl;
+			return 1;
+		}
+	}
+	else
+	{
+		return processConfigFile( argv[1] ) ? 0 : 1;
 	}
 }

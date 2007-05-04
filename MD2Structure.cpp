@@ -1,7 +1,5 @@
 #include "Common.h"
 #include "MD2Structure.h"
- 
-#define MD2_MAGIC			0x32504449
 
 MD2Structure::MD2Structure()
 {
@@ -22,7 +20,9 @@ bool MD2Structure::load( const string &filename )
 	}
 
 	fread( &header, sizeof( MD2Header ), 1, f );
-	if ( header.magic != MD2_MAGIC || header.version != 8 )
+	if (	header.magic[0] != 'I' || header.magic[1] != 'D' ||
+			header.magic[2] != 'P' || header.magic[3] != '2' ||
+			header.version != 8 )
 	{
 		fclose( f );
 		return false;
@@ -57,11 +57,6 @@ bool MD2Structure::load( const string &filename )
 	printf( "MD2Structure::load() - Loaded %i skins, %i vertices, %i texture coordinates, %i triangles, %i frames\n", 
 		header.numSkins, header.numVertices, header.numTexCoords, header.numTriangles, header.numFrames );
 
-/*	for ( int i = 0; i < header.numFrames; i++ )
-	{
-		printf( "MD2Structure::load() - Frame %i = '%s'\n", i, frames[i].header.name );
-	}*/
-
 	return true;
 }
 
@@ -94,4 +89,19 @@ void MD2Structure::free()
 		delete[] frames;
 		frames = NULL;
 	}
+}
+
+void MD2Structure::printInfo()
+{
+	cout << "MD2 file info" << endl;
+	for ( int i = 0; i < header.numSkins; i++ )
+	{
+		cout << "Skin " << i << " = " << skins[i].name << endl;
+	}
+	cout << header.numSkins << " skins total" << endl;
+	for ( int i = 0; i < header.numFrames; i++ )
+	{
+		cout << "Frame " << i << " = " << frames[i].header.name << endl;
+	}
+	cout << header.numFrames << " frames total" << endl;
 }

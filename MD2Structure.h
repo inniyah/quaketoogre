@@ -5,7 +5,7 @@
 
 struct MD2Header
 {
-	int		magic;
+	char	magic[4];
 	int		version;
 	int		skinWidth;
 	int		skinHeight;
@@ -67,6 +67,8 @@ public:
 
 	bool load( const string &filename );
 	void free();
+	
+	void printInfo();
 	
 	MD2Header	header;
 	MD2Skin		*skins;
