@@ -1,3 +1,4 @@
+------------
 Introduction
 ------------
 
@@ -6,6 +7,7 @@ the Quake To Ogre Mesh Converter. It can take a 3D model from either Quake 2
 or Quake 3 and convert it to an equivalent Ogre mesh, including (a selection 
 of) the original model's animations.
 
+--------
 Features
 --------
 
@@ -14,14 +16,28 @@ Features
 - Specify a selection of animations to convert (both MD2 and MD3), or load 
   them from a player model's animation file (MD3 only)
 - Convert vertices and normals from Quake's coordinate system to Ogre's system
-- 
+- Specify material names for each submesh
 
+--------
 Building
 --------
 
-- Windows (VC7.1)
-- Linux (dependencies = G++ & libmath)
+The program should compile on pretty much any platform, but it's only been 
+tested on Windows and GNU/Linux. The only requirements are a decent C++ 
+compiler and the standard C math library.
 
+For Windows users, I've included a Visual C++ .NET 2003 (VC7.1) project file. 
+It should also work for Visual C++ .NET 2005 (VC8), but that has not been 
+tested.
+
+For GNU/Linux, a Makefile has been included that uses 'g++' for compilation. 
+To compile the code, just run "make" from the command line. The compiled binary
+will be placed in the 'out' directory.
+
+For users of other platforms or IDEs, just creating a new project and adding 
+all source files should be enough.
+
+-----
 Usage
 -----
 
@@ -31,8 +47,8 @@ QuakeToOgre [configfile]
 
 With 'configfile' being the name of a valid configuration XML file (more on
 that later). The resulting mesh XML file can be converted to a binary Ogre mesh
-using the standard OgreXmlConverter tool, with the usual options (generate edge
-lists, compute tangent vectors, etc).
+using the standard 'OgreXmlConverter' tool, with the usual options (generate 
+edge lists, compute tangent vectors, etc).
 
 The configuration file is an XML document containing conversion parameters as
 defined by the Document Type Definition in the 'config.dtd' file. Most of the
@@ -66,22 +82,5 @@ in Quake jargon) they use. In many cases, these shader names will not suffice
 for whatever project you're working on. To remedy this, an option has been 
 added to specify new material names for every submesh. 
 The important thing to note here is that this option only affects the material
-references within the final Ogre mesh. You still have to write the material
-script yourself.
-
-Disclaimer (don't keep in readme)
-----------
-
-This is something that has been asked for in the past, but has never actually
-been made as far as I know. I decided not to ask, but to simply make it myself.
-
-The source code of this program isn't really good. It started as a two-evening
-hack job, but as the number of features and configuration options grew and
-shrank again, things got constantly refactored and now it's just a mess without
-clear design and with lots of naming inconsistencies.
-
-Theoretically, the program could be expanded to allow conversions of complete
-Quake 3 player models (legs, torso and head) to a single mesh with the tag
-structure converted to a skeleton. It's a pretty complicated conversion though
-and I don't have much use for it, so it's not likely that I'll ever add such
-a feature.
+references within the resulting Ogre mesh. You still have to write the material
+scripts yourself.

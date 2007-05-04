@@ -35,6 +35,3 @@
 <!ELEMENT material (submeshname, materialname)>
 <!ELEMENT submeshname (#PCDATA)>
 <!ELEMENT materialname (#PCDATA)>
-
-<!-- TODO: Add MD3 player models (lower, upper, head) -->
-<!-- TODO: Add tag-to-skeleton support -->

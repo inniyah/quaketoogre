@@ -10,18 +10,18 @@
 		</inputfile>
 		
 		<outputfile>
-			<filename>lower.mesh.xml</filename>
+			<filename>visorlegs.mesh.xml</filename>
 		</outputfile>
 		
-		<referenceframe>0</referenceframe>
+		<referenceframe>157</referenceframe>
 		
 		<animationfile>
 			<filename>models/players/visor/animation.cfg</filename>
-			<convertlegs/>
-			<!--<convertselection>
+			<!--<convertlegs/>-->
+			<convertselection>
 				<animationname>LEGS_WALK</animationname>
 				<animationname>LEGS_RUN</animationname>
-			</convertselection>-->
+			</convertselection>
 		</animationfile>
 		
 		<animations>
@@ -42,7 +42,7 @@
 		<materials>
 			<material>
 				<submeshname>l_legs</submeshname>
-				<materialname>visor/lower</materialname>
+				<materialname>q3models/visor/legs</materialname>
 			</material>
 		</materials>
 	</md3mesh>
