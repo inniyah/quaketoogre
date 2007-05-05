@@ -278,8 +278,7 @@ bool processConfigFile( const char *filename )
 		return false;
 	}
 	
-	// Yes, casting away const is evil, but it's convenient in this case
-	TiXmlElement *root = const_cast<TiXmlElement*>(config.RootElement());
+	TiXmlElement *root = config.RootElement();
 	if ( !root || root->ValueStr() != "conversion" )
 	{
 		cout << "[Error] This is not a valid QuakeToOgre configuration file" << endl;
