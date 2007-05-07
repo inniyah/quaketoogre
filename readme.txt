@@ -2,10 +2,10 @@
 Introduction
 ------------
 
-In the catagory 'abusing something good for evil purposes', I present to you
-the Quake To Ogre Mesh Converter. It can take a 3D model from either Quake 2
-or Quake 3 and convert it to an equivalent Ogre mesh, including (a selection 
-of) the original model's animations.
+In the category 'why would you do that?', I present to you the Quake To Ogre 
+Mesh Converter. It can take a 3D model from either Quake 2 or Quake 3 and 
+convert it to an equivalent Ogre mesh, including (a selection of) the original
+model's animations.
 
 --------
 Features
@@ -45,7 +45,7 @@ The program is run from the command line as follows:
 
 QuakeToOgre [config file]
 
-With 'configfile' being the name of a valid configuration XML file (more on
+With 'config file' being the name of a valid configuration XML file (more on
 that later). The resulting mesh XML file can be converted to a binary Ogre mesh
 using the standard 'OgreXmlConverter' tool, with the usual options (generate 
 edge lists, compute tangent vectors, etc).
