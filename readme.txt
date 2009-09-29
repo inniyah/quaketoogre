@@ -2,8 +2,8 @@
 Introduction
 ------------
 
-In the category 'why would you do that?', I present to you the Quake To Ogre 
-Mesh Converter. It can take a 3D model from either Quake 2 or Quake 3 and 
+I present to you the Quake To Ogre
+Mesh Converter. It can take a 3D model from either Quake 2 or Quake 3 and
 convert it to an equivalent Ogre mesh, including (a selection of) the original
 model's animations.
 
@@ -13,7 +13,7 @@ Features
 
 - Convert MD2 or MD3 files to Ogre Mesh XML
 - Convert Quake's vertex animations to Ogre's morph animations
-- Specify a selection of animations to convert (both MD2 and MD3), or load 
+- Specify a selection of animations to convert (both MD2 and MD3), or load
   them from a player model's animation file (MD3 only)
 - Convert vertices and normals from Quake's coordinate system to Ogre's system
 - Specify material names for each submesh
@@ -22,19 +22,18 @@ Features
 Building
 --------
 
-The program should compile on pretty much any platform, but it's only been 
-tested on Windows and GNU/Linux. The only requirements are a decent C++ 
-compiler and the standard C math library.
+The program should compile on pretty much any platform, but it has been tested
+only on Windows and GNU/Linux. The only requirements are a decent C++ compiler
+and the standard C math library.
 
-For Windows users, I've included a Visual C++ .NET 2003 (VC7.1) project file. 
-It should also work for Visual C++ .NET 2005 (VC8), but that has not been 
-tested.
+For Windows users, I've included a Visual C++ .NET 2005 (VC8) project file.
+The program can be compiled directly from that.
 
 For GNU/Linux, a Makefile has been included that uses 'g++' for compilation. 
 To compile the code, just run "make" from the command line. The compiled binary
 will be placed in the 'out' directory.
 
-For users of other platforms or IDEs, just creating a new project and adding 
+For users of other platforms or IDEs, simply creating a new project and adding
 all source files should be enough.
 
 -----
@@ -64,9 +63,10 @@ Configuration
 
 The configuration file is an XML document containing conversion parameters as
 defined by the Document Type Definition in the 'config.dtd' file. Most of the
-specification from the DTD file should be pretty self-explanatory, and an 
-example configuration file has been supplied to show you how to write a config
-XML file. There are a couple of specific details I will explain here though:
+specification from the DTD file should be pretty self-explanatory, and two
+example configuration files have been supplied to show you how to write a 
+config XML file. There are a couple of specific details I will explain here
+though:
 
 - convertcoordinates
 The Quake engines use a different coordinate system than Ogre uses. When this
@@ -90,9 +90,9 @@ convert can be supplied.
 
 - materials
 Most (but not all) Quake models contain references to the materials (or shaders
-in Quake jargon) they use. In many cases, these shader names will not suffice
-for whatever project you're working on. To remedy this, an option has been 
-added to specify new material names for every submesh. 
-The important thing to note here is that this option only affects the material
-references within the resulting Ogre mesh. You still have to write the material
-scripts yourself.
+in Quake terminology) they use. In many cases, these shader names are not 
+correct for whatever Ogre project you're working on. To fix this, an option
+has been added to specify new material names for every submesh.
+The important thing to note here is that this option only affects the 
+references to materials within the resulting Ogre mesh. You still have to write
+the material scripts yourself.

@@ -23,7 +23,7 @@
 				<animationname>LEGS_RUN</animationname>
 			</convertselection>
 		</animationfile>
-		
+
 		<animations>
 			<animationsequence>
 				<animationname>swim</animationname>
@@ -38,7 +38,7 @@
 				<fps>25</fps>
 			</animationsequence>
 		</animations>
-		
+
 		<materials>
 			<material>
 				<submeshname>l_legs</submeshname>

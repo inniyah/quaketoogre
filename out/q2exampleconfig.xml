@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE conversion SYSTEM "../config.dtd">
+
+<conversion>
+    <convertcoordinates/>
+
+	<md2mesh>
+		<inputfile>
+			<filename>players/male/tris.md2</filename>
+		</inputfile>
+
+		<outputfile>
+			<filename>q2male.mesh.xml</filename>
+		</outputfile>
+
+		<referenceframe>0</referenceframe>
+
+		<animations>
+			<animationsequence>
+				<animationname>run</animationname>
+				<startframe>40</startframe>
+				<numframes>6</numframes>
+				<fps>10</fps>
+			</animationsequence>
+			<animationsequence>
+				<animationname>taunt</animationname>
+				<startframe>95</startframe>
+				<numframes>17</numframes>
+				<fps>10</fps>
+			</animationsequence>
+		</animations>
+
+		<materialname>q2male/skin</materialname>
+	</md2mesh>
+</conversion>
