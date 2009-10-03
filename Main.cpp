@@ -154,7 +154,7 @@ bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
 			
 	string inputFile, outputFile;
 	AnimationList animList;
-	const char *material;
+	const char *material = NULL;
 	int referenceFrame = 0;
 	
 	// Process the configuration XML tree
