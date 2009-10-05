@@ -97,6 +97,16 @@ The important thing to note here is that this option only affects the
 references to materials in the resulting Ogre mesh. You still have to write the
 material scripts yourself.
 
+--------------
+Known problems
+--------------
+
+Ogre does not support interpolation of normals for morph animated meshes.
+Consequently, converted MD2 and MD3 models can only have one single set of
+normals, namely those taken from the reference frame. With extensively animated
+meshes (such as player models) this means that the normals will be incorrect
+for most frames, resulting in weird lighting behaviour.
+
 ---------
 Licensing
 ---------
