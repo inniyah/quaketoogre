@@ -229,18 +229,25 @@ void Q2ModelToMesh::buildKeyframe( int frameIndex, float time )
 	kfNode->SetAttribute( "time", toStr( time ) );
 
 	const MD2Frame &frame = mModel.frames[frameIndex];
-	float position[3];
+	float position[3], normal[3];
 
 	for ( int i = 0; i < (int)mNewVertices.size(); i++ )
 	{
 		const NewVertex &newVert = mNewVertices[i];
 		const MD2Vertex &vert = frame.vertices[newVert.first];
 		convertPosition( vert.vertex, frame.header, position );
+		convertNormal( vert.normalIndex, normal );
 
 		TiXmlElement *posNode = openTag( "position" );
 		posNode->SetAttribute( "x", toStr( position[0] ) );
 		posNode->SetAttribute( "y", toStr( position[1] ) );
 		posNode->SetAttribute( "z", toStr( position[2] ) );
+		closeTag();
+		
+		TiXmlElement *normNode = openTag( "normal" );
+		normNode->SetAttribute( "x", toStr( normal[0] ) );
+		normNode->SetAttribute( "y", toStr( normal[1] ) );
+		normNode->SetAttribute( "z", toStr( normal[2] ) );
 		closeTag();
 	}
 
@@ -267,3 +274,4 @@ void Q2ModelToMesh::convertNormal( const unsigned char normalIndex, float dest[3
 	if ( mConvertCoordinates )
 		Quake::convertCoordinate( dest );
 }
+

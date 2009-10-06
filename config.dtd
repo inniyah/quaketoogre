@@ -13,7 +13,7 @@
 <!ELEMENT outputfile (filename)>
 <!ELEMENT filename (#PCDATA)>
 
-<!-- Frame that will be used for the non-animated pose -->
+<!-- Frame that will be used for the non-animated pose. The model's normals will be taken from this frame. -->
 <!ELEMENT referenceframe (#PCDATA)>
 
 <!-- Quake 3 animation file -->
@@ -35,3 +35,4 @@
 <!ELEMENT material (submeshname, materialname)>
 <!ELEMENT submeshname (#PCDATA)>
 <!ELEMENT materialname (#PCDATA)>
+

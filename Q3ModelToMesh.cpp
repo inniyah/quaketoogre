@@ -209,18 +209,25 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 	kfNode->SetAttribute( "time", toStr( time ) );
 
 	const MD3Vertex *verts = &mesh.vertices[frame * mesh.header.numVertices];
-	float position[3];
+	float position[3], normal[3];
 
 	for ( int i = 0; i < mesh.header.numVertices; i++ )
 	{
 		const MD3Vertex &vertex = verts[i];
 		convertPosition( vertex.position, position );
+		convertNormal( vertex.normal, normal );
 
 		TiXmlElement *posNode = openTag( "position" );
 		posNode->SetAttribute( "x", toStr( position[0] ) );
 		posNode->SetAttribute( "y", toStr( position[1] ) );
 		posNode->SetAttribute( "z", toStr( position[2] ) );
 		closeTag();
+		
+		TiXmlElement *normNode = openTag( "normal" );
+		normNode->SetAttribute( "x", toStr( normal[0] ) );
+		normNode->SetAttribute( "y", toStr( normal[1] ) );
+		normNode->SetAttribute( "z", toStr( normal[2] ) );
+		closeTag();		
 	}
 
 	closeTag();
@@ -250,3 +257,4 @@ void Q3ModelToMesh::convertNormal( const short &normal, float dest[3] )
 	if ( mConvertCoordinates )
 		Quake::convertCoordinate( dest );	
 }
+

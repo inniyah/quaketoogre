@@ -2,10 +2,15 @@
 Introduction
 ------------
 
-I present to you the Quake To Ogre
-Mesh Converter. It can take a 3D model from either Quake 2 or Quake 3 and
-convert it to an equivalent Ogre mesh, including (a selection of) the original
-model's animations.
+The modding communities for both Quake 2 and Quake 3 have created a wealth of 
+3D models that are readily available on the internet. Many of these models
+could be useful for game development projects using Ogre, but since Ogre has
+its own custom mesh format, it cannot directly load any Quake models.
+
+For this reason, I present to you the Quake To Ogre Mesh Converter. 
+This tool can take a 3D model from either Quake 2 or Quake 3 and convert it to
+an equivalent Ogre mesh, including (a selection of) the original model's
+animations.
 
 --------
 Features
