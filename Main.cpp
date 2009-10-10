@@ -5,6 +5,8 @@
 #include "Q3ModelToMesh.h"
 #include "Animation.h"
 
+#include <direct.h>
+
 bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 {
 	cout << "Processing animation file" << endl;
@@ -267,8 +269,40 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 	return true;
 }
 
-bool processConfigFile( const char *filename )
+// Returns file name without path
+string changeToWorkingDir( string filepath )
 {
+	// fnsplit() isn't available on Windows, so we'll have to dissect the file path ourselves...
+	size_t drivePos = filepath.find_first_of( ':' );
+	if ( drivePos != string::npos )
+	{
+		// Change drive
+		char driveLetter = filepath[0];
+		int driveNumber = toupper(driveLetter) - 'A' + 1;
+		_chdrive( driveNumber );
+
+		filepath = filepath.substr( drivePos + 1 );
+	}
+
+	size_t pathPos = filepath.find_last_of( "\\/" );
+	if ( pathPos != string::npos )
+	{
+		// Change working dir
+		string dir = filepath.substr( 0, pathPos );
+		_chdir( dir.c_str() );
+
+		filepath = filepath.substr( pathPos + 1 );
+	}
+
+	return filepath;
+}
+
+bool processConfigFile( const string &filepath )
+{
+	// Change working directory to script file's local directory
+	string filename = changeToWorkingDir( filepath );
+	cout << "Loading configuration from file '" << filename << "'" << endl;
+
 	TiXmlDocument config;
 	if ( !config.LoadFile( filename ) )
 	{
@@ -356,6 +390,7 @@ int main( int argc, char **argv )
 	}
 	else
 	{
-		return processConfigFile( argv[1] ) ? 0 : 1;
+		string filepath = argv[1];
+		return processConfigFile( filepath ) ? 0 : 1;
 	}
 }
