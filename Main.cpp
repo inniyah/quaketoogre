@@ -5,7 +5,13 @@
 #include "Q3ModelToMesh.h"
 #include "Animation.h"
 
+#ifdef _WIN32
 #include <direct.h>
+#else
+#include <unistd.h>
+#define _chdir chdir
+void _chdrive( int ) {}
+#endif
 
 bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 {
