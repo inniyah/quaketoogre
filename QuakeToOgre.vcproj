@@ -202,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MD5ModelToMesh.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Q2ModelToMesh.cpp"
 				>
 			</File>
@@ -257,6 +261,10 @@
 			</File>
 			<File
 				RelativePath=".\md5model.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MD5ModelToMesh.h"
 				>
 			</File>
 			<File

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE conversion SYSTEM "../config.dtd">
+
+<conversion>
+	<convertcoordinates/>
+
+	<md5mesh>
+		<inputfile>
+			<filename>bernie/bernie.md5mesh</filename>
+		</inputfile>
+		
+		<outputfile>
+			<filename>bernie.mesh.xml</filename>
+		</outputfile>
+		
+		<md5animations>
+			<md5anim>
+				<animationname>Spit Attack</animationname>
+				<filename>spit_attack1.md5anim</filename>
+			</md5anim>
+		</md5animations>
+
+		<materials>
+			<material>
+				<submeshname>something</submeshname>
+				<materialname>md5models/bernie/something</materialname>
+			</material>
+		</materials>
+	</md5mesh>
+</conversion>

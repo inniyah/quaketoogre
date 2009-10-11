@@ -3,6 +3,7 @@
 #include "MD3Structure.h"
 #include "Q2ModelToMesh.h"
 #include "Q3ModelToMesh.h"
+#include "MD5ModelToMesh.h"
 #include "Animation.h"
 
 #ifdef _WIN32
@@ -275,6 +276,48 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 	return true;
 }
 
+bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
+{
+	cout << "Doing MD5 Mesh conversion" << endl;
+	
+	MD5ModelToMesh builder;
+	builder.setConvertCoordinates( convertCoordinates );
+
+	// Process the configuration XML tree
+	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "inputfile" )
+		{
+			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
+			if ( filenameNode )
+				builder.setInputFile( filenameNode->GetText() );
+		}
+		else if ( nodeName == "outputfile" )
+		{
+			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
+			if ( filenameNode )
+				builder.setOutputFile( filenameNode->GetText() );
+		}
+		else if ( nodeName == "md5animations" )
+		{
+			//processAnimations( node, animList );
+		}
+		else if ( nodeName == "materials" )
+		{
+			//processMaterials( node, materialNames );
+		}
+	}
+	
+	if ( !builder.build() )
+	{
+		cout << "[Error] Failed to convert MD5 file" << endl;
+		return false;
+	}
+	
+	return true;
+}
+
 // Returns file name without path
 string changeToWorkingDir( string filepath )
 {
@@ -338,6 +381,10 @@ bool processConfigFile( const string &filepath )
 		else if ( nodeName == "md3mesh" )
 		{
 			success = convertMD3Mesh( node, convertCoordinates );
+		}
+		else if ( nodeName == "md5mesh" )
+		{
+			success = convertMD5Mesh( node, convertCoordinates );
 		}
 	}
 	

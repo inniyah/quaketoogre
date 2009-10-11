@@ -1,5 +1,5 @@
 <!-- Root element -->
-<!ELEMENT conversion (convertcoordinates?, (md2mesh|md3mesh))>
+<!ELEMENT conversion (convertcoordinates?, (md2mesh|md3mesh|md5mesh))>
 
 <!-- Convert vectors to Ogre coordinate system -->
 <!ELEMENT convertcoordinates EMPTY>
@@ -7,6 +7,7 @@
 <!-- This element determines type of conversion -->
 <!ELEMENT md2mesh (inputfile, outputfile, referenceframe?, animations?, materialname?)>
 <!ELEMENT md3mesh (inputfile, outputfile, referenceframe?, animationfile?, animations?, materials?)>
+<!ELEMENT md5mesh (inputfile, outputfile, md5animations?, materials?)>
 
 <!-- Filenames -->
 <!ELEMENT inputfile (filename)>
@@ -23,6 +24,10 @@
 <!ELEMENT convertselection (animationname+)>		<!-- Convert specific animations -->
 <!ELEMENT animationname (#PCDATA)>
 
+<!-- MD5 animation file -->
+<!ELEMENT md5animations (md5anim+)>
+<!ELEMENT md5anim (animationname, filename)>
+
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>
 <!ELEMENT animationsequence (animationname, startframe, numframes, fps)>
@@ -35,4 +40,3 @@
 <!ELEMENT material (submeshname, materialname)>
 <!ELEMENT submeshname (#PCDATA)>
 <!ELEMENT materialname (#PCDATA)>
-
