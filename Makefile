@@ -11,7 +11,9 @@ OBJ = \
 	Animation.o \
 	XmlWriter.o \
 	Q2ModelToMesh.o \
-	Q3ModelToMesh.o
+	Q3ModelToMesh.o \
+	md5mesh.o \
+	md5anim.o
 
 CC = g++
 INCLUDE =

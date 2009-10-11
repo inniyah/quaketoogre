@@ -194,6 +194,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\md5anim.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\md5mesh.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Q2ModelToMesh.cpp"
 				>
 			</File>
@@ -245,6 +253,10 @@
 			</File>
 			<File
 				RelativePath=".\MD3Structure.h"
+				>
+			</File>
+			<File
+				RelativePath=".\md5model.h"
 				>
 			</File>
 			<File
