@@ -13,7 +13,8 @@ OBJ = \
 	Q2ModelToMesh.o \
 	Q3ModelToMesh.o \
 	md5mesh.o \
-	md5anim.o
+	md5anim.o \
+	MD5ModelToMesh.o
 
 CC = g++
 INCLUDE =
