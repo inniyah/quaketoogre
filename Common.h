@@ -8,6 +8,8 @@
 #include <sstream>
 #include <map>
 #include <vector>
+#include <algorithm>
+#include <locale>
 
 #include <cstdio>
 #include <cstdlib>

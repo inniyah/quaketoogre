@@ -13,12 +13,15 @@
 			<filename>bernie.mesh.xml</filename>
 		</outputfile>
 		
-		<md5animations>
+		<md5skeleton>
+			<outputfile>
+				<filename>bernie.skeleton.xml</filename>
+			</outputfile>
 			<md5anim>
-				<animationname>Spit Attack</animationname>
+				<animationname>SpitAttack</animationname>
 				<filename>spit_attack1.md5anim</filename>
 			</md5anim>
-		</md5animations>
+		</md5skeleton>
 
 		<materials>
 			<material>

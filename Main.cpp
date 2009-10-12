@@ -299,7 +299,7 @@ bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
 			if ( filenameNode )
 				builder.setOutputFile( filenameNode->GetText() );
 		}
-		else if ( nodeName == "md5animations" )
+		else if ( nodeName == "md5skeleton" )
 		{
 			//processAnimations( node, animList );
 		}
@@ -433,6 +433,11 @@ int main( int argc, char **argv )
 		else if ( md3Struct.load( argv[2] ) )
 		{
 			md3Struct.printInfo();
+			return 0;
+		}
+		else if ( MD5ModelToMesh::isMD5Mesh( argv[2] ) || MD5ModelToMesh::isMD5Anim( argv[2] ) )
+		{
+			MD5ModelToMesh::printInfo( argv[2] );
 			return 0;
 		}
 		else
