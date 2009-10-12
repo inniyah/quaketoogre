@@ -20,7 +20,7 @@ static string getExtension( const string &filename )
 		return "";
 
 	string ext = filename.substr( pos+1 );
-	std::transform( ext.begin(), ext.end(), ext.begin(), std::tolower );
+	std::transform( ext.begin(), ext.end(), ext.begin(), static_cast<int(*)(int)>(std::tolower) );
 	return ext;
 }
 
