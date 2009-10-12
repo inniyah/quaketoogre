@@ -39,22 +39,6 @@
 
 #pragma warning(disable:4996)
 
-struct md5_model_t md5file;
-struct md5_anim_t md5anim;
-
-int animated = 0;
-
-struct md5_joint_t *skeleton = NULL;
-struct anim_info_t animInfo;
-
-/* vertex array related stuff */
-int max_verts = 0;
-int max_tris = 0;
-
-vec3_t *vertexArray = NULL;
-unsigned int *vertexIndices = NULL;
-
-
 /**
  * Basic quaternion operations.
  */
@@ -236,10 +220,9 @@ ReadMD5Model (const char *filename, struct md5_model_t *mdl)
 		      /* Allocate memory for vertices */
 		      mesh->vertices = (struct md5_vertex_t *)
 			malloc (sizeof (struct md5_vertex_t) * mesh->num_verts);
-		    }
 
-		  if (mesh->num_verts > max_verts)
-		    max_verts = mesh->num_verts;
+			  mesh->vertexArray = (vec3_t *)malloc (sizeof (vec3_t) * mesh->num_verts);
+		    }
 		}
 	      else if (sscanf (buff, " numtris %d", &mesh->num_tris) == 1)
 		{
@@ -249,9 +232,6 @@ ReadMD5Model (const char *filename, struct md5_model_t *mdl)
 		      mesh->triangles = (struct md5_triangle_t *)
 			malloc (sizeof (struct md5_triangle_t) * mesh->num_tris);
 		    }
-
-		  if (mesh->num_tris > max_tris)
-		    max_tris = mesh->num_tris;
 		}
 	      else if (sscanf (buff, " numweights %d", &mesh->num_weights) == 1)
 		{
@@ -337,6 +317,11 @@ FreeModel (struct md5_model_t *mdl)
 	      free (mdl->meshes[i].weights);
 	      mdl->meshes[i].weights = NULL;
 	    }
+	  if (mdl->meshes[i].vertexArray)
+	  {
+		  free(mdl->meshes[i].vertexArray);
+		  mdl->meshes[i].vertexArray = NULL;
+	  }
 	}
 
       free (mdl->meshes);
@@ -349,18 +334,13 @@ FreeModel (struct md5_model_t *mdl)
  * given a skeleton.  Put the vertices in vertex arrays.
  */
 void
-PrepareMesh (const struct md5_mesh_t *mesh,
+PrepareMesh (struct md5_mesh_t *mesh,
 	     const struct md5_joint_t *skeleton)
 
 {
-  int i, j, k;
+  int i, j;
 
-  /* Setup vertex indices */
-  for (k = 0, i = 0; i < mesh->num_tris; ++i)
-    {
-      for (j = 0; j < 3; ++j, ++k)
-	vertexIndices[k] = mesh->triangles[i].index[j];
-    }
+  vec3_t *vertexArray = mesh->vertexArray;
 
   /* Setup vertices */
   for (i = 0; i < mesh->num_verts; ++i)
@@ -389,42 +369,4 @@ PrepareMesh (const struct md5_mesh_t *mesh,
       vertexArray[i][1] = finalVertex[1];
       vertexArray[i][2] = finalVertex[2];
     }
-}
-
-void
-AllocVertexArrays ()
-{
-  vertexArray = (vec3_t *)malloc (sizeof (vec3_t) * max_verts);
-  vertexIndices = (unsigned int *)malloc (sizeof (unsigned int) * max_tris * 3);
-}
-
-void
-FreeVertexArrays ()
-{
-  if (vertexArray)
-    {
-      free (vertexArray);
-      vertexArray = NULL;
-    }
-
-  if (vertexIndices)
-    {
-      free (vertexIndices);
-      vertexIndices = NULL;
-    }
-}
-
-void
-cleanup ()
-{
-  FreeModel (&md5file);
-  FreeAnim (&md5anim);
-
-  if (animated && skeleton)
-    {
-      free (skeleton);
-      skeleton = NULL;
-    }
-
-  FreeVertexArrays ();
 }

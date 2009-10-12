@@ -94,6 +94,8 @@ struct md5_mesh_t
   int num_weights;
 
   char shader[256];
+
+  vec3_t *vertexArray;
 };
 
 /* MD5 model structure */
@@ -137,13 +139,14 @@ void Quat_multVec (const quat4_t q, const vec3_t v, quat4_t out);
 void Quat_rotatePoint (const quat4_t q, const vec3_t in, vec3_t out);
 float Quat_dotProduct (const quat4_t qa, const quat4_t qb);
 void Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out);
+void Quat_toAngleAxis(const quat4_t q, float *angle, vec3_t axis);
 
 /**
  * md5mesh prototypes
  */
 int ReadMD5Model (const char *filename, struct md5_model_t *mdl);
 void FreeModel (struct md5_model_t *mdl);
-void PrepareMesh (const struct md5_mesh_t *mesh,
+void PrepareMesh (struct md5_mesh_t *mesh,
 		  const struct md5_joint_t *skeleton);
 void AllocVertexArrays ();
 void FreeVertexArrays ();

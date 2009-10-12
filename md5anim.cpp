@@ -143,6 +143,26 @@ Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out)
   out[Z] = (k0 * qa[2]) + (k1 * q1z);
 }
 
+void Quat_toAngleAxis( const quat4_t q, float *angle, vec3_t axis )
+{
+	float lenSqr = q[0]*q[0] + q[1]*q[1] + q[2]*q[2];
+    if ( lenSqr > 0.0 )
+    {
+        *angle = 2.0f * (float)cos(q[3]);
+        float invLen = 1.0f / (float)sqrt(lenSqr);
+        axis[0] = q[0]*invLen;
+        axis[1] = q[1]*invLen;
+        axis[2] = q[2]*invLen;
+    }
+    else
+    {
+        *angle = 0.0f;
+        axis[0] = 1.0f;
+        axis[1] = 0.0f;
+        axis[2] = 0.0f;
+    }
+}
+
 /**
  * Check if an animation can be used for a given model.  Model's
  * skeleton and animation's skeleton must match.

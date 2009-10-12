@@ -276,6 +276,45 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 	return true;
 }
 
+void processSubMesh( TiXmlElement *subMeshNode, MD5ModelToMesh &builder )
+{
+	int index = -1;
+	string material;
+
+	for ( TiXmlElement *node = subMeshNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "index" )
+		{
+			index = atoi( node->GetText() );
+		}
+		else if ( nodeName == "materialname" )
+		{
+			material = node->GetText();
+		}
+	}
+
+	if ( index < 0 )
+	{
+		cout << "[Warning] Submesh with no valid index" << endl;
+		return;
+	}
+
+	builder.addSubMesh( index, material );
+}
+
+void processSubMeshes( TiXmlElement *subMeshesNode, MD5ModelToMesh &builder )
+{
+	for ( TiXmlElement *node = subMeshesNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "submesh" )
+		{
+			processSubMesh( node, builder );
+		}
+	}
+}
+
 bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
 {
 	cout << "Doing MD5 Mesh conversion" << endl;
@@ -299,13 +338,13 @@ bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
 			if ( filenameNode )
 				builder.setOutputFile( filenameNode->GetText() );
 		}
+		else if ( nodeName == "submeshes" )
+		{
+			processSubMeshes( node, builder );
+		}
 		else if ( nodeName == "md5skeleton" )
 		{
 			//processAnimations( node, animList );
-		}
-		else if ( nodeName == "materials" )
-		{
-			//processMaterials( node, materialNames );
 		}
 	}
 	

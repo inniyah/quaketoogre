@@ -13,6 +13,16 @@
 			<filename>bernie.mesh.xml</filename>
 		</outputfile>
 		
+		<submeshes>
+		    <submesh>
+		        <index>0</index>
+		    </submesh>
+		    <submesh>
+		        <index>1</index>
+		        <materialname>md5models/bernie/fx</materialname>
+		    </submesh>
+		</submeshes>
+		
 		<md5skeleton>
 			<outputfile>
 				<filename>bernie.skeleton.xml</filename>
@@ -22,12 +32,5 @@
 				<filename>spit_attack1.md5anim</filename>
 			</md5anim>
 		</md5skeleton>
-
-		<materials>
-			<material>
-				<submeshname>something</submeshname>
-				<materialname>md5models/bernie/something</materialname>
-			</material>
-		</materials>
 	</md5mesh>
 </conversion>

@@ -7,7 +7,7 @@
 <!-- This element determines type of conversion -->
 <!ELEMENT md2mesh (inputfile, outputfile, referenceframe?, animations?, materialname?)>
 <!ELEMENT md3mesh (inputfile, outputfile, referenceframe?, animationfile?, animations?, materials?)>
-<!ELEMENT md5mesh (inputfile, outputfile, md5skeleton?, materials?)>
+<!ELEMENT md5mesh (inputfile, outputfile, submeshes, md5skeleton?)>
 
 <!-- Filenames -->
 <!ELEMENT inputfile (filename)>
@@ -23,6 +23,11 @@
 <!ELEMENT converttorso EMPTY>	<!-- Convert all TORSO_ and BOTH_ animations -->
 <!ELEMENT convertselection (animationname+)>		<!-- Convert specific animations -->
 <!ELEMENT animationname (#PCDATA)>
+
+<!-- MD5 submeshes -->
+<!ELEMENT submeshes (submesh+)>
+<!ELEMENT submesh (index, materialname?)>
+<!ELEMENT index (#PCDATA)>
 
 <!-- MD5 animation file -->
 <!ELEMENT md5skeleton (outputfile, md5anim*)>
