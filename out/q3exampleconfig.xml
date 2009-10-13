@@ -5,18 +5,13 @@
 	<convertcoordinates/>
 
 	<md3mesh>
-		<inputfile>
-			<filename>models/players/visor/lower.md3</filename>
-		</inputfile>
-		
-		<outputfile>
-			<filename>visorlegs.mesh.xml</filename>
-		</outputfile>
+		<inputfile>models/players/visor/lower.md3</inputfile>
+		<outputfile>visorlegs.mesh.xml</outputfile>
 		
 		<referenceframe>157</referenceframe>
 		
 		<animationfile>
-			<filename>models/players/visor/animation.cfg</filename>
+			<inputfile>models/players/visor/animation.cfg</inputfile>
 			<!--<convertlegs/>-->
 			<convertselection>
 				<animationname>LEGS_WALK</animationname>

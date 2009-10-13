@@ -5,31 +5,21 @@
 	<convertcoordinates/>
 
 	<md5mesh>
-		<inputfile>
-			<filename>bernie/bernie.md5mesh</filename>
-		</inputfile>
-		
-		<outputfile>
-			<filename>bernie.mesh.xml</filename>
-		</outputfile>
-		
+		<inputfile>bernie/bernie.md5mesh</inputfile>
+		<outputfile>bernie.mesh.xml</outputfile>
+
 		<submeshes>
-		    <submesh>
-		        <index>0</index>
-		    </submesh>
-		    <submesh>
-		        <index>1</index>
+		    <submesh index="0"/>
+		    <submesh index="1">
 		        <materialname>md5models/bernie/fx</materialname>
 		    </submesh>
 		</submeshes>
 		
 		<md5skeleton>
-			<outputfile>
-				<filename>bernie.skeleton.xml</filename>
-			</outputfile>
+			<outputfile>bernie.skeleton.xml</outputfile>
 			<md5anim>
 				<animationname>SpitAttack</animationname>
-				<filename>spit_attack1.md5anim</filename>
+				<inputfile>spit_attack1.md5anim</inputfile>
 			</md5anim>
 		</md5skeleton>
 	</md5mesh>

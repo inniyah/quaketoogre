@@ -10,15 +10,14 @@
 <!ELEMENT md5mesh (inputfile, outputfile, submeshes, md5skeleton?)>
 
 <!-- Filenames -->
-<!ELEMENT inputfile (filename)>
-<!ELEMENT outputfile (filename)>
-<!ELEMENT filename (#PCDATA)>
+<!ELEMENT inputfile (#PCDATA)>
+<!ELEMENT outputfile (#PCDATA)>
 
 <!-- Frame that will be used for the non-animated pose. The model's normals will be taken from this frame. -->
 <!ELEMENT referenceframe (#PCDATA)>
 
 <!-- Quake 3 animation file -->
-<!ELEMENT animationfile (filename, (convertlegs|converttorso|convertselection))>
+<!ELEMENT animationfile (inputfile, (convertlegs|converttorso|convertselection))>
 <!ELEMENT convertlegs EMPTY>	<!-- Convert all LEGS_ and BOTH_ animations -->
 <!ELEMENT converttorso EMPTY>	<!-- Convert all TORSO_ and BOTH_ animations -->
 <!ELEMENT convertselection (animationname+)>		<!-- Convert specific animations -->
@@ -26,12 +25,13 @@
 
 <!-- MD5 submeshes -->
 <!ELEMENT submeshes (submesh+)>
-<!ELEMENT submesh (index, materialname?)>
-<!ELEMENT index (#PCDATA)>
+<!ELEMENT submesh (materialname?)>
+<!ATTLIST submesh
+    index   CDATA   #REQUIRED>
 
 <!-- MD5 animation file -->
 <!ELEMENT md5skeleton (outputfile, md5anim*)>
-<!ELEMENT md5anim (animationname, filename)>
+<!ELEMENT md5anim (animationname, inputfile)>
 
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>

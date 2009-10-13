@@ -5,13 +5,8 @@
     <convertcoordinates/>
 
 	<md2mesh>
-		<inputfile>
-			<filename>players/male/tris.md2</filename>
-		</inputfile>
-
-		<outputfile>
-			<filename>q2male.mesh.xml</filename>
-		</outputfile>
+		<inputfile>players/male/tris.md2</inputfile>
+		<outputfile>q2male.mesh.xml</outputfile>
 
 		<referenceframe>0</referenceframe>
 

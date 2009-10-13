@@ -18,10 +18,10 @@ bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 {
 	cout << "Processing animation file" << endl;
 
-	TiXmlElement *filenameNode = animFileNode->FirstChildElement( "filename" );
+	TiXmlElement *filenameNode = animFileNode->FirstChildElement( "inputfile" );
 	if ( !filenameNode )
 	{
-		cout << "[Warning] Animation file declaration misses filename" << endl;
+		cout << "[Warning] Animation file declaration misses input filename" << endl;
 		return false;
 	}
 
@@ -172,15 +172,11 @@ bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "inputfile" )
 		{
-			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
-			if ( filenameNode )
-				inputFile = filenameNode->GetText();
+			inputFile = node->GetText();
 		}
 		else if ( nodeName == "outputfile" )
 		{
-			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
-			if ( filenameNode )
-				outputFile = filenameNode->GetText();		
+			outputFile = node->GetText();		
 		}
 		else if ( nodeName == "referenceframe" )
 		{
@@ -229,15 +225,11 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "inputfile" )
 		{
-			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
-			if ( filenameNode )
-				inputFile = filenameNode->GetText();
+			inputFile = node->GetText();
 		}
 		else if ( nodeName == "outputfile" )
 		{
-			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
-			if ( filenameNode )
-				outputFile = filenameNode->GetText();		
+			outputFile = node->GetText();		
 		}
 		else if ( nodeName == "referenceframe" )
 		{
@@ -281,23 +273,19 @@ void processSubMesh( TiXmlElement *subMeshNode, MD5ModelToMesh &builder )
 	int index = -1;
 	string material;
 
+	if ( !subMeshNode->Attribute( "index", &index ) )
+	{
+		cout << "[Warning] Submesh with no index" << endl;
+		return;
+	}
+
 	for ( TiXmlElement *node = subMeshNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{
 		const string &nodeName = node->ValueStr();
-		if ( nodeName == "index" )
-		{
-			index = atoi( node->GetText() );
-		}
-		else if ( nodeName == "materialname" )
+		if ( nodeName == "materialname" )
 		{
 			material = node->GetText();
 		}
-	}
-
-	if ( index < 0 )
-	{
-		cout << "[Warning] Submesh with no valid index" << endl;
-		return;
 	}
 
 	builder.addSubMesh( index, material );
@@ -328,15 +316,11 @@ bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "inputfile" )
 		{
-			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
-			if ( filenameNode )
-				builder.setInputFile( filenameNode->GetText() );
+			builder.setInputFile( node->GetText() );
 		}
 		else if ( nodeName == "outputfile" )
 		{
-			TiXmlElement *filenameNode = node->FirstChildElement( "filename" );
-			if ( filenameNode )
-				builder.setOutputFile( filenameNode->GetText() );
+			builder.setOutputFile( node->GetText() );
 		}
 		else if ( nodeName == "submeshes" )
 		{
