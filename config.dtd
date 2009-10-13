@@ -30,7 +30,9 @@
     index   CDATA   #REQUIRED>
 
 <!-- MD5 animation file -->
-<!ELEMENT md5skeleton (outputfile, md5anim*)>
+<!ELEMENT md5skeleton (md5anim*)>
+<!ATTLIST md5skeleton
+    name    CDATA   #REQUIRED>
 <!ELEMENT md5anim (animationname, inputfile)>
 
 <!-- Individual animation definitions -->

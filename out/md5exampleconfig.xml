@@ -15,8 +15,7 @@
 		    </submesh>
 		</submeshes>
 		
-		<md5skeleton>
-			<outputfile>bernie.skeleton.xml</outputfile>
+		<md5skeleton name="bernie">
 			<md5anim>
 				<animationname>SpitAttack</animationname>
 				<inputfile>spit_attack1.md5anim</inputfile>

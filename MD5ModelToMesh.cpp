@@ -35,6 +35,12 @@ bool MD5ModelToMesh::build()
 	}
 	closeTag();	// submeshes
 
+	if ( !mSkeletonFile.empty() )
+	{
+		openTag( "skeletonlink" )->SetAttribute( "name", mSkeletonFile );
+		closeTag();
+	}
+
 	closeTag();	// mesh
 	FreeModel( &mdl );
 
@@ -64,6 +70,11 @@ void MD5ModelToMesh::buildSubMesh( const struct md5_mesh_t *mesh, const string &
 	geomNode->SetAttribute( "vertexcount", mesh->num_verts );
 	buildVertexBuffers( mesh );
 	closeTag();	// geometry
+
+	// Bone assignments
+	openTag( "boneassignments" );
+	buildBoneAssignments( mesh );
+	closeTag();	// boneassignments
 
 	closeTag();	// submesh
 }
@@ -189,6 +200,28 @@ void MD5ModelToMesh::buildTexCoord( const float texCoord[2] )
 	closeTag();
 
 	closeTag();
+}
+
+void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
+{
+	for ( int i = 0; i < mesh->num_verts; i++ )
+	{
+		const struct md5_vertex_t *v = &mesh->vertices[i];
+		for ( int j = 0; j < v->count; j++ )
+		{
+			const struct md5_weight_t *w = &mesh->weights[v->start + j];
+
+			TiXmlElement *vbNode = openTag( "vertexboneassignment" );
+			vbNode->SetAttribute( "vertexindex", i );
+			vbNode->SetAttribute( "boneindex", w->joint );
+
+			stringstream ss;
+			ss << w->bias;
+			vbNode->SetAttribute( "weight", ss.str() );
+
+			closeTag();
+		}
+	}
 }
 
 void MD5ModelToMesh::convertVector( const float in[3], float out[3] )

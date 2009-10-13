@@ -303,6 +303,52 @@ void processSubMeshes( TiXmlElement *subMeshesNode, MD5ModelToMesh &builder )
 	}
 }
 
+void processMD5Animation( TiXmlElement *animNode, MD5ModelToMesh &builder )
+{
+	string name, inputfile;
+
+	for ( TiXmlElement *node = animNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "animationname" )
+		{
+			name = node->GetText();
+		}
+		else if ( nodeName == "inputfile" )
+		{
+			inputfile = node->GetText();
+		}
+	}
+
+	if ( name.empty() || inputfile.empty() )
+	{
+		cout << "[Warning] MD5 Animation missing name or input file" << endl;
+		return;
+	}
+
+	builder.addAnimation( name, inputfile );
+}
+
+void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
+{
+	const string *name;
+	if ( !(name = skelNode->Attribute( string("name") )) )
+	{
+		cout << "[Warning] MD5 Skeleton without a name" << endl;
+		return;
+	}
+	builder.setSkeletonFile( (*name) + ".skeleton" );
+
+	for ( TiXmlElement *node = skelNode->FirstChildElement(); node; node = node->NextSiblingElement() )
+	{
+		const string &nodeName = node->ValueStr();
+		if ( nodeName == "md5anim" )
+		{
+			processMD5Animation( node, builder );
+		}
+	}
+}
+
 bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
 {
 	cout << "Doing MD5 Mesh conversion" << endl;
@@ -328,7 +374,7 @@ bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		}
 		else if ( nodeName == "md5skeleton" )
 		{
-			//processAnimations( node, animList );
+			processMD5Skeleton( node, builder );
 		}
 	}
 	

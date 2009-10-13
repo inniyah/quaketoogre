@@ -206,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MD5SkeletonBuilder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Q2ModelToMesh.cpp"
 				>
 			</File>
@@ -265,6 +269,10 @@
 			</File>
 			<File
 				RelativePath=".\MD5ModelToMesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MD5SkeletonBuilder.h"
 				>
 			</File>
 			<File

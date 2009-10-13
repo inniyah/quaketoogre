@@ -2,8 +2,7 @@
 #define __MD5MODELTOMESH_H__
 
 #include "XmlWriter.h"
-#include "MD3Structure.h"
-#include "Animation.h"
+#include "Quake.h"
 
 struct md5_mesh_t;
 struct md5_triangle_t;
@@ -18,6 +17,7 @@ public:
 	void setConvertCoordinates( bool value ) { mConvertCoords = value; }
 	void setInputFile( const string &filename ) { mInputFile = filename; }
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
+	void setSkeletonFile( const string &filename ) { mSkeletonFile = filename; }
 	void addSubMesh( int index, const string &material ) { mSubMeshes[index] = material; }
 	void addAnimation( const string &name, const string &filename ) { mAnimations[name] = filename; }
 
@@ -31,12 +31,14 @@ private:
 	void buildVertexBuffers( const struct md5_mesh_t *mesh );
 	void buildVertex( const float position[3], const float normal[3] );
 	void buildTexCoord( const float texCoord[2] );
+	void buildBoneAssignments( const struct md5_mesh_t *mesh );
 
 	void convertVector( const float in[3], float out[3] );
 
 	bool mConvertCoords;
 	string mInputFile;
 	string mOutputFile;
+	string mSkeletonFile;
 	StringMap mAnimations;
 
 	typedef map<int, string> SubMeshMap;
