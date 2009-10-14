@@ -226,7 +226,105 @@ void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 {
 	mSkelWriter.openTag( "skeleton" );
+	
+	buildBones( mdl );
+	buildBoneHierarchy( mdl );
+
 	mSkelWriter.closeTag();	// skeleton
+}
+
+static string stripQuotes( const string &str )
+{
+	size_t len = str.size();
+
+	if ( str[0] == '\"' && str[len-1] == '\"' )
+		return str.substr( 1, len-2 );
+
+	return str;
+}
+
+void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
+{
+	mSkelWriter.openTag( "bones" );
+	for ( int i = 0; i < mdl->num_joints; i++ )
+	{
+		const struct md5_joint_t *joint = &mdl->baseSkel[i];
+		const struct md5_joint_t *parent = NULL;
+		if ( joint->parent >= 0 )
+			parent = &mdl->baseSkel[joint->parent];
+
+		TiXmlElement *boneNode = mSkelWriter.openTag( "bone" );
+		boneNode->SetAttribute( "id", i );
+		boneNode->SetAttribute( "name", stripQuotes(joint->name) );
+
+		vec3_t pos;
+		quat4_t orient;
+
+		if ( parent )
+		{
+			// Convert the bone's orientation from world space to its parent's joint space
+			quat4_t parentInv;
+			Quat_inverse( parent->orient, parentInv );
+			Quat_multQuat( parentInv, joint->orient, orient );
+
+			vec3_t tmp;
+			vec_subtract( joint->pos, parent->pos, tmp );
+			Quat_rotatePoint( parentInv, tmp, pos );
+		}
+		else
+		{
+			// Root bone, so just copy the bone's world space orientation
+			vec_copy( joint->pos, pos );
+			Quat_copy( joint->orient, orient );
+		}
+
+		vec3_t axis;
+		float angle;
+		convertVector( pos, pos );
+		Quat_toAngleAxis( orient, &angle, axis );
+		convertVector( axis, axis );	// TODO this is only half-right
+
+		TiXmlElement *posNode = mSkelWriter.openTag( "position" );
+		posNode->SetAttribute( "x", XmlWriter::toStr( pos[0] ) );
+		posNode->SetAttribute( "y", XmlWriter::toStr( pos[1] ) );
+		posNode->SetAttribute( "z", XmlWriter::toStr( pos[2] ) );
+		mSkelWriter.closeTag();	// position
+
+		TiXmlElement *rotNode = mSkelWriter.openTag( "rotation" );
+		rotNode->SetAttribute( "angle", XmlWriter::toStr( angle ) );
+
+		TiXmlElement *axisNode = mSkelWriter.openTag( "axis" );
+		axisNode->SetAttribute( "x", XmlWriter::toStr( axis[0] ) );
+		axisNode->SetAttribute( "y", XmlWriter::toStr( axis[1] ) );
+		axisNode->SetAttribute( "z", XmlWriter::toStr( axis[2] ) );
+		mSkelWriter.closeTag();	// axis
+		mSkelWriter.closeTag();	// rotation
+
+		mSkelWriter.closeTag();	// bone
+	}
+
+	mSkelWriter.closeTag();	// bones
+}
+
+void MD5ModelToMesh::buildBoneHierarchy( const struct md5_model_t *mdl )
+{
+	mSkelWriter.openTag( "bonehierarchy" );
+
+	for ( int i = 0; i < mdl->num_joints; i++ )
+	{
+		const struct md5_joint_t *joint = &mdl->baseSkel[i];
+		if ( joint->parent < 0 )
+			continue;
+
+		const struct md5_joint_t *parent = &mdl->baseSkel[joint->parent];
+
+		TiXmlElement *node = mSkelWriter.openTag( "boneparent" );
+		node->SetAttribute( "bone", stripQuotes(joint->name) );
+		node->SetAttribute( "parent", stripQuotes(parent->name) );
+		mSkelWriter.closeTag();
+	}
+
+	mSkelWriter.closeTag();	// bonehierarchy
 }
 
 void MD5ModelToMesh::convertVector( const vec3_t in, vec3_t out )

@@ -22,6 +22,13 @@ void vec_subtract( const vec3_t a, const vec3_t b, vec3_t out )
 	out[2] = a[2] - b[2];
 }
 
+void vec_scale( const vec3_t v, float f, vec3_t out )
+{
+	out[0] = v[0] * f;
+	out[1] = v[1] * f;
+	out[2] = v[2] * f;
+}
+
 void vec_crossProduct( const vec3_t a, const vec3_t b, vec3_t out )
 {
 	out[0] = a[1] * b[2] - b[1] * a[2];

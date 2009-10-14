@@ -7,6 +7,7 @@
 struct md5_model_t;
 struct md5_mesh_t;
 struct md5_triangle_t;
+struct md5_joint_t;
 
 class MD5ModelToMesh
 {
@@ -36,6 +37,8 @@ private:
 	void buildBoneAssignments( const struct md5_mesh_t *mesh );
 
 	void buildSkeleton( const struct md5_model_t *mdl );
+	void buildBones( const struct md5_model_t *mdl );
+	void buildBoneHierarchy( const struct md5_model_t *mdl );
 
 	void convertVector( const float in[3], float out[3] );
 

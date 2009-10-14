@@ -31,6 +31,7 @@
  */
 
 #include "quaternion.h"
+#include <limits>
 #include <math.h>
 #include <assert.h>
 #include <memory.h>
@@ -193,22 +194,44 @@ Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out)
   out[Z] = (k0 * qa[2]) + (k1 * q1z);
 }
 
+void Quat_copy(const quat4_t q, quat4_t out)
+{
+	out[W] = q[W];
+	out[X] = q[X];
+	out[Y] = q[Y];
+	out[Z] = q[Z];
+}
+
+void Quat_conjugate(const quat4_t q, quat4_t out)
+{
+	out[W] = q[W];
+	out[X] = -q[X];
+	out[Y] = -q[Y];
+	out[Z] = -q[Z];
+}
+
+void Quat_inverse(const quat4_t q, quat4_t out)
+{
+	Quat_conjugate( q, out );
+	Quat_normalize( out );
+}
+
 void Quat_toAngleAxis( const quat4_t q, float *angle, vec3_t axis )
 {
-	float lenSqr = q[0]*q[0] + q[1]*q[1] + q[2]*q[2];
-    if ( lenSqr > 0.0 )
+	float lenSqr = q[X]*q[X] + q[Y]*q[Y] + q[Z]*q[Z];
+	if ( lenSqr > std::numeric_limits<float>::epsilon() )
     {
-        *angle = 2.0f * (float)cos(q[3]);
+        *angle = 2.0f * (float)acos(q[W]);
         float invLen = 1.0f / (float)sqrt(lenSqr);
-        axis[0] = q[0]*invLen;
-        axis[1] = q[1]*invLen;
-        axis[2] = q[2]*invLen;
+        axis[X] = q[X]*invLen;
+        axis[Y] = q[Y]*invLen;
+        axis[Z] = q[Z]*invLen;
     }
     else
     {
         *angle = 0.0f;
-        axis[0] = 1.0f;
-        axis[1] = 0.0f;
-        axis[2] = 0.0f;
+        axis[X] = 1.0f;
+        axis[Y] = 0.0f;
+        axis[Z] = 0.0f;
     }
 }
