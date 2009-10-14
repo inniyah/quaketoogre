@@ -4,6 +4,7 @@
 #include "XmlWriter.h"
 #include "Quake.h"
 
+struct md5_model_t;
 struct md5_mesh_t;
 struct md5_triangle_t;
 
@@ -17,7 +18,7 @@ public:
 	void setConvertCoordinates( bool value ) { mConvertCoords = value; }
 	void setInputFile( const string &filename ) { mInputFile = filename; }
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
-	void setSkeletonFile( const string &filename ) { mSkeletonFile = filename; }
+	void setSkeletonName( const string &name ) { mSkeletonName = name; }
 	void addSubMesh( int index, const string &material ) { mSubMeshes[index] = material; }
 	void addAnimation( const string &name, const string &filename ) { mAnimations[name] = filename; }
 
@@ -26,12 +27,15 @@ public:
 	static void printInfo( const string &filename );
 
 private:
+	void buildMesh( const struct md5_model_t *mdl );
 	void buildSubMesh( const struct md5_mesh_t *mesh, const string &material );
 	void buildFace( const struct md5_triangle_t *triangle );
 	void buildVertexBuffers( const struct md5_mesh_t *mesh );
 	void buildVertex( const float position[3], const float normal[3] );
 	void buildTexCoord( const float texCoord[2] );
 	void buildBoneAssignments( const struct md5_mesh_t *mesh );
+
+	void buildSkeleton( const struct md5_model_t *mdl );
 
 	void convertVector( const float in[3], float out[3] );
 
@@ -41,7 +45,7 @@ private:
 	bool mConvertCoords;
 	string mInputFile;
 	string mOutputFile;
-	string mSkeletonFile;
+	string mSkeletonName;
 	StringMap mAnimations;
 
 	typedef map<int, string> SubMeshMap;

@@ -337,7 +337,7 @@ void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
 		cout << "[Warning] MD5 Skeleton without a name" << endl;
 		return;
 	}
-	builder.setSkeletonFile( (*name) + ".skeleton" );
+	builder.setSkeletonName( *name );
 
 	for ( TiXmlElement *node = skelNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{

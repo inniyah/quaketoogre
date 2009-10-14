@@ -17,40 +17,52 @@ bool MD5ModelToMesh::build()
 		return false;
 	}
 
+	buildMesh( &mdl );
+	if ( !mMeshWriter.saveFile( mOutputFile ) )
+	{
+		cout << "[Error] Could not save mesh XML file" << endl;
+		FreeModel( &mdl );
+		return false;
+	}
+
+	if ( !mSkeletonName.empty() )
+	{
+		buildSkeleton( &mdl );
+		if ( !mSkelWriter.saveFile( mSkeletonName + ".skeleton.xml" ) )
+			cout << "[Warning] Could not save skeleton XML file" << endl;
+	}
+
+	FreeModel( &mdl );
+	return true;
+}
+
+void MD5ModelToMesh::buildMesh( const struct md5_model_t *mdl )
+{
 	mMeshWriter.openTag( "mesh" );
 
 	mMeshWriter.openTag( "submeshes" );
 	for ( SubMeshMap::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter )
 	{
 		int index = iter->first;
-		if ( index < 0 || index >= mdl.num_meshes )
+		if ( index < 0 || index >= mdl->num_meshes )
 		{
 			cout << "[Warning] Invalid submesh index: " << index << endl;
 			continue;
 		}
 
-		struct md5_mesh_t *mesh = &mdl.meshes[index];
-		PrepareMesh( mesh, mdl.baseSkel );
+		struct md5_mesh_t *mesh = &mdl->meshes[index];
+		PrepareMesh( mesh, mdl->baseSkel );
 		buildSubMesh( mesh, iter->second );
 	}
 	mMeshWriter.closeTag();	// submeshes
 
-	if ( !mSkeletonFile.empty() )
+	if ( !mSkeletonName.empty() )
 	{
-		mMeshWriter.openTag( "skeletonlink" )->SetAttribute( "name", mSkeletonFile );
+		mMeshWriter.openTag( "skeletonlink" )->SetAttribute( "name", mSkeletonName + ".skeleton" );
 		mMeshWriter.closeTag();
 	}
 
 	mMeshWriter.closeTag();	// mesh
-	FreeModel( &mdl );
-
-	if ( !mMeshWriter.saveFile( mOutputFile ) )
-	{
-		cout << "[Error] Could not save mesh XML file" << endl;
-		return false;
-	}
-
-	return true;
 }
 
 void MD5ModelToMesh::buildSubMesh( const struct md5_mesh_t *mesh, const string &material )
@@ -94,21 +106,6 @@ void MD5ModelToMesh::buildFace( const struct md5_triangle_t *triangle )
 	mMeshWriter.closeTag();	
 }
 
-static void crossProduct( const vec3_t a, const vec3_t b, vec3_t out )
-{
-	out[0] = a[1] * b[2] - b[1] * a[2];
-	out[1] = a[2] * b[0] - b[2] * a[0];
-	out[2] = a[0] * b[1] - b[0] * a[1];
-}
-
-static void normalize( vec3_t v )
-{
-	float len = (float)sqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] );
-	v[0] /= len;
-	v[1] /= len;
-	v[2] /= len;
-}
-
 static void computeNormals( const struct md5_mesh_t *mesh, vec3_t *normals )
 {
 	memset( normals, 0, sizeof(vec3_t) * mesh->num_verts );
@@ -121,27 +118,26 @@ static void computeNormals( const struct md5_mesh_t *mesh, vec3_t *normals )
 		vec3_t &v1 = mesh->vertexArray[tri->index[1]];
 		vec3_t &v2 = mesh->vertexArray[tri->index[2]];
 
-		// Compute direction vectors
+		// Compute face normal
 		vec3_t dir[2];
-		for ( int j = 0; j < 3; j++ )
-			dir[0][j] = v2[j] - v0[j];
-		for ( int j = 0; j < 3; j++ )
-			dir[1][j] = v1[j] - v0[j];
+		vec_subtract( v2, v0, dir[0] );
+		vec_subtract( v1, v0, dir[1] );
 
 		vec3_t faceNormal;
-		crossProduct( dir[0], dir[1], faceNormal );
+		vec_crossProduct( dir[0], dir[1], faceNormal );
 
+		// Add face normal to the normal of each face vertex
 		for ( int j = 0; j < 3; j++ )
 		{
 			vec3_t &normal = normals[tri->index[j]];
-			for ( int k = 0; k < 3; k++ )
-				normal[k] += faceNormal[k];
+			vec_add( normal, faceNormal, normal );
 		}
 	}
 
+	// Normalize each vertex normal
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
-		normalize( normals[i] );
+		vec_normalize( normals[i] );
 	}
 }
 
@@ -227,10 +223,15 @@ void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 	}
 }
 
-void MD5ModelToMesh::convertVector( const float in[3], float out[3] )
+void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 {
-	for ( int i = 0; i < 3; i++ )
-		out[i] = in[i];
+	mSkelWriter.openTag( "skeleton" );
+	mSkelWriter.closeTag();	// skeleton
+}
+
+void MD5ModelToMesh::convertVector( const vec3_t in, vec3_t out )
+{
+	vec_copy( in, out );
 
 	if ( mConvertCoords )
 		Quake::convertCoordinate( out );
