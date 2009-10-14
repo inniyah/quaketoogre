@@ -7,7 +7,7 @@
 struct md5_mesh_t;
 struct md5_triangle_t;
 
-class MD5ModelToMesh: public XmlWriter
+class MD5ModelToMesh
 {
 public:
 	MD5ModelToMesh();
@@ -34,6 +34,9 @@ private:
 	void buildBoneAssignments( const struct md5_mesh_t *mesh );
 
 	void convertVector( const float in[3], float out[3] );
+
+	XmlWriter mMeshWriter;
+	XmlWriter mSkelWriter;
 
 	bool mConvertCoords;
 	string mInputFile;

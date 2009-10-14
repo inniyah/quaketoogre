@@ -17,9 +17,9 @@ bool MD5ModelToMesh::build()
 		return false;
 	}
 
-	openTag( "mesh" );
+	mMeshWriter.openTag( "mesh" );
 
-	openTag( "submeshes" );
+	mMeshWriter.openTag( "submeshes" );
 	for ( SubMeshMap::iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter )
 	{
 		int index = iter->first;
@@ -33,23 +33,29 @@ bool MD5ModelToMesh::build()
 		PrepareMesh( mesh, mdl.baseSkel );
 		buildSubMesh( mesh, iter->second );
 	}
-	closeTag();	// submeshes
+	mMeshWriter.closeTag();	// submeshes
 
 	if ( !mSkeletonFile.empty() )
 	{
-		openTag( "skeletonlink" )->SetAttribute( "name", mSkeletonFile );
-		closeTag();
+		mMeshWriter.openTag( "skeletonlink" )->SetAttribute( "name", mSkeletonFile );
+		mMeshWriter.closeTag();
 	}
 
-	closeTag();	// mesh
+	mMeshWriter.closeTag();	// mesh
 	FreeModel( &mdl );
 
-	return saveFile( mOutputFile );
+	if ( !mMeshWriter.saveFile( mOutputFile ) )
+	{
+		cout << "[Error] Could not save mesh XML file" << endl;
+		return false;
+	}
+
+	return true;
 }
 
 void MD5ModelToMesh::buildSubMesh( const struct md5_mesh_t *mesh, const string &material )
 {
-	TiXmlElement *submeshNode = openTag( "submesh" );
+	TiXmlElement *submeshNode = mMeshWriter.openTag( "submesh" );
 
 	string matName = (material.empty() ? mesh->shader : material);
 	submeshNode->SetAttribute( "material", matName );
@@ -57,35 +63,35 @@ void MD5ModelToMesh::buildSubMesh( const struct md5_mesh_t *mesh, const string &
 	submeshNode->SetAttribute( "operationtype", "triangle_list" );
 
 	// Faces
-	TiXmlElement *facesNode = openTag( "faces" );
+	TiXmlElement *facesNode = mMeshWriter.openTag( "faces" );
 	facesNode->SetAttribute( "count", mesh->num_tris );
 	for ( int i = 0; i < mesh->num_tris; i++ )
 	{
 		buildFace( &mesh->triangles[i] );
 	}
-	closeTag();	// faces
+	mMeshWriter.closeTag();	// faces
 
 	// Geometry
-	TiXmlElement *geomNode = openTag( "geometry" );
+	TiXmlElement *geomNode = mMeshWriter.openTag( "geometry" );
 	geomNode->SetAttribute( "vertexcount", mesh->num_verts );
 	buildVertexBuffers( mesh );
-	closeTag();	// geometry
+	mMeshWriter.closeTag();	// geometry
 
 	// Bone assignments
-	openTag( "boneassignments" );
+	mMeshWriter.openTag( "boneassignments" );
 	buildBoneAssignments( mesh );
-	closeTag();	// boneassignments
+	mMeshWriter.closeTag();	// boneassignments
 
-	closeTag();	// submesh
+	mMeshWriter.closeTag();	// submesh
 }
 
 void MD5ModelToMesh::buildFace( const struct md5_triangle_t *triangle )
 {
-	TiXmlElement *faceNode = openTag( "face" );
+	TiXmlElement *faceNode = mMeshWriter.openTag( "face" );
 	faceNode->SetAttribute( "v1", triangle->index[0] );
 	faceNode->SetAttribute( "v2", triangle->index[2] );
 	faceNode->SetAttribute( "v3", triangle->index[1] );
-	closeTag();	
+	mMeshWriter.closeTag();	
 }
 
 static void crossProduct( const vec3_t a, const vec3_t b, vec3_t out )
@@ -145,26 +151,26 @@ void MD5ModelToMesh::buildVertexBuffers( const struct md5_mesh_t *mesh )
 	computeNormals( mesh, normals );
 
 	// Vertices and normals
-	TiXmlElement *vbNode = openTag( "vertexbuffer" );
+	TiXmlElement *vbNode = mMeshWriter.openTag( "vertexbuffer" );
 	vbNode->SetAttribute( "positions", "true" );
 	vbNode->SetAttribute( "normals", "true" );
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
 		buildVertex( mesh->vertexArray[i], normals[i] );
 	}
-	closeTag();	// vertexbuffer
+	mMeshWriter.closeTag();	// vertexbuffer
 
 	delete[] normals;
 
 	// Texture coordinates
-	TiXmlElement *tcNode = openTag( "vertexbuffer" );
+	TiXmlElement *tcNode = mMeshWriter.openTag( "vertexbuffer" );
 	tcNode->SetAttribute( "texture_coords", 1 );
 	tcNode->SetAttribute( "texture_coord_dimensions_0", 2 );
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
 		buildTexCoord( mesh->vertices[i].st );
 	}
-	closeTag();
+	mMeshWriter.closeTag();
 }
 
 void MD5ModelToMesh::buildVertex( const float position[3], const float normal[3] )
@@ -173,33 +179,33 @@ void MD5ModelToMesh::buildVertex( const float position[3], const float normal[3]
 	convertVector( position, v );
 	convertVector( normal, n );
 
-	openTag( "vertex" );
+	mMeshWriter.openTag( "vertex" );
 
-	TiXmlElement *posNode = openTag( "position" );
-	posNode->SetAttribute( "x", toStr( v[0] ) );
-	posNode->SetAttribute( "y", toStr( v[1] ) );
-	posNode->SetAttribute( "z", toStr( v[2] ) );
-	closeTag();
+	TiXmlElement *posNode = mMeshWriter.openTag( "position" );
+	posNode->SetAttribute( "x", XmlWriter::toStr( v[0] ) );
+	posNode->SetAttribute( "y", XmlWriter::toStr( v[1] ) );
+	posNode->SetAttribute( "z", XmlWriter::toStr( v[2] ) );
+	mMeshWriter.closeTag();
 	
-	TiXmlElement *normNode = openTag( "normal" );
-	normNode->SetAttribute( "x", toStr( n[0] ) );
-	normNode->SetAttribute( "y", toStr( n[1] ) );
-	normNode->SetAttribute( "z", toStr( n[2] ) );
-	closeTag();
+	TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
+	normNode->SetAttribute( "x", XmlWriter::toStr( n[0] ) );
+	normNode->SetAttribute( "y", XmlWriter::toStr( n[1] ) );
+	normNode->SetAttribute( "z", XmlWriter::toStr( n[2] ) );
+	mMeshWriter.closeTag();
 
-	closeTag();	// vertex
+	mMeshWriter.closeTag();	// vertex
 }
 
 void MD5ModelToMesh::buildTexCoord( const float texCoord[2] )
 {
-	openTag( "vertex" );
+	mMeshWriter.openTag( "vertex" );
 
-	TiXmlElement *tcNode = openTag( "texcoord" );
-	tcNode->SetAttribute( "u", toStr( texCoord[0] ) );
-	tcNode->SetAttribute( "v", toStr( texCoord[1] ) );
-	closeTag();
+	TiXmlElement *tcNode = mMeshWriter.openTag( "texcoord" );
+	tcNode->SetAttribute( "u", XmlWriter::toStr( texCoord[0] ) );
+	tcNode->SetAttribute( "v", XmlWriter::toStr( texCoord[1] ) );
+	mMeshWriter.closeTag();
 
-	closeTag();
+	mMeshWriter.closeTag();
 }
 
 void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
@@ -211,15 +217,12 @@ void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 		{
 			const struct md5_weight_t *w = &mesh->weights[v->start + j];
 
-			TiXmlElement *vbNode = openTag( "vertexboneassignment" );
+			TiXmlElement *vbNode = mMeshWriter.openTag( "vertexboneassignment" );
 			vbNode->SetAttribute( "vertexindex", i );
 			vbNode->SetAttribute( "boneindex", w->joint );
+			vbNode->SetAttribute( "weight", XmlWriter::toStr( w->bias ) );
 
-			stringstream ss;
-			ss << w->bias;
-			vbNode->SetAttribute( "weight", ss.str() );
-
-			closeTag();
+			mMeshWriter.closeTag();
 		}
 	}
 }

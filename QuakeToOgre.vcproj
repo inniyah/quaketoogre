@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\quaternion.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tinyxml.cpp"
 				>
 			</File>
@@ -231,6 +235,10 @@
 			</File>
 			<File
 				RelativePath=".\tinyxmlparser.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\vector.cpp"
 				>
 			</File>
 			<File
@@ -288,11 +296,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\quaternion.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
 			<File
 				RelativePath=".\tinyxml.h"
+				>
+			</File>
+			<File
+				RelativePath=".\vector.h"
 				>
 			</File>
 			<File

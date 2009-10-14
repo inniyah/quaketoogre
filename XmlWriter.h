@@ -10,7 +10,6 @@ public:
 	operator string() const;
 	friend ostream &operator<<( ostream &os, const XmlWriter &xw );
 
-protected:
 	TiXmlElement *openTag( const string &name );
 	void closeTag();
 
