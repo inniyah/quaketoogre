@@ -12,9 +12,6 @@ public:
 
 	TiXmlElement *openTag( const string &name );
 	void closeTag();
-
-	static string toStr( const char *str, size_t len );
-	static string toStr( float f );
 	
 private:
 	TiXmlDocument mDoc;

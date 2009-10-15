@@ -16,7 +16,8 @@ OBJ = \
 	md5anim.o \
 	MD5ModelToMesh.o \
 	quaternion.o \
-	vector.o
+	vector.o \
+	StringUtil.o
 
 CC = g++
 INCLUDE =

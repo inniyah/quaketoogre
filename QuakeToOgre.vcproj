@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\StringUtil.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tinyxml.cpp"
 				>
 			</File>
@@ -293,6 +297,10 @@
 			</File>
 			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StringUtil.h"
 				>
 			</File>
 			<File

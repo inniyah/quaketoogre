@@ -34,7 +34,7 @@ void Q3ModelToMesh::convert()
 	for ( int i = 0; i < mModel.header.numMeshes; i++ )
 	{
 		TiXmlElement *smnameNode = openTag( "submeshname" );
-		smnameNode->SetAttribute( "name", toStr( mModel.meshes[i].header.name, 64 ) );
+		smnameNode->SetAttribute( "name", StringUtil::toString( mModel.meshes[i].header.name, 64 ) );
 		smnameNode->SetAttribute( "index", i );
 		closeTag();
 	}
@@ -63,7 +63,7 @@ void Q3ModelToMesh::buildSubMesh( const MD3Mesh &mesh )
 	if ( iter != mMaterials.end() )
 		materialName = iter->second;	
 	else
-		materialName = toStr( mesh.shaders[0].name, 64 );
+		materialName = StringUtil::toString( mesh.shaders[0].name, 64 );
 
 	TiXmlElement *submeshNode = openTag( "submesh" );
 	submeshNode->SetAttribute( "material", materialName );
@@ -133,16 +133,16 @@ void Q3ModelToMesh::buildVertex( const MD3Vertex &vert )
 
 	// Position
 	TiXmlElement *posNode = openTag( "position" );
-	posNode->SetAttribute( "x", toStr( position[0] ) );
-	posNode->SetAttribute( "y", toStr( position[1] ) );
-	posNode->SetAttribute( "z", toStr( position[2] ) );
+	posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
+	posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
+	posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
 	closeTag();
 	
 	// Normal
 	TiXmlElement *normNode = openTag( "normal" );
-	normNode->SetAttribute( "x", toStr( normal[0] ) );
-	normNode->SetAttribute( "y", toStr( normal[1] ) );
-	normNode->SetAttribute( "z", toStr( normal[2] ) );
+	normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
+	normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
+	normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
 	closeTag();
 
 	closeTag();
@@ -153,8 +153,8 @@ void Q3ModelToMesh::buildTexCoord( const MD3TexCoord &texCoord )
 	openTag( "vertex" );
 
 	TiXmlElement *tcNode = openTag( "texcoord" );
-	tcNode->SetAttribute( "u", toStr( texCoord.uv[0] ) );
-	tcNode->SetAttribute( "v", toStr( texCoord.uv[1] ) );
+	tcNode->SetAttribute( "u", StringUtil::toString( texCoord.uv[0] ) );
+	tcNode->SetAttribute( "v", StringUtil::toString( texCoord.uv[1] ) );
 	closeTag();
 
 	closeTag();
@@ -166,7 +166,7 @@ void Q3ModelToMesh::buildAnimation( const string &name, int startFrame, int numF
 
 	TiXmlElement *animNode = openTag( "animation" );
 	animNode->SetAttribute( "name", name );
-	animNode->SetAttribute( "length", toStr( (float)numFrames / (float)fps ) );
+	animNode->SetAttribute( "length", StringUtil::toString( (float)numFrames / (float)fps ) );
 
 	openTag( "tracks" );
 	for ( int i = 0; i < mModel.header.numMeshes; i++ )
@@ -206,7 +206,7 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 	cout << "Building frame " << frame << " for SubMesh '" << mesh.header.name << "'" << endl;
 
 	TiXmlElement *kfNode = openTag( "keyframe" );
-	kfNode->SetAttribute( "time", toStr( time ) );
+	kfNode->SetAttribute( "time", StringUtil::toString( time ) );
 
 	const MD3Vertex *verts = &mesh.vertices[frame * mesh.header.numVertices];
 	float position[3], normal[3];
@@ -218,15 +218,15 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 		convertNormal( vertex.normal, normal );
 
 		TiXmlElement *posNode = openTag( "position" );
-		posNode->SetAttribute( "x", toStr( position[0] ) );
-		posNode->SetAttribute( "y", toStr( position[1] ) );
-		posNode->SetAttribute( "z", toStr( position[2] ) );
+		posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
+		posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
+		posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
 		closeTag();
 		
 		TiXmlElement *normNode = openTag( "normal" );
-		normNode->SetAttribute( "x", toStr( normal[0] ) );
-		normNode->SetAttribute( "y", toStr( normal[1] ) );
-		normNode->SetAttribute( "z", toStr( normal[2] ) );
+		normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
+		normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
+		normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
 		closeTag();		
 	}
 

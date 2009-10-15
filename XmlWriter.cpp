@@ -1,8 +1,6 @@
 #include "Common.h"
 #include "XmlWriter.h"
 
-static char tmp[32];
-
 XmlWriter::XmlWriter()
 {
 	mDoc.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );
@@ -43,15 +41,3 @@ void XmlWriter::closeTag()
 {
 	mNodeStack.pop_back();
 }
-
-string XmlWriter::toStr( const char *str, size_t len )
-{
-	return string( str, MIN( strlen( str ), len ) );
-}
-
-string XmlWriter::toStr( float f )
-{
-	sprintf( tmp, "%f", f );
-	return string( tmp );
-}
-

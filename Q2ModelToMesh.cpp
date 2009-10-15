@@ -158,16 +158,16 @@ void Q2ModelToMesh::buildVertex( const MD2Frame &frame, int vertIndex )
 
 	// Position
 	TiXmlElement *posNode = openTag( "position" );
-	posNode->SetAttribute( "x", toStr( position[0] ) );
-	posNode->SetAttribute( "y", toStr( position[1] ) );
-	posNode->SetAttribute( "z", toStr( position[2] ) );
+	posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
+	posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
+	posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
 	closeTag();
 	
 	// Normal
 	TiXmlElement *normNode = openTag( "normal" );
-	normNode->SetAttribute( "x", toStr( normal[0] ) );
-	normNode->SetAttribute( "y", toStr( normal[1] ) );
-	normNode->SetAttribute( "z", toStr( normal[2] ) );
+	normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
+	normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
+	normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
 	closeTag();
 
 	closeTag();	
@@ -178,8 +178,8 @@ void Q2ModelToMesh::buildTexCoord( const MD2TexCoord &texCoord )
 	openTag( "vertex" );
 
 	TiXmlElement *tcNode = openTag( "texcoord" );
-	tcNode->SetAttribute( "u", toStr( (float)texCoord.u / (float)mModel.header.skinWidth ) );
-	tcNode->SetAttribute( "v", toStr( (float)texCoord.v / (float)mModel.header.skinHeight ) );
+	tcNode->SetAttribute( "u", StringUtil::toString( (float)texCoord.u / (float)mModel.header.skinWidth ) );
+	tcNode->SetAttribute( "v", StringUtil::toString( (float)texCoord.v / (float)mModel.header.skinHeight ) );
 	closeTag();
 
 	closeTag();
@@ -191,7 +191,7 @@ void Q2ModelToMesh::buildAnimation( const string &name, int startFrame, int numF
 
 	TiXmlElement *animNode = openTag( "animation" );
 	animNode->SetAttribute( "name", name );
-	animNode->SetAttribute( "length", toStr( (float)numFrames / (float)fps ) );
+	animNode->SetAttribute( "length", StringUtil::toString( (float)numFrames / (float)fps ) );
 
 	openTag( "tracks" );
 	buildTrack( startFrame, numFrames, fps );
@@ -226,7 +226,7 @@ void Q2ModelToMesh::buildKeyframe( int frameIndex, float time )
 	cout << "Building frame " << frameIndex << endl;
 
 	TiXmlElement *kfNode = openTag( "keyframe" );
-	kfNode->SetAttribute( "time", toStr( time ) );
+	kfNode->SetAttribute( "time", StringUtil::toString( time ) );
 
 	const MD2Frame &frame = mModel.frames[frameIndex];
 	float position[3], normal[3];
@@ -239,15 +239,15 @@ void Q2ModelToMesh::buildKeyframe( int frameIndex, float time )
 		convertNormal( vert.normalIndex, normal );
 
 		TiXmlElement *posNode = openTag( "position" );
-		posNode->SetAttribute( "x", toStr( position[0] ) );
-		posNode->SetAttribute( "y", toStr( position[1] ) );
-		posNode->SetAttribute( "z", toStr( position[2] ) );
+		posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
+		posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
+		posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
 		closeTag();
 		
 		TiXmlElement *normNode = openTag( "normal" );
-		normNode->SetAttribute( "x", toStr( normal[0] ) );
-		normNode->SetAttribute( "y", toStr( normal[1] ) );
-		normNode->SetAttribute( "z", toStr( normal[2] ) );
+		normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
+		normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
+		normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
 		closeTag();
 	}
 

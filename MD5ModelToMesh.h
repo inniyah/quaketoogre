@@ -45,7 +45,8 @@ private:
 	static void convertQuaternion( quat4_t q );
 	static void convertCoordSystem( struct md5_model_t *mdl );
 	static void convertCoordSystem( struct md5_anim_t *anim );
-	static void jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, vec3_t translate, quat4_t rotate );
+	static void jointDifference( const struct md5_joint_t *from, 
+		const struct md5_joint_t *to, vec3_t translate, quat4_t rotate );
 
 	XmlWriter mMeshWriter;
 	XmlWriter mSkelWriter;

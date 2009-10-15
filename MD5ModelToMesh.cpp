@@ -177,15 +177,15 @@ void MD5ModelToMesh::buildVertex( const float position[3], const float normal[3]
 	mMeshWriter.openTag( "vertex" );
 
 	TiXmlElement *posNode = mMeshWriter.openTag( "position" );
-	posNode->SetAttribute( "x", XmlWriter::toStr( position[0] ) );
-	posNode->SetAttribute( "y", XmlWriter::toStr( position[1] ) );
-	posNode->SetAttribute( "z", XmlWriter::toStr( position[2] ) );
+	posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
+	posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
+	posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
 	mMeshWriter.closeTag();
 	
 	TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
-	normNode->SetAttribute( "x", XmlWriter::toStr( normal[0] ) );
-	normNode->SetAttribute( "y", XmlWriter::toStr( normal[1] ) );
-	normNode->SetAttribute( "z", XmlWriter::toStr( normal[2] ) );
+	normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
+	normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
+	normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
 	mMeshWriter.closeTag();
 
 	mMeshWriter.closeTag();	// vertex
@@ -196,8 +196,8 @@ void MD5ModelToMesh::buildTexCoord( const float texCoord[2] )
 	mMeshWriter.openTag( "vertex" );
 
 	TiXmlElement *tcNode = mMeshWriter.openTag( "texcoord" );
-	tcNode->SetAttribute( "u", XmlWriter::toStr( texCoord[0] ) );
-	tcNode->SetAttribute( "v", XmlWriter::toStr( texCoord[1] ) );
+	tcNode->SetAttribute( "u", StringUtil::toString( texCoord[0] ) );
+	tcNode->SetAttribute( "v", StringUtil::toString( texCoord[1] ) );
 	mMeshWriter.closeTag();
 
 	mMeshWriter.closeTag();
@@ -215,7 +215,7 @@ void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 			TiXmlElement *vbNode = mMeshWriter.openTag( "vertexboneassignment" );
 			vbNode->SetAttribute( "vertexindex", i );
 			vbNode->SetAttribute( "boneindex", w->joint );
-			vbNode->SetAttribute( "weight", XmlWriter::toStr( w->bias ) );
+			vbNode->SetAttribute( "weight", StringUtil::toString( w->bias ) );
 
 			mMeshWriter.closeTag();
 		}
@@ -234,16 +234,6 @@ void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 	mSkelWriter.closeTag();	// skeleton
 }
 
-static string stripQuotes( const string &str )
-{
-	size_t len = str.size();
-
-	if ( str[0] == '\"' && str[len-1] == '\"' )
-		return str.substr( 1, len-2 );
-
-	return str;
-}
-
 void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 {
 	mSkelWriter.openTag( "bones" );
@@ -256,7 +246,7 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 
 		TiXmlElement *boneNode = mSkelWriter.openTag( "bone" );
 		boneNode->SetAttribute( "id", i );
-		boneNode->SetAttribute( "name", stripQuotes(joint->name) );
+		boneNode->SetAttribute( "name", StringUtil::stripQuotes(joint->name) );
 
 		vec3_t pos;
 		quat4_t orient;
@@ -279,18 +269,18 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		Quat_toAngleAxis( orient, &angle, axis );
 
 		TiXmlElement *posNode = mSkelWriter.openTag( "position" );
-		posNode->SetAttribute( "x", XmlWriter::toStr( pos[0] ) );
-		posNode->SetAttribute( "y", XmlWriter::toStr( pos[1] ) );
-		posNode->SetAttribute( "z", XmlWriter::toStr( pos[2] ) );
+		posNode->SetAttribute( "x", StringUtil::toString( pos[0] ) );
+		posNode->SetAttribute( "y", StringUtil::toString( pos[1] ) );
+		posNode->SetAttribute( "z", StringUtil::toString( pos[2] ) );
 		mSkelWriter.closeTag();	// position
 
 		TiXmlElement *rotNode = mSkelWriter.openTag( "rotation" );
-		rotNode->SetAttribute( "angle", XmlWriter::toStr( angle ) );
+		rotNode->SetAttribute( "angle", StringUtil::toString( angle ) );
 
 		TiXmlElement *axisNode = mSkelWriter.openTag( "axis" );
-		axisNode->SetAttribute( "x", XmlWriter::toStr( axis[0] ) );
-		axisNode->SetAttribute( "y", XmlWriter::toStr( axis[1] ) );
-		axisNode->SetAttribute( "z", XmlWriter::toStr( axis[2] ) );
+		axisNode->SetAttribute( "x", StringUtil::toString( axis[0] ) );
+		axisNode->SetAttribute( "y", StringUtil::toString( axis[1] ) );
+		axisNode->SetAttribute( "z", StringUtil::toString( axis[2] ) );
 		mSkelWriter.closeTag();	// axis
 		mSkelWriter.closeTag();	// rotation
 
@@ -313,8 +303,8 @@ void MD5ModelToMesh::buildBoneHierarchy( const struct md5_model_t *mdl )
 		const struct md5_joint_t *parent = &mdl->baseSkel[joint->parent];
 
 		TiXmlElement *node = mSkelWriter.openTag( "boneparent" );
-		node->SetAttribute( "bone", stripQuotes(joint->name) );
-		node->SetAttribute( "parent", stripQuotes(parent->name) );
+		node->SetAttribute( "bone", StringUtil::stripQuotes(joint->name) );
+		node->SetAttribute( "parent", StringUtil::stripQuotes(parent->name) );
 		mSkelWriter.closeTag();
 	}
 
@@ -332,13 +322,6 @@ void MD5ModelToMesh::convertQuaternion( quat4_t q )
 
 void MD5ModelToMesh::convertCoordSystem( struct md5_model_t *mdl )
 {	
-	for ( int i = 0; i < mdl->num_meshes; i++ )
-	{
-		struct md5_mesh_t *mesh = &mdl->meshes[i];
-		for ( int j = 0; j < mesh->num_weights; j++ )
-			Quake::convertCoordinate( mesh->weights[j].pos );
-	}
-	
 	for ( int i = 0; i < mdl->num_joints; i++ )
 	{
 		struct md5_joint_t *joint = &mdl->baseSkel[i];
@@ -364,7 +347,8 @@ void MD5ModelToMesh::convertCoordSystem( struct md5_anim_t *anim )
 	}
 }
 
-void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, vec3_t translate, quat4_t rotate )
+void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, 
+	const struct md5_joint_t *to, vec3_t translate, quat4_t rotate )
 {
 	// This computes the transformation from one given joint to another
 	quat4_t fromInv;
@@ -376,25 +360,14 @@ void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const stru
 	Quat_rotatePoint( fromInv, tmp, translate );
 }
 
-static string getExtension( const string &filename )
-{
-	size_t pos = filename.find_last_of( '.' );
-	if ( pos == string::npos )
-		return "";
-
-	string ext = filename.substr( pos+1 );
-	std::transform( ext.begin(), ext.end(), ext.begin(), static_cast<int(*)(int)>(std::tolower) );
-	return ext;
-}
-
 bool MD5ModelToMesh::isMD5Mesh( const string &filename )
 {
-	return (getExtension( filename ) == "md5mesh");
+	return (StringUtil::getExtension( filename ) == "md5mesh");
 }
 
 bool MD5ModelToMesh::isMD5Anim( const string &filename )
 {
-	return (getExtension( filename ) == "md5anim");
+	return (StringUtil::getExtension( filename ) == "md5anim");
 }
 
 void MD5ModelToMesh::printInfo( const string &filename )
