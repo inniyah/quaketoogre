@@ -16,6 +16,9 @@ bool MD5ModelToMesh::build()
 		cout << "[Error] Could not load file '" << mInputFile << "'" << endl;
 		return false;
 	}
+	
+	if ( mConvertCoords )
+		convertCoordSystem( &mdl );
 
 	buildMesh( &mdl );
 	if ( !mMeshWriter.saveFile( mOutputFile ) )
@@ -171,22 +174,18 @@ void MD5ModelToMesh::buildVertexBuffers( const struct md5_mesh_t *mesh )
 
 void MD5ModelToMesh::buildVertex( const float position[3], const float normal[3] )
 {
-	float v[3], n[3];
-	convertVector( position, v );
-	convertVector( normal, n );
-
 	mMeshWriter.openTag( "vertex" );
 
 	TiXmlElement *posNode = mMeshWriter.openTag( "position" );
-	posNode->SetAttribute( "x", XmlWriter::toStr( v[0] ) );
-	posNode->SetAttribute( "y", XmlWriter::toStr( v[1] ) );
-	posNode->SetAttribute( "z", XmlWriter::toStr( v[2] ) );
+	posNode->SetAttribute( "x", XmlWriter::toStr( position[0] ) );
+	posNode->SetAttribute( "y", XmlWriter::toStr( position[1] ) );
+	posNode->SetAttribute( "z", XmlWriter::toStr( position[2] ) );
 	mMeshWriter.closeTag();
 	
 	TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
-	normNode->SetAttribute( "x", XmlWriter::toStr( n[0] ) );
-	normNode->SetAttribute( "y", XmlWriter::toStr( n[1] ) );
-	normNode->SetAttribute( "z", XmlWriter::toStr( n[2] ) );
+	normNode->SetAttribute( "x", XmlWriter::toStr( normal[0] ) );
+	normNode->SetAttribute( "y", XmlWriter::toStr( normal[1] ) );
+	normNode->SetAttribute( "z", XmlWriter::toStr( normal[2] ) );
 	mMeshWriter.closeTag();
 
 	mMeshWriter.closeTag();	// vertex
@@ -230,6 +229,8 @@ void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 	buildBones( mdl );
 	buildBoneHierarchy( mdl );
 
+	// TODO load animation files, convert coord system, build animations block
+
 	mSkelWriter.closeTag();	// skeleton
 }
 
@@ -241,16 +242,6 @@ static string stripQuotes( const string &str )
 		return str.substr( 1, len-2 );
 
 	return str;
-}
-
-void MD5ModelToMesh::convertQuaternion( const quat4_t in, quat4_t out )
-{
-	static const quat4_t trsf = {0.707107f, 0, 0, -0.707107f};
-
-	if ( mConvertCoords )
-		Quat_multQuat( trsf, in, out );
-	else
-		Quat_copy( in, out );
 }
 
 void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
@@ -267,35 +258,22 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		boneNode->SetAttribute( "id", i );
 		boneNode->SetAttribute( "name", stripQuotes(joint->name) );
 
-		vec3_t jointPos, pos;
-		quat4_t jointOrient, orient;
-
-		convertVector( joint->pos, jointPos );
-		convertQuaternion( joint->orient, jointOrient );
+		vec3_t pos;
+		quat4_t orient;
 
 		if ( parent )
 		{
 			// Convert the bone's orientation from world space to joint local space
-			vec3_t parentPos;
-			quat4_t parentOrient;
-			convertVector( parent->pos, parentPos );
-			convertQuaternion( parent->orient, parentOrient );
-
-			quat4_t parentInv;
-			Quat_inverse( parentOrient, parentInv );
-			Quat_multQuat( parentInv, jointOrient, orient );
-
-			vec3_t tmp;
-			vec_subtract( jointPos, parentPos, tmp );
-			Quat_rotatePoint( parentInv, tmp, pos );
+			jointDifference( parent, joint, pos, orient );
 		}
 		else
 		{
 			// Root bone, so just copy the bone's world space orientation
-			vec_copy( jointPos, pos );
-			Quat_copy( jointOrient, orient );
+			vec_copy( joint->pos, pos );
+			Quat_copy( joint->orient, orient );
 		}
 
+		// Ogre's mesh format wants its rotations as axis+angle
 		vec3_t axis;
 		float angle;
 		Quat_toAngleAxis( orient, &angle, axis );
@@ -343,12 +321,59 @@ void MD5ModelToMesh::buildBoneHierarchy( const struct md5_model_t *mdl )
 	mSkelWriter.closeTag();	// bonehierarchy
 }
 
-void MD5ModelToMesh::convertVector( const vec3_t in, vec3_t out )
+void MD5ModelToMesh::convertQuaternion( quat4_t q )
 {
-	vec_copy( in, out );
+	static const quat4_t trsf = {0.707107f, 0, 0, -0.707107f};
+	
+	quat4_t tmp;
+	Quat_multQuat( trsf, q, tmp );
+	Quat_copy( tmp, q );
+}
 
-	if ( mConvertCoords )
-		Quake::convertCoordinate( out );
+void MD5ModelToMesh::convertCoordSystem( struct md5_model_t *mdl )
+{	
+	for ( int i = 0; i < mdl->num_meshes; i++ )
+	{
+		struct md5_mesh_t *mesh = &mdl->meshes[i];
+		for ( int j = 0; j < mesh->num_weights; j++ )
+			Quake::convertCoordinate( mesh->weights[j].pos );
+	}
+	
+	for ( int i = 0; i < mdl->num_joints; i++ )
+	{
+		struct md5_joint_t *joint = &mdl->baseSkel[i];
+		Quake::convertCoordinate( joint->pos );
+		convertQuaternion( joint->orient );
+	}
+}
+
+void MD5ModelToMesh::convertCoordSystem( struct md5_anim_t *anim )
+{
+	for ( int i = 0; i < anim->num_frames; i++ )
+	{
+		for ( int j = 0; j < anim->num_joints; j++ )
+		{
+			struct md5_joint_t *joint = &anim->skelFrames[i][j];
+			Quake::convertCoordinate( joint->pos );
+			convertQuaternion( joint->orient );
+		}
+		
+		struct md5_bbox_t *bbox = &anim->bboxes[i];
+		Quake::convertCoordinate( bbox->min );
+		Quake::convertCoordinate( bbox->max );
+	}
+}
+
+void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, vec3_t translate, quat4_t rotate )
+{
+	// This computes the transformation from one given joint to another
+	quat4_t fromInv;
+	Quat_inverse( from->orient, fromInv );
+	Quat_multQuat( fromInv, to->orient, rotate );
+
+	vec3_t tmp;
+	vec_subtract( to->pos, from->pos, tmp );
+	Quat_rotatePoint( fromInv, tmp, translate );
 }
 
 static string getExtension( const string &filename )

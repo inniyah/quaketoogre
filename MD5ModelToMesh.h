@@ -3,6 +3,8 @@
 
 #include "XmlWriter.h"
 #include "Quake.h"
+#include "vector.h"
+#include "quaternion.h"
 
 struct md5_model_t;
 struct md5_mesh_t;
@@ -40,8 +42,10 @@ private:
 	void buildBones( const struct md5_model_t *mdl );
 	void buildBoneHierarchy( const struct md5_model_t *mdl );
 
-	void convertVector( const float in[3], float out[3] );
-	void convertQuaternion( const float in[4], float out[4] );
+	static void convertQuaternion( quat4_t q );
+	static void convertCoordSystem( struct md5_model_t *mdl );
+	static void convertCoordSystem( struct md5_anim_t *anim );
+	static void jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, vec3_t translate, quat4_t rotate );
 
 	XmlWriter mMeshWriter;
 	XmlWriter mSkelWriter;
