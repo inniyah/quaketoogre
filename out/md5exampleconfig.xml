@@ -14,11 +14,15 @@
 		        <materialname>md5models/bernie/fx</materialname>
 		    </submesh>
 		</submeshes>
-		
+
 		<md5skeleton name="bernie">
 			<md5anim>
 				<animationname>SpitAttack</animationname>
-				<inputfile>spit_attack1.md5anim</inputfile>
+				<inputfile>bernie/spit_attack1.md5anim</inputfile>
+			</md5anim>
+			<md5anim>
+			    <animationname>FastWalk</animationname>
+			    <inputfile>bernie/fastwalk.md5anim</inputfile>
 			</md5anim>
 		</md5skeleton>
 	</md5mesh>

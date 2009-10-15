@@ -229,7 +229,8 @@ void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 	buildBones( mdl );
 	buildBoneHierarchy( mdl );
 
-	// TODO load animation files, convert coord system, build animations block
+	if ( !mAnimations.empty() )
+		buildAnimations( mdl );
 
 	mSkelWriter.closeTag();	// skeleton
 }
@@ -309,6 +310,105 @@ void MD5ModelToMesh::buildBoneHierarchy( const struct md5_model_t *mdl )
 	}
 
 	mSkelWriter.closeTag();	// bonehierarchy
+}
+
+void MD5ModelToMesh::buildAnimations( const struct md5_model_t *mdl )
+{
+	mSkelWriter.openTag( "animations" );
+
+	for ( StringMap::iterator iter = mAnimations.begin(); iter != mAnimations.end(); ++iter )
+	{
+		struct md5_anim_t anim;
+		if ( !ReadMD5Anim( iter->second.c_str(), &anim ) )
+		{
+			cout << "[Warning] Could not load MD5 animation file '" << iter->second << "'" << endl;
+			continue;
+		}
+
+		if ( !CheckAnimValidity( mdl, &anim ) )
+		{
+			cout << "[Warning] MD5 animation file '" << iter->second << "' is not compatible with this model" << endl;
+			FreeAnim( &anim );
+			continue;
+		}
+
+		if ( mConvertCoords )
+			convertCoordSystem( &anim );
+
+		buildAnimation( iter->first, mdl, &anim );
+		FreeAnim( &anim );
+	}
+
+	mSkelWriter.closeTag();	// animations
+}
+
+void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_t *mdl, const struct md5_anim_t *anim )
+{
+	TiXmlElement *animTag = mSkelWriter.openTag( "animation" );
+	animTag->SetAttribute( "name", name );
+	animTag->SetAttribute( "length", StringUtil::toString((float)anim->num_frames / (float)anim->frameRate) );
+
+	mSkelWriter.openTag( "tracks" );
+	for ( int i = 0; i < anim->num_joints; i++ )
+	{
+		buildTrack( mdl, anim, i );
+	}
+	mSkelWriter.closeTag();	// tracks
+
+	mSkelWriter.closeTag();	// animation
+}
+
+void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex )
+{
+	const struct md5_joint_t *baseJoint = &mdl->baseSkel[jointIndex];
+
+	TiXmlElement *trackTag = mSkelWriter.openTag( "track" );
+	trackTag->SetAttribute( "bone", StringUtil::stripQuotes( baseJoint->name ) );
+
+	mSkelWriter.openTag( "keyframes" );
+
+	const struct md5_joint_t *prevJoint = &anim->skelFrames[anim->num_frames-1][jointIndex];
+	for ( int i = 0; i < anim->num_frames; i++ )
+	{
+		const struct md5_joint_t *currJoint = &anim->skelFrames[i][jointIndex];
+		buildKeyFrame( prevJoint, currJoint, (float)i / (float)anim->frameRate );
+		prevJoint = currJoint;
+	}
+
+	mSkelWriter.closeTag();	// keyframes
+
+	mSkelWriter.closeTag();	// track
+}
+
+void MD5ModelToMesh::buildKeyFrame( const struct md5_joint_t *base, const struct md5_joint_t *frame, float time )
+{
+	TiXmlElement *frameTag = mSkelWriter.openTag( "keyframe" );
+	frameTag->SetAttribute( "time", StringUtil::toString( time ) );
+
+	vec3_t translate;
+	quat4_t rotate;
+	jointDifference( base, frame, translate, rotate );
+
+	TiXmlElement *translateTag = mSkelWriter.openTag( "translate" );
+	translateTag->SetAttribute( "x", StringUtil::toString( translate[0] ) );
+	translateTag->SetAttribute( "y", StringUtil::toString( translate[1] ) );
+	translateTag->SetAttribute( "z", StringUtil::toString( translate[2] ) );
+	mSkelWriter.closeTag();	// translate
+
+	vec3_t axis;
+	float angle;
+	Quat_toAngleAxis( rotate, &angle, axis );
+
+	TiXmlElement *rotateTag = mSkelWriter.openTag( "rotate" );
+	rotateTag->SetAttribute( "angle", StringUtil::toString( angle ) );
+	TiXmlElement *axisTag = mSkelWriter.openTag( "axis" );
+	axisTag->SetAttribute( "x", StringUtil::toString( axis[0] ) );
+	axisTag->SetAttribute( "y", StringUtil::toString( axis[1] ) );
+	axisTag->SetAttribute( "z", StringUtil::toString( axis[2] ) );
+	mSkelWriter.closeTag();	// axis
+	mSkelWriter.closeTag();	// rotate
+
+	mSkelWriter.closeTag();	// keyframe
 }
 
 void MD5ModelToMesh::convertQuaternion( quat4_t q )

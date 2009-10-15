@@ -213,13 +213,13 @@ void Quat_conjugate(const quat4_t q, quat4_t out)
 void Quat_inverse(const quat4_t q, quat4_t out)
 {
 	Quat_conjugate( q, out );
-	Quat_normalize( out );
+//	Quat_normalize( out );
 }
 
 void Quat_toAngleAxis( const quat4_t q, float *angle, vec3_t axis )
 {
 	float lenSqr = q[X]*q[X] + q[Y]*q[Y] + q[Z]*q[Z];
-	if ( lenSqr > std::numeric_limits<float>::epsilon() )
+	if ( q[W] <= 1.0f && lenSqr > 0.0f )
     {
         *angle = 2.0f * (float)acos(q[W]);
         float invLen = 1.0f / (float)sqrt(lenSqr);

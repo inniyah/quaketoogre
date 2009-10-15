@@ -10,6 +10,7 @@ struct md5_model_t;
 struct md5_mesh_t;
 struct md5_triangle_t;
 struct md5_joint_t;
+struct md5_anim_t;
 
 class MD5ModelToMesh
 {
@@ -41,6 +42,10 @@ private:
 	void buildSkeleton( const struct md5_model_t *mdl );
 	void buildBones( const struct md5_model_t *mdl );
 	void buildBoneHierarchy( const struct md5_model_t *mdl );
+	void buildAnimations( const struct md5_model_t *mdl );
+	void buildAnimation( const string &name, const struct md5_model_t *mdl, const struct md5_anim_t *anim );
+	void buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex );
+	void buildKeyFrame( const struct md5_joint_t *base, const struct md5_joint_t *frame, float time );
 
 	static void convertQuaternion( quat4_t q );
 	static void convertCoordSystem( struct md5_model_t *mdl );
