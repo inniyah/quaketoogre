@@ -245,11 +245,7 @@ static string stripQuotes( const string &str )
 
 void MD5ModelToMesh::convertQuaternion( const quat4_t in, quat4_t out )
 {
-	quat4_t trsf;
-	trsf[W] = -0.707107f;
-	trsf[X] = 0.707107f;
-	trsf[Y] = 0;
-	trsf[Z] = 0;
+	static const quat4_t trsf = {0.707107f, 0, 0, -0.707107f};
 
 	if ( mConvertCoords )
 		Quat_multQuat( trsf, in, out );

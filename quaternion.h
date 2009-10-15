@@ -54,4 +54,4 @@ void Quat_conjugate(const quat4_t q, quat4_t out);
 void Quat_inverse(const quat4_t q, quat4_t out);
 void Quat_toAngleAxis(const quat4_t q, float *angle, vec3_t axis);
 
-#endif __QUATERNION_H__
+#endif	// __QUATERNION_H__
