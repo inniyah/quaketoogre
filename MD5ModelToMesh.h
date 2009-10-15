@@ -41,6 +41,7 @@ private:
 	void buildBoneHierarchy( const struct md5_model_t *mdl );
 
 	void convertVector( const float in[3], float out[3] );
+	void convertQuaternion( const float in[4], float out[4] );
 
 	XmlWriter mMeshWriter;
 	XmlWriter mSkelWriter;

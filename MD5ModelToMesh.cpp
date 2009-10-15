@@ -243,6 +243,20 @@ static string stripQuotes( const string &str )
 	return str;
 }
 
+void MD5ModelToMesh::convertQuaternion( const quat4_t in, quat4_t out )
+{
+	quat4_t trsf;
+	trsf[W] = -0.707107f;
+	trsf[X] = 0.707107f;
+	trsf[Y] = 0;
+	trsf[Z] = 0;
+
+	if ( mConvertCoords )
+		Quat_multQuat( trsf, in, out );
+	else
+		Quat_copy( in, out );
+}
+
 void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 {
 	mSkelWriter.openTag( "bones" );
@@ -257,32 +271,38 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		boneNode->SetAttribute( "id", i );
 		boneNode->SetAttribute( "name", stripQuotes(joint->name) );
 
-		vec3_t pos;
-		quat4_t orient;
+		vec3_t jointPos, pos;
+		quat4_t jointOrient, orient;
+
+		convertVector( joint->pos, jointPos );
+		convertQuaternion( joint->orient, jointOrient );
 
 		if ( parent )
 		{
-			// Convert the bone's orientation from world space to its parent's joint space
+			// Convert the bone's orientation from world space to joint local space
+			vec3_t parentPos;
+			quat4_t parentOrient;
+			convertVector( parent->pos, parentPos );
+			convertQuaternion( parent->orient, parentOrient );
+
 			quat4_t parentInv;
-			Quat_inverse( parent->orient, parentInv );
-			Quat_multQuat( parentInv, joint->orient, orient );
+			Quat_inverse( parentOrient, parentInv );
+			Quat_multQuat( parentInv, jointOrient, orient );
 
 			vec3_t tmp;
-			vec_subtract( joint->pos, parent->pos, tmp );
+			vec_subtract( jointPos, parentPos, tmp );
 			Quat_rotatePoint( parentInv, tmp, pos );
 		}
 		else
 		{
 			// Root bone, so just copy the bone's world space orientation
-			vec_copy( joint->pos, pos );
-			Quat_copy( joint->orient, orient );
+			vec_copy( jointPos, pos );
+			Quat_copy( jointOrient, orient );
 		}
 
 		vec3_t axis;
 		float angle;
-		convertVector( pos, pos );
 		Quat_toAngleAxis( orient, &angle, axis );
-		convertVector( axis, axis );	// TODO this is only half-right
 
 		TiXmlElement *posNode = mSkelWriter.openTag( "position" );
 		posNode->SetAttribute( "x", XmlWriter::toStr( pos[0] ) );
