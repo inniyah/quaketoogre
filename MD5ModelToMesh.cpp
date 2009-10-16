@@ -367,12 +367,25 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 
 	mSkelWriter.openTag( "keyframes" );
 
-//	const struct md5_joint_t *prevJoint = &anim->skelFrames[anim->num_frames-1][jointIndex];
 	for ( int i = 0; i < anim->num_frames; i++ )
 	{
-		const struct md5_joint_t *currJoint = &anim->skelFrames[i][jointIndex];
-		buildKeyFrame( baseJoint, currJoint, (float)i / (float)anim->frameRate );
-//		prevJoint = currJoint;
+		const struct md5_joint_t *animJoint = &anim->skelFrames[i][jointIndex];
+		
+		int parentIndex = baseJoint->parent;
+		if ( parentIndex < 0 )
+		{
+			buildKeyFrame( baseJoint, animJoint, (float)i / (float)anim->frameRate );
+		}
+		else
+		{
+			const struct md5_joint_t *baseParent = &mdl->baseSkel[parentIndex];
+			const struct md5_joint_t *animParent = &anim->skelFrames[i][parentIndex];
+			
+			struct md5_joint_t localJoint, tmpJoint;
+			jointDifference( baseParent, baseJoint, localJoint.pos, localJoint.orient );
+			jointDifference( animParent, animJoint, tmpJoint.pos, tmpJoint.orient );
+			buildKeyFrame( &localJoint, &tmpJoint, (float)i / (float)anim->frameRate );
+		}
 	}
 
 	mSkelWriter.closeTag();	// keyframes
@@ -451,13 +464,13 @@ void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from,
 	const struct md5_joint_t *to, vec3_t translate, quat4_t rotate )
 {
 	// This computes the transformation from one given joint to another
-	quat4_t fromInv;
-	Quat_inverse( from->orient, fromInv );
-	Quat_multQuat( fromInv, to->orient, rotate );
+	quat4_t fromOrientInv;
+	Quat_inverse( from->orient, fromOrientInv );
+	Quat_multQuat( fromOrientInv, to->orient, rotate );
 
 	vec3_t tmp;
 	vec_subtract( to->pos, from->pos, tmp );
-	Quat_rotatePoint( fromInv, tmp, translate );
+	Quat_rotatePoint( fromOrientInv, tmp, translate );
 }
 
 bool MD5ModelToMesh::isMD5Mesh( const string &filename )
