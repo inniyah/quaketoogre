@@ -222,7 +222,6 @@ void Quat_toAngleAxis( const quat4_t q, float *angle, vec3_t axis )
 	Quat_copy( q, qp );
 	Quat_normalize( qp );
 
-	// TODO this can be shortened, since qp is normalized
 	float lenSqr = qp[X]*qp[X] + qp[Y]*qp[Y] + qp[Z]*qp[Z];
 	if ( qp[W] <= 1.0f && lenSqr > 0.0f )
     {

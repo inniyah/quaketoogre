@@ -23,6 +23,7 @@
 			<md5anim>
 			    <animationname>FastWalk</animationname>
 			    <inputfile>bernie/fastwalk.md5anim</inputfile>
+			    <lockorigin/>
 			</md5anim>
 		</md5skeleton>
 	</md5mesh>

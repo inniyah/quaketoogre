@@ -241,9 +241,6 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 	for ( int i = 0; i < mdl->num_joints; i++ )
 	{
 		const struct md5_joint_t *joint = &mdl->baseSkel[i];
-		const struct md5_joint_t *parent = NULL;
-		if ( joint->parent >= 0 )
-			parent = &mdl->baseSkel[joint->parent];
 
 		TiXmlElement *boneNode = mSkelWriter.openTag( "bone" );
 		boneNode->SetAttribute( "id", i );
@@ -251,17 +248,17 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 
 		vec3_t pos;
 		quat4_t orient;
-
-		if ( parent )
-		{
-			// Convert the bone's orientation from world space to joint local space
-			jointDifference( parent, joint, pos, orient );
-		}
-		else
+		if ( joint->parent < 0 )
 		{
 			// Root bone, so just copy the bone's world space orientation
 			vec_copy( joint->pos, pos );
 			Quat_copy( joint->orient, orient );
+		}
+		else
+		{
+			// Convert the bone's orientation from world space to joint local space
+			const struct md5_joint_t *parent = &mdl->baseSkel[joint->parent];
+			jointDifference( parent, joint, pos, orient );
 		}
 
 		// Ogre's mesh format wants its rotations as axis+angle
@@ -361,6 +358,8 @@ void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_
 void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex )
 {
 	const struct md5_joint_t *baseJoint = &mdl->baseSkel[jointIndex];
+	static vec3_t translate;
+	static quat4_t rotate;
 
 	TiXmlElement *trackTag = mSkelWriter.openTag( "track" );
 	trackTag->SetAttribute( "bone", StringUtil::stripQuotes( baseJoint->name ) );
@@ -370,22 +369,25 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 	for ( int i = 0; i < anim->num_frames; i++ )
 	{
 		const struct md5_joint_t *animJoint = &anim->skelFrames[i][jointIndex];
+		float time = (float)i / (float)anim->frameRate;
 		
 		int parentIndex = baseJoint->parent;
 		if ( parentIndex < 0 )
 		{
-			buildKeyFrame( baseJoint, animJoint, (float)i / (float)anim->frameRate );
+			jointDifference( baseJoint, animJoint, translate, rotate );
 		}
 		else
 		{
 			const struct md5_joint_t *baseParent = &mdl->baseSkel[parentIndex];
 			const struct md5_joint_t *animParent = &anim->skelFrames[i][parentIndex];
 			
-			struct md5_joint_t localJoint, tmpJoint;
+			static struct md5_joint_t localJoint, tmpJoint;
 			jointDifference( baseParent, baseJoint, localJoint.pos, localJoint.orient );
 			jointDifference( animParent, animJoint, tmpJoint.pos, tmpJoint.orient );
-			buildKeyFrame( &localJoint, &tmpJoint, (float)i / (float)anim->frameRate );
+			jointDifference( &localJoint, &tmpJoint, translate, rotate );
 		}
+
+		buildKeyFrame( time, translate, rotate );
 	}
 
 	mSkelWriter.closeTag();	// keyframes
@@ -393,14 +395,10 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 	mSkelWriter.closeTag();	// track
 }
 
-void MD5ModelToMesh::buildKeyFrame( const struct md5_joint_t *base, const struct md5_joint_t *frame, float time )
+void MD5ModelToMesh::buildKeyFrame( float time, const vec3_t translate, const quat4_t rotate )
 {
 	TiXmlElement *frameTag = mSkelWriter.openTag( "keyframe" );
 	frameTag->SetAttribute( "time", StringUtil::toString( time ) );
-
-	vec3_t translate;
-	quat4_t rotate;
-	jointDifference( base, frame, translate, rotate );
 
 	TiXmlElement *translateTag = mSkelWriter.openTag( "translate" );
 	translateTag->SetAttribute( "x", StringUtil::toString( translate[0] ) );

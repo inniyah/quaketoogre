@@ -33,7 +33,8 @@
 <!ELEMENT md5skeleton (md5anim*)>
 <!ATTLIST md5skeleton
     name    CDATA   #REQUIRED>
-<!ELEMENT md5anim (animationname, inputfile)>
+<!ELEMENT md5anim (animationname, inputfile, lockorigin?)>
+<!ELEMENT lockorigin EMTPY>
 
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>

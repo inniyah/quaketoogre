@@ -45,7 +45,7 @@ private:
 	void buildAnimations( const struct md5_model_t *mdl );
 	void buildAnimation( const string &name, const struct md5_model_t *mdl, const struct md5_anim_t *anim );
 	void buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex );
-	void buildKeyFrame( const struct md5_joint_t *base, const struct md5_joint_t *frame, float time );
+	void buildKeyFrame( float time, const vec3_t translate, const quat4_t rotate );
 
 	static void convertQuaternion( quat4_t q );
 	static void convertCoordSystem( struct md5_model_t *mdl );
