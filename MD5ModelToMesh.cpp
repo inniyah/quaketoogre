@@ -367,12 +367,12 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 
 	mSkelWriter.openTag( "keyframes" );
 
-	const struct md5_joint_t *prevJoint = &anim->skelFrames[anim->num_frames-1][jointIndex];
+//	const struct md5_joint_t *prevJoint = &anim->skelFrames[anim->num_frames-1][jointIndex];
 	for ( int i = 0; i < anim->num_frames; i++ )
 	{
 		const struct md5_joint_t *currJoint = &anim->skelFrames[i][jointIndex];
-		buildKeyFrame( prevJoint, currJoint, (float)i / (float)anim->frameRate );
-		prevJoint = currJoint;
+		buildKeyFrame( baseJoint, currJoint, (float)i / (float)anim->frameRate );
+//		prevJoint = currJoint;
 	}
 
 	mSkelWriter.closeTag();	// keyframes
@@ -479,6 +479,13 @@ void MD5ModelToMesh::printInfo( const string &filename )
 			return;
 
 		cout << "MD5 Mesh file info" << endl;
+		for ( int i = 0; i < mdl.num_joints; i++ )
+		{
+			struct md5_joint_t *joint = &mdl.baseSkel[i];
+			cout << "Joint " << i << " = " << joint->name << endl;
+		}
+		cout << mdl.num_joints << " joints total" << endl;
+
 		for ( int i = 0; i < mdl.num_meshes; i++ )
 		{
 			struct md5_mesh_t *mesh = &mdl.meshes[i];
@@ -487,13 +494,6 @@ void MD5ModelToMesh::printInfo( const string &filename )
 				<< mesh->num_tris << " triangles, " << mesh->num_weights << " weights" << endl;
 		}
 		cout << mdl.num_meshes << " meshes total" << endl;
-
-		for ( int i = 0; i < mdl.num_joints; i++ )
-		{
-			struct md5_joint_t *joint = &mdl.baseSkel[i];
-			cout << "Joint " << i << " = " << joint->name << endl;
-		}
-		cout << mdl.num_joints << " joints total" << endl;
 
 		FreeModel( &mdl );
 		return;

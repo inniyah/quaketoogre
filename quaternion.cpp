@@ -213,19 +213,24 @@ void Quat_conjugate(const quat4_t q, quat4_t out)
 void Quat_inverse(const quat4_t q, quat4_t out)
 {
 	Quat_conjugate( q, out );
-//	Quat_normalize( out );
+	Quat_normalize( out );
 }
 
 void Quat_toAngleAxis( const quat4_t q, float *angle, vec3_t axis )
 {
-	float lenSqr = q[X]*q[X] + q[Y]*q[Y] + q[Z]*q[Z];
-	if ( q[W] <= 1.0f && lenSqr > 0.0f )
+	quat4_t qp;
+	Quat_copy( q, qp );
+	Quat_normalize( qp );
+
+	// TODO this can be shortened, since qp is normalized
+	float lenSqr = qp[X]*qp[X] + qp[Y]*qp[Y] + qp[Z]*qp[Z];
+	if ( qp[W] <= 1.0f && lenSqr > 0.0f )
     {
-        *angle = 2.0f * (float)acos(q[W]);
+        *angle = 2.0f * (float)acos(qp[W]);
         float invLen = 1.0f / (float)sqrt(lenSqr);
-        axis[X] = q[X]*invLen;
-        axis[Y] = q[Y]*invLen;
-        axis[Z] = q[Z]*invLen;
+        axis[X] = qp[X]*invLen;
+        axis[Y] = qp[Y]*invLen;
+        axis[Z] = qp[Z]*invLen;
     }
     else
     {
