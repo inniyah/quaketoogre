@@ -375,6 +375,7 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 		if ( parentIndex < 0 )
 		{
 			jointDifference( baseJoint, animJoint, translate, rotate );
+			vec_subtract( animJoint->pos, baseJoint->pos, translate );
 		}
 		else
 		{
