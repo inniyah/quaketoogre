@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE conversion SYSTEM "../config.dtd">
 
-<conversion>
+<quake2ogre>
 	<convertcoordinates/>
 
 	<md5mesh>
@@ -23,8 +23,8 @@
 			<md5anim>
 			    <animationname>FastWalk</animationname>
 			    <inputfile>bernie/fastwalk.md5anim</inputfile>
-			    <lockorigin/>
+			    <lockroot/>
 			</md5anim>
 		</md5skeleton>
 	</md5mesh>
-</conversion>
+</quake2ogre>

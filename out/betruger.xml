@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE conversion SYSTEM "../config.dtd">
+
+<quake2ogre>
+	<convertcoordinates/>
+
+	<md5mesh>
+		<inputfile>betruger/labcoat.md5mesh</inputfile>
+		<outputfile>betruger_body.mesh.xml</outputfile>
+
+		<submeshes>
+		    <submesh index="0"/>
+		</submeshes>
+
+		<md5skeleton name="betruger_body">
+			<md5anim>
+				<animationname>meeting_d</animationname>
+				<inputfile>betruger/meeting_d.md5anim</inputfile>
+			</md5anim>
+		</md5skeleton>
+	</md5mesh>
+	
+	<md5mesh>
+		<inputfile>betruger/betruger.md5mesh</inputfile>
+		<outputfile>betruger_head.mesh.xml</outputfile>
+
+		<submeshes>
+		    <submesh index="0"/>
+            <submesh index="1"/>
+            <submesh index="2"/>
+		    <submesh index="3"/>
+            <submesh index="4"/>
+		</submeshes>
+
+		<md5skeleton name="betruger_head" rootbone="neckcontrol">
+			<md5anim>
+				<animationname>meeting_d</animationname>
+				<inputfile>betruger/betspeech_d.md5anim</inputfile>
+			</md5anim>
+		</md5skeleton>
+	</md5mesh>
+</quake2ogre>

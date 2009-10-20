@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE conversion SYSTEM "../config.dtd">
 
-<conversion>
+<quake2ogre>
     <convertcoordinates/>
 
 	<md2mesh>
@@ -27,4 +27,4 @@
 
 		<materialname>q2male/skin</materialname>
 	</md2mesh>
-</conversion>
+</quake2ogre>

@@ -1,5 +1,5 @@
 <!-- Root element -->
-<!ELEMENT conversion (convertcoordinates?, (md2mesh|md3mesh|md5mesh))>
+<!ELEMENT quake2ogre (convertcoordinates?, (md2mesh|md3mesh|md5mesh)+)>
 
 <!-- Convert vectors to Ogre coordinate system -->
 <!ELEMENT convertcoordinates EMPTY>
@@ -27,14 +27,15 @@
 <!ELEMENT submeshes (submesh+)>
 <!ELEMENT submesh (materialname?)>
 <!ATTLIST submesh
-    index   CDATA   #REQUIRED>
+    index       CDATA   #REQUIRED>
 
 <!-- MD5 animation file -->
 <!ELEMENT md5skeleton (md5anim*)>
 <!ATTLIST md5skeleton
-    name    CDATA   #REQUIRED>
-<!ELEMENT md5anim (animationname, inputfile, lockorigin?)>
-<!ELEMENT lockorigin EMTPY>
+    name        CDATA   #REQUIRED
+    rootbone    CDATA   #IMPLIED>
+<!ELEMENT md5anim (animationname, inputfile, lockroot?)>
+<!ELEMENT lockroot EMTPY>
 
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>

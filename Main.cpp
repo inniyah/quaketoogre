@@ -431,7 +431,7 @@ bool processConfigFile( const string &filepath )
 	}
 	
 	TiXmlElement *root = config.RootElement();
-	if ( !root || root->ValueStr() != "conversion" )
+	if ( !root || root->ValueStr() != "quake2ogre" )
 	{
 		cout << "[Error] This is not a valid QuakeToOgre configuration file" << endl;
 		return false;
