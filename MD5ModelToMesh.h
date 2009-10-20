@@ -47,11 +47,13 @@ private:
 	void buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex );
 	void buildKeyFrame( float time, const vec3_t translate, const quat4_t rotate );
 
+public:
 	static void convertQuaternion( quat4_t q );
 	static void convertCoordSystem( struct md5_model_t *mdl );
 	static void convertCoordSystem( struct md5_anim_t *anim );
 	static void jointDifference( const struct md5_joint_t *from, 
 		const struct md5_joint_t *to, vec3_t translate, quat4_t rotate );
+private:		
 
 	XmlWriter mMeshWriter;
 	XmlWriter mSkelWriter;

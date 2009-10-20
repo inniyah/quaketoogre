@@ -355,6 +355,38 @@ void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_
 	mSkelWriter.closeTag();	// animation
 }
 
+static void animationDelta( 
+	const struct md5_joint_t *baseParent, const struct md5_joint_t *animParent, 
+	const struct md5_joint_t *baseJoint, const struct md5_joint_t *animJoint, 
+	quat4_t rotate, vec3_t translate )
+{
+	if ( baseParent && animParent )
+	{
+		struct md5_joint_t relJoint;
+		MD5ModelToMesh::jointDifference( baseParent, baseJoint, relJoint.pos, relJoint.orient );
+		
+		quat4_t animParentInv, relJointInv, q1;
+		Quat_inverse( animParent->orient, animParentInv );
+		Quat_inverse( relJoint.orient, relJointInv );
+		
+		Quat_multQuat( animParentInv, animJoint->orient, q1 );
+		Quat_multQuat( relJointInv, q1, rotate );
+		
+		vec3_t v1, v2;
+		vec_subtract( animJoint->pos, animParent->pos, v1 );
+		Quat_rotatePoint( animParentInv, v1, v2 );
+		vec_subtract( v2, relJoint.pos, translate );
+	}
+	else
+	{
+		quat4_t invBaseJoint;
+		Quat_inverse( baseJoint->orient, invBaseJoint );
+		Quat_multQuat( invBaseJoint, animJoint->orient, rotate );
+		
+		vec_subtract( animJoint->pos, baseJoint->pos, translate );
+	}
+}
+
 void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex )
 {
 	const struct md5_joint_t *baseJoint = &mdl->baseSkel[jointIndex];
@@ -368,25 +400,20 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 
 	for ( int i = 0; i < anim->num_frames; i++ )
 	{
-		const struct md5_joint_t *animJoint = &anim->skelFrames[i][jointIndex];
 		float time = (float)i / (float)anim->frameRate;
+	
+		const struct md5_joint_t *animJoint = &anim->skelFrames[i][jointIndex];
+		const struct md5_joint_t *baseParent = NULL;
+		const struct md5_joint_t *animParent = NULL;		
 		
 		int parentIndex = baseJoint->parent;
-		if ( parentIndex < 0 )
+		if ( parentIndex >= 0 )
 		{
-			jointDifference( baseJoint, animJoint, translate, rotate );
-			vec_subtract( animJoint->pos, baseJoint->pos, translate );
+			baseParent = &mdl->baseSkel[parentIndex];
+			animParent = &anim->skelFrames[i][parentIndex];
 		}
-		else
-		{
-			const struct md5_joint_t *baseParent = &mdl->baseSkel[parentIndex];
-			const struct md5_joint_t *animParent = &anim->skelFrames[i][parentIndex];
 			
-			static struct md5_joint_t localJoint, tmpJoint;
-			jointDifference( baseParent, baseJoint, localJoint.pos, localJoint.orient );
-			jointDifference( animParent, animJoint, tmpJoint.pos, tmpJoint.orient );
-			jointDifference( &localJoint, &tmpJoint, translate, rotate );
-		}
+		animationDelta( baseParent, animParent, baseJoint, animJoint, rotate, translate );
 
 		buildKeyFrame( time, translate, rotate );
 	}
@@ -459,14 +486,18 @@ void MD5ModelToMesh::convertCoordSystem( struct md5_anim_t *anim )
 	}
 }
 
+// This computes the transformation from one given joint to another
 void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, 
 	const struct md5_joint_t *to, vec3_t translate, quat4_t rotate )
 {
-	// This computes the transformation from one given joint to another
+	// to->orient = from->orient * rotate =>
+	// rotate = inv(from->orient) * to->orient
 	quat4_t fromOrientInv;
 	Quat_inverse( from->orient, fromOrientInv );
 	Quat_multQuat( fromOrientInv, to->orient, rotate );
 
+	// to->pos = from->orient * translate + from->pos =>
+	// translate = inv(from->orient) * (to->pos - from->pos)
 	vec3_t tmp;
 	vec_subtract( to->pos, from->pos, tmp );
 	Quat_rotatePoint( fromOrientInv, tmp, translate );
