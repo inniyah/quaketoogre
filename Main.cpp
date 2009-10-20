@@ -305,28 +305,30 @@ void processSubMeshes( TiXmlElement *subMeshesNode, MD5ModelToMesh &builder )
 
 void processMD5Animation( TiXmlElement *animNode, MD5ModelToMesh &builder )
 {
-	string name, inputfile;
+	const string *name;
+	if ( !(name = animNode->Attribute( string("name") )) )
+	{
+		cout << "[Warning] MD5 Animation without a name" << endl;
+		return;
+	}
 
+	string inputfile;
 	for ( TiXmlElement *node = animNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{
 		const string &nodeName = node->ValueStr();
-		if ( nodeName == "animationname" )
-		{
-			name = node->GetText();
-		}
-		else if ( nodeName == "inputfile" )
+		if ( nodeName == "inputfile" )
 		{
 			inputfile = node->GetText();
 		}
 	}
 
-	if ( name.empty() || inputfile.empty() )
+	if ( inputfile.empty() )
 	{
-		cout << "[Warning] MD5 Animation missing name or input file" << endl;
+		cout << "[Warning] MD5 Animation '" << (*name) << "' missing input file" << endl;
 		return;
 	}
 
-	builder.addAnimation( name, inputfile );
+	builder.addAnimation( *name, inputfile );
 }
 
 void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
@@ -388,7 +390,7 @@ bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
 }
 
 // Returns file name without path
-string changeToWorkingDir( string filepath )
+static string changeToWorkingDir( string filepath )
 {
 	// fnsplit() isn't available on Windows, so we'll have to dissect the file path ourselves...
 	size_t drivePos = filepath.find_first_of( ':' );

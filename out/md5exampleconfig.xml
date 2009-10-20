@@ -16,12 +16,10 @@
 		</submeshes>
 
 		<md5skeleton name="bernie">
-			<md5anim>
-				<animationname>SpitAttack</animationname>
+			<md5anim name="SpitAttack">
 				<inputfile>bernie/spit_attack1.md5anim</inputfile>
 			</md5anim>
-			<md5anim>
-			    <animationname>FastWalk</animationname>
+			<md5anim name="FastWalk">
 			    <inputfile>bernie/fastwalk.md5anim</inputfile>
 			    <lockroot/>
 			</md5anim>

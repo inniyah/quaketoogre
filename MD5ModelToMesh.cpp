@@ -53,6 +53,8 @@ void MD5ModelToMesh::buildMesh( const struct md5_model_t *mdl )
 			continue;
 		}
 
+		cout << "Building submesh " << index << endl;
+
 		struct md5_mesh_t *mesh = &mdl->meshes[index];
 		PrepareMesh( mesh, mdl->baseSkel );
 		buildSubMesh( mesh, iter->second );
@@ -341,6 +343,8 @@ void MD5ModelToMesh::buildAnimations( const struct md5_model_t *mdl )
 
 void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_t *mdl, const struct md5_anim_t *anim )
 {
+	cout << "Building animation '" << name << "'" << endl;
+
 	TiXmlElement *animTag = mSkelWriter.openTag( "animation" );
 	animTag->SetAttribute( "name", name );
 	animTag->SetAttribute( "length", StringUtil::toString((float)anim->num_frames / (float)anim->frameRate) );
@@ -349,6 +353,7 @@ void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_
 	for ( int i = 0; i < anim->num_joints; i++ )
 	{
 		buildTrack( mdl, anim, i );
+		cout << ((i+1) * 100 / anim->num_joints) << "%\r";
 	}
 	mSkelWriter.closeTag();	// tracks
 

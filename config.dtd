@@ -1,13 +1,15 @@
 <!-- Root element -->
 <!ELEMENT quake2ogre (convertcoordinates?, (md2mesh|md3mesh|md5mesh)+)>
 
+<!-- This element determines type of conversion -->
+<!ELEMENT md2mesh (convertcoordinates?, inputfile, outputfile, referenceframe?, animations?, materialname?)>
+<!ELEMENT md3mesh (convertcoordinates?, inputfile, outputfile, referenceframe?, animationfile?, animations?, materials?)>
+<!ELEMENT md5mesh (convertcoordinates?, inputfile, outputfile, submeshes, md5skeleton?)>
+
 <!-- Convert vectors to Ogre coordinate system -->
 <!ELEMENT convertcoordinates EMPTY>
-
-<!-- This element determines type of conversion -->
-<!ELEMENT md2mesh (inputfile, outputfile, referenceframe?, animations?, materialname?)>
-<!ELEMENT md3mesh (inputfile, outputfile, referenceframe?, animationfile?, animations?, materials?)>
-<!ELEMENT md5mesh (inputfile, outputfile, submeshes, md5skeleton?)>
+<!ATTLIST convertcoordinates
+    value       (true|false)    "true">
 
 <!-- Filenames -->
 <!ELEMENT inputfile (#PCDATA)>
@@ -18,24 +20,26 @@
 
 <!-- Quake 3 animation file -->
 <!ELEMENT animationfile (inputfile, (convertlegs|converttorso|convertselection))>
-<!ELEMENT convertlegs EMPTY>	<!-- Convert all LEGS_ and BOTH_ animations -->
-<!ELEMENT converttorso EMPTY>	<!-- Convert all TORSO_ and BOTH_ animations -->
-<!ELEMENT convertselection (animationname+)>		<!-- Convert specific animations -->
+<!ELEMENT convertlegs EMPTY>    <!-- Convert all LEGS_ and BOTH_ animations -->
+<!ELEMENT converttorso EMPTY>   <!-- Convert all TORSO_ and BOTH_ animations -->
+<!ELEMENT convertselection (animationname+)>    <!-- Convert only specific animations -->
 <!ELEMENT animationname (#PCDATA)>
 
 <!-- MD5 submeshes -->
 <!ELEMENT submeshes (submesh+)>
 <!ELEMENT submesh (materialname?)>
 <!ATTLIST submesh
-    index       CDATA   #REQUIRED>
+    index       CDATA   #REQUIRED>  <!-- Submesh indices and info can be queried using 'QuakeToOgre -i' -->
 
 <!-- MD5 animation file -->
 <!ELEMENT md5skeleton (md5anim*)>
 <!ATTLIST md5skeleton
-    name        CDATA   #REQUIRED
-    rootbone    CDATA   #IMPLIED>
-<!ELEMENT md5anim (animationname, inputfile, lockroot?)>
-<!ELEMENT lockroot EMTPY>
+    name        CDATA   #REQUIRED   <!-- This affects both the skeleton file name and the reference in the mesh. -->
+    rootbone    CDATA   #IMPLIED>   <!-- Moves the root bone to the position and orientation of this bone. -->
+<!ELEMENT md5anim (inputfile, lockroot?)>
+<!ATTLIST md5anim
+    name        CDATA   #REQUIRED>
+<!ELEMENT lockroot EMPTY>   <!-- Locks the root bone in place, i.e. translation is always zero. -->
 
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>
