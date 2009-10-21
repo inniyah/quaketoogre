@@ -34,7 +34,7 @@
 <!-- MD5 animation file -->
 <!ELEMENT md5skeleton (md5anim*)>
 <!ATTLIST md5skeleton
-    name        CDATA   #REQUIRED   <!-- This affects both the skeleton file name and the reference in the mesh. -->
+    name        CDATA   #REQUIRED
     rootbone    CDATA   #IMPLIED>   <!-- Moves the root bone to the position and orientation of this bone. -->
 <!ELEMENT md5anim (inputfile, lockroot?)>
 <!ATTLIST md5anim
@@ -53,3 +53,4 @@
 <!ELEMENT material (submeshname, materialname)>
 <!ELEMENT submeshname (#PCDATA)>
 <!ELEMENT materialname (#PCDATA)>
+

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE conversion SYSTEM "../config.dtd">
+<!DOCTYPE quake2ogre SYSTEM "../config.dtd">
 
 <quake2ogre>
     <convertcoordinates/>
@@ -28,3 +28,4 @@
 		<materialname>q2male/skin</materialname>
 	</md2mesh>
 </quake2ogre>
+

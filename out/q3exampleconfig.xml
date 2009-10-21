@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE conversion SYSTEM "../config.dtd">
+<!DOCTYPE quake2ogre SYSTEM "../config.dtd">
 
 <quake2ogre>
 	<convertcoordinates/>
@@ -42,3 +42,4 @@
 		</materials>
 	</md3mesh>
 </quake2ogre>
+
