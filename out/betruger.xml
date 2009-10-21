@@ -8,7 +8,7 @@
 		<inputfile>betruger/labcoat.md5mesh</inputfile>
 		<outputfile>betruger_body.mesh.xml</outputfile>
 
-		<submeshes>
+		<submeshes maxweights="4">
 		    <submesh index="0"/>
 		</submeshes>
 

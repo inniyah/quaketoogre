@@ -293,6 +293,10 @@ void processSubMesh( TiXmlElement *subMeshNode, MD5ModelToMesh &builder )
 
 void processSubMeshes( TiXmlElement *subMeshesNode, MD5ModelToMesh &builder )
 {
+	int maxWeights;
+	if ( subMeshesNode->Attribute( "maxweights", &maxWeights ) )
+		builder.setMaxWeights( maxWeights );
+
 	for ( TiXmlElement *node = subMeshesNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{
 		const string &nodeName = node->ValueStr();
@@ -305,8 +309,8 @@ void processSubMeshes( TiXmlElement *subMeshesNode, MD5ModelToMesh &builder )
 
 void processMD5Animation( TiXmlElement *animNode, MD5ModelToMesh &builder )
 {
-	const string *name;
-	if ( !(name = animNode->Attribute( string("name") )) )
+	const char *name;
+	if ( !(name = animNode->Attribute( "name" )) )
 	{
 		cout << "[Warning] MD5 Animation without a name" << endl;
 		return;
@@ -328,18 +332,22 @@ void processMD5Animation( TiXmlElement *animNode, MD5ModelToMesh &builder )
 		return;
 	}
 
-	builder.addAnimation( *name, inputfile );
+	builder.addAnimation( name, inputfile );
 }
 
 void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
 {
-	const string *name;
-	if ( !(name = skelNode->Attribute( string("name") )) )
+	const char *name;
+	if ( !(name = skelNode->Attribute( "name" )) )
 	{
 		cout << "[Warning] MD5 Skeleton without a name" << endl;
 		return;
 	}
-	builder.setSkeletonName( *name );
+	builder.setSkeletonName( name );
+
+	const char *rootBone;
+	if ( rootBone = skelNode->Attribute( "rootbone" ) )
+		builder.setRootBone( rootBone );
 
 	for ( TiXmlElement *node = skelNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{

@@ -27,6 +27,8 @@
 
 <!-- MD5 submeshes -->
 <!ELEMENT submeshes (submesh+)>
+<!ATTLIST submeshes
+    maxweights  CDATA   #IMPLIED>
 <!ELEMENT submesh (materialname?)>
 <!ATTLIST submesh
     index       CDATA   #REQUIRED>  <!-- Submesh indices and info can be queried using 'QuakeToOgre -i' -->

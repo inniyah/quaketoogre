@@ -4,7 +4,7 @@
 #include "md5model.h"
 
 MD5ModelToMesh::MD5ModelToMesh():
-	mConvertCoords( false )
+	mConvertCoords( false ), mMaxWeights( -1 )
 {
 }
 
@@ -21,6 +21,8 @@ bool MD5ModelToMesh::build()
 		convertCoordSystem( &mdl );
 
 	buildMesh( &mdl );
+
+	cout << "Saving mesh XML file '" << mOutputFile << "'" << endl;
 	if ( !mMeshWriter.saveFile( mOutputFile ) )
 	{
 		cout << "[Error] Could not save mesh XML file" << endl;
@@ -31,7 +33,10 @@ bool MD5ModelToMesh::build()
 	if ( !mSkeletonName.empty() )
 	{
 		buildSkeleton( &mdl );
-		if ( !mSkelWriter.saveFile( mSkeletonName + ".skeleton.xml" ) )
+
+		string skeletonFile = mSkeletonName + ".skeleton.xml";
+		cout << "Saving skeleton XML file '" << skeletonFile << "'" << endl;
+		if ( !mSkelWriter.saveFile( skeletonFile ) )
 			cout << "[Warning] Could not save skeleton XML file" << endl;
 	}
 
@@ -207,19 +212,48 @@ void MD5ModelToMesh::buildTexCoord( const float texCoord[2] )
 
 void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 {
+	typedef multimap<float, const struct md5_weight_t*> WeightMap;
+	typedef pair<float, const struct md5_weight_t*> WeightPair;
+	WeightMap weights;
+
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
 		const struct md5_vertex_t *v = &mesh->vertices[i];
+
+		// First, sort all the weights on their bias value by adding them to the multimap.
+		// Going through this multimap in reverse order gives the weights in descending order.
+		weights.clear();
 		for ( int j = 0; j < v->count; j++ )
 		{
 			const struct md5_weight_t *w = &mesh->weights[v->start + j];
+			weights.insert( WeightPair( w->bias, w ) );
+		}
+
+		// Count the total weight of all the weights that will be used
+		int count = 0;
+		float totalWeight = 0;
+		for ( WeightMap::reverse_iterator iter = weights.rbegin(); iter != weights.rend(); ++iter )
+		{
+			totalWeight += iter->first;
+			if ( mMaxWeights > 0 && ++count >= mMaxWeights )
+				break;
+		}
+
+		// Finally, write all the relevant weights, with adjusted biases
+		count = 0;
+		for ( WeightMap::reverse_iterator iter = weights.rbegin(); iter != weights.rend(); ++iter )
+		{
+			const struct md5_weight_t *w = iter->second;
 
 			TiXmlElement *vbNode = mMeshWriter.openTag( "vertexboneassignment" );
 			vbNode->SetAttribute( "vertexindex", i );
 			vbNode->SetAttribute( "boneindex", w->joint );
-			vbNode->SetAttribute( "weight", StringUtil::toString( w->bias ) );
+			vbNode->SetAttribute( "weight", StringUtil::toString( w->bias / totalWeight ) );
 
 			mMeshWriter.closeTag();
+
+			if ( mMaxWeights > 0 && ++count >= mMaxWeights )
+				break;
 		}
 	}
 }
@@ -235,6 +269,17 @@ void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 		buildAnimations( mdl );
 
 	mSkelWriter.closeTag();	// skeleton
+}
+
+static const md5_joint_t *findJoint( const struct md5_model_t *mdl, const string &name )
+{
+	for ( int i = 0; i < mdl->num_joints; i++ )
+	{
+		const struct md5_joint_t *joint = &mdl->baseSkel[i];
+		if ( StringUtil::stripQuotes(joint->name) == name )
+			return joint;
+	}
+	return NULL;
 }
 
 void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
@@ -255,6 +300,23 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 			// Root bone, so just copy the bone's world space orientation
 			vec_copy( joint->pos, pos );
 			Quat_copy( joint->orient, orient );
+
+/*			if ( !mRootBone.empty() )
+			{
+				const struct md5_joint_t *rootJoint = findJoint( mdl, mRootBone );
+				if ( rootJoint )
+				{
+					quat4_t rotate, invRot;
+					vec3_t translate, invTrans;
+					jointDifference( joint, rootJoint, translate, rotate );
+
+					Quat_inverse( rotate, invRot );
+					Quat_rotatePoint( invRot, translate, invTrans );
+
+					Quat_multQuat( invRot, joint->orient, orient );
+					vec_subtract( joint->pos, invTrans, pos );
+				}
+			}*/
 		}
 		else
 		{
