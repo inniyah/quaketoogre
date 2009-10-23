@@ -116,45 +116,10 @@ void MD5ModelToMesh::buildFace( const struct md5_triangle_t *triangle )
 	mMeshWriter.closeTag();	
 }
 
-static void computeNormals( const struct md5_mesh_t *mesh, vec3_t *normals )
-{
-	memset( normals, 0, sizeof(vec3_t) * mesh->num_verts );
-
-	for ( int i = 0; i < mesh->num_tris; i++ )
-	{
-		const struct md5_triangle_t *tri = &mesh->triangles[i];
-
-		vec3_t &v0 = mesh->vertexArray[tri->index[0]];
-		vec3_t &v1 = mesh->vertexArray[tri->index[1]];
-		vec3_t &v2 = mesh->vertexArray[tri->index[2]];
-
-		// Compute face normal
-		vec3_t dir[2];
-		vec_subtract( v2, v0, dir[0] );
-		vec_subtract( v1, v0, dir[1] );
-
-		vec3_t faceNormal;
-		vec_crossProduct( dir[0], dir[1], faceNormal );
-
-		// Add face normal to the normal of each face vertex
-		for ( int j = 0; j < 3; j++ )
-		{
-			vec3_t &normal = normals[tri->index[j]];
-			vec_add( normal, faceNormal, normal );
-		}
-	}
-
-	// Normalize each vertex normal
-	for ( int i = 0; i < mesh->num_verts; i++ )
-	{
-		vec_normalize( normals[i] );
-	}
-}
-
 void MD5ModelToMesh::buildVertexBuffers( const struct md5_mesh_t *mesh )
 {
 	vec3_t *normals = new vec3_t[mesh->num_verts];
-	computeNormals( mesh, normals );
+	generateNormals( mesh, normals );
 
 	// Vertices and normals
 	TiXmlElement *vbNode = mMeshWriter.openTag( "vertexbuffer" );
@@ -210,40 +175,39 @@ void MD5ModelToMesh::buildTexCoord( const float texCoord[2] )
 	mMeshWriter.closeTag();
 }
 
+static bool weightCompare( const struct md5_weight_t *a, const struct md5_weight_t *b )
+{
+	return (a->bias < b->bias);
+}
+
 void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 {
-	typedef multimap<float, const struct md5_weight_t*> WeightMap;
-	typedef pair<float, const struct md5_weight_t*> WeightPair;
-	WeightMap weights;
+	typedef vector<const struct md5_weight_t *> WeightVector;
+	WeightVector weights;
 
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
 		const struct md5_vertex_t *v = &mesh->vertices[i];
-
-		// First, sort all the weights on their bias value by adding them to the multimap.
-		// Going through this multimap in reverse order gives the weights in descending order.
 		weights.clear();
+
+		// First, sort all the vertex weights on their bias value in descending order
 		for ( int j = 0; j < v->count; j++ )
-		{
-			const struct md5_weight_t *w = &mesh->weights[v->start + j];
-			weights.insert( WeightPair( w->bias, w ) );
-		}
+			weights.push_back( &mesh->weights[v->start + j] );
+		std::stable_sort( weights.rbegin(), weights.rend(), &weightCompare );
 
-		// Count the total weight of all the weights that will be used
-		int count = 0;
+		// Remove the least significant weights, so only mMaxWeights weights remain
+		if ( weights.size() > mMaxWeights )
+			weights.erase( weights.begin() + mMaxWeights, weights.end() );
+
+		// Count the total bias of all the remaining weights
 		float totalWeight = 0;
-		for ( WeightMap::reverse_iterator iter = weights.rbegin(); iter != weights.rend(); ++iter )
-		{
-			totalWeight += iter->first;
-			if ( mMaxWeights > 0 && ++count >= mMaxWeights )
-				break;
-		}
+		for ( WeightVector::iterator iter = weights.begin(); iter != weights.end(); ++iter )
+			totalWeight += (*iter)->bias;
 
-		// Finally, write all the relevant weights, with adjusted biases
-		count = 0;
-		for ( WeightMap::reverse_iterator iter = weights.rbegin(); iter != weights.rend(); ++iter )
+		// Finally, write all the remaining weights, with adjusted biases
+		for ( WeightVector::iterator iter = weights.begin(); iter != weights.end(); ++iter )
 		{
-			const struct md5_weight_t *w = iter->second;
+			const struct md5_weight_t *w = *iter;
 
 			TiXmlElement *vbNode = mMeshWriter.openTag( "vertexboneassignment" );
 			vbNode->SetAttribute( "vertexindex", i );
@@ -251,9 +215,6 @@ void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 			vbNode->SetAttribute( "weight", StringUtil::toString( w->bias / totalWeight ) );
 
 			mMeshWriter.closeTag();
-
-			if ( mMaxWeights > 0 && ++count >= mMaxWeights )
-				break;
 		}
 	}
 }
@@ -269,17 +230,6 @@ void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 		buildAnimations( mdl );
 
 	mSkelWriter.closeTag();	// skeleton
-}
-
-static const md5_joint_t *findJoint( const struct md5_model_t *mdl, const string &name )
-{
-	for ( int i = 0; i < mdl->num_joints; i++ )
-	{
-		const struct md5_joint_t *joint = &mdl->baseSkel[i];
-		if ( StringUtil::stripQuotes(joint->name) == name )
-			return joint;
-	}
-	return NULL;
 }
 
 void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
@@ -422,38 +372,6 @@ void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_
 	mSkelWriter.closeTag();	// animation
 }
 
-static void animationDelta( 
-	const struct md5_joint_t *baseParent, const struct md5_joint_t *animParent, 
-	const struct md5_joint_t *baseJoint, const struct md5_joint_t *animJoint, 
-	quat4_t rotate, vec3_t translate )
-{
-	if ( baseParent && animParent )
-	{
-		struct md5_joint_t relJoint;
-		MD5ModelToMesh::jointDifference( baseParent, baseJoint, relJoint.pos, relJoint.orient );
-		
-		quat4_t animParentInv, relJointInv, q1;
-		Quat_inverse( animParent->orient, animParentInv );
-		Quat_inverse( relJoint.orient, relJointInv );
-		
-		Quat_multQuat( animParentInv, animJoint->orient, q1 );
-		Quat_multQuat( relJointInv, q1, rotate );
-		
-		vec3_t v1, v2;
-		vec_subtract( animJoint->pos, animParent->pos, v1 );
-		Quat_rotatePoint( animParentInv, v1, v2 );
-		vec_subtract( v2, relJoint.pos, translate );
-	}
-	else
-	{
-		quat4_t invBaseJoint;
-		Quat_inverse( baseJoint->orient, invBaseJoint );
-		Quat_multQuat( invBaseJoint, animJoint->orient, rotate );
-		
-		vec_subtract( animJoint->pos, baseJoint->pos, translate );
-	}
-}
-
 void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex )
 {
 	const struct md5_joint_t *baseJoint = &mdl->baseSkel[jointIndex];
@@ -517,13 +435,96 @@ void MD5ModelToMesh::buildKeyFrame( float time, const vec3_t translate, const qu
 	mSkelWriter.closeTag();	// keyframe
 }
 
-void MD5ModelToMesh::convertQuaternion( quat4_t q )
+void MD5ModelToMesh::generateNormals( const struct md5_mesh_t *mesh, vec3_t *normals )
 {
-	static const quat4_t trsf = {0.707107f, 0, 0, -0.707107f};
-	
-	quat4_t tmp;
-	Quat_multQuat( trsf, q, tmp );
-	Quat_copy( tmp, q );
+	memset( normals, 0, sizeof(vec3_t) * mesh->num_verts );
+
+	for ( int i = 0; i < mesh->num_tris; i++ )
+	{
+		const struct md5_triangle_t *tri = &mesh->triangles[i];
+
+		vec3_t &v0 = mesh->vertexArray[tri->index[0]];
+		vec3_t &v1 = mesh->vertexArray[tri->index[1]];
+		vec3_t &v2 = mesh->vertexArray[tri->index[2]];
+
+		// Compute face normal
+		vec3_t dir[2];
+		vec_subtract( v2, v0, dir[0] );
+		vec_subtract( v1, v0, dir[1] );
+
+		vec3_t faceNormal;
+		vec_crossProduct( dir[0], dir[1], faceNormal );
+
+		// Add face normal to the normal of each face vertex
+		for ( int j = 0; j < 3; j++ )
+		{
+			vec3_t &normal = normals[tri->index[j]];
+			vec_add( normal, faceNormal, normal );
+		}
+	}
+
+	// Normalize each vertex normal
+	for ( int i = 0; i < mesh->num_verts; i++ )
+	{
+		vec_normalize( normals[i] );
+	}
+}
+
+const struct md5_joint_t *MD5ModelToMesh::findJoint( const struct md5_model_t *mdl, const string &name )
+{
+	for ( int i = 0; i < mdl->num_joints; i++ )
+	{
+		const struct md5_joint_t *joint = &mdl->baseSkel[i];
+		if ( StringUtil::stripQuotes(joint->name) == name )
+			return joint;
+	}
+	return NULL;
+}
+
+// This computes the transformation from one given joint to another
+void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, 
+									 vec3_t translate, quat4_t rotate )
+{
+	// rotate = inv(from->orient) * to->orient
+	quat4_t fromOrientInv;
+	Quat_inverse( from->orient, fromOrientInv );
+	Quat_multQuat( fromOrientInv, to->orient, rotate );
+
+	// translate = inv(from->orient) * (to->pos - from->pos)
+	vec3_t tmp;
+	vec_subtract( to->pos, from->pos, tmp );
+	Quat_rotatePoint( fromOrientInv, tmp, translate );
+}
+
+void MD5ModelToMesh::animationDelta( const struct md5_joint_t *baseParent, const struct md5_joint_t *animParent, 
+									const struct md5_joint_t *baseJoint, const struct md5_joint_t *animJoint, 
+									quat4_t rotate, vec3_t translate )
+{
+	if ( baseParent && animParent )
+	{
+		struct md5_joint_t relJoint;
+		jointDifference( baseParent, baseJoint, relJoint.pos, relJoint.orient );
+		
+		quat4_t animParentInv, relJointInv, q1;
+		Quat_inverse( animParent->orient, animParentInv );
+		Quat_inverse( relJoint.orient, relJointInv );
+		
+		Quat_multQuat( animParentInv, animJoint->orient, q1 );
+		Quat_multQuat( relJointInv, q1, rotate );
+		
+		vec3_t v1, v2;
+		vec_subtract( animJoint->pos, animParent->pos, v1 );
+		Quat_rotatePoint( animParentInv, v1, v2 );
+		vec_subtract( v2, relJoint.pos, translate );
+	}
+	else
+	{
+		quat4_t invBaseJoint;
+		Quat_inverse( baseJoint->orient, invBaseJoint );
+		Quat_multQuat( invBaseJoint, animJoint->orient, rotate );
+		
+		vec_subtract( animJoint->pos, baseJoint->pos, translate );
+	}
 }
 
 void MD5ModelToMesh::convertCoordSystem( struct md5_model_t *mdl )
@@ -531,8 +532,8 @@ void MD5ModelToMesh::convertCoordSystem( struct md5_model_t *mdl )
 	for ( int i = 0; i < mdl->num_joints; i++ )
 	{
 		struct md5_joint_t *joint = &mdl->baseSkel[i];
-		Quake::convertCoordinate( joint->pos );
-		convertQuaternion( joint->orient );
+		Quake::convertVector( joint->pos );
+		Quake::convertQuaternion( joint->orient );
 	}
 }
 
@@ -543,31 +544,14 @@ void MD5ModelToMesh::convertCoordSystem( struct md5_anim_t *anim )
 		for ( int j = 0; j < anim->num_joints; j++ )
 		{
 			struct md5_joint_t *joint = &anim->skelFrames[i][j];
-			Quake::convertCoordinate( joint->pos );
-			convertQuaternion( joint->orient );
+			Quake::convertVector( joint->pos );
+			Quake::convertQuaternion( joint->orient );
 		}
 		
 		struct md5_bbox_t *bbox = &anim->bboxes[i];
-		Quake::convertCoordinate( bbox->min );
-		Quake::convertCoordinate( bbox->max );
+		Quake::convertVector( bbox->min );
+		Quake::convertVector( bbox->max );
 	}
-}
-
-// This computes the transformation from one given joint to another
-void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, 
-	const struct md5_joint_t *to, vec3_t translate, quat4_t rotate )
-{
-	// to->orient = from->orient * rotate =>
-	// rotate = inv(from->orient) * to->orient
-	quat4_t fromOrientInv;
-	Quat_inverse( from->orient, fromOrientInv );
-	Quat_multQuat( fromOrientInv, to->orient, rotate );
-
-	// to->pos = from->orient * translate + from->pos =>
-	// translate = inv(from->orient) * (to->pos - from->pos)
-	vec3_t tmp;
-	vec_subtract( to->pos, from->pos, tmp );
-	Quat_rotatePoint( fromOrientInv, tmp, translate );
 }
 
 bool MD5ModelToMesh::isMD5Mesh( const string &filename )

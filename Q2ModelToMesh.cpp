@@ -261,7 +261,7 @@ void Q2ModelToMesh::convertPosition( const unsigned char position[3], const MD2F
 	dest[2] = (position[2] * frameHeader.scale[2]) + frameHeader.translate[2];
 
 	if ( mConvertCoordinates )
-		Quake::convertCoordinate( dest );	
+		Quake::convertVector( dest );	
 }
 
 void Q2ModelToMesh::convertNormal( const unsigned char normalIndex, float dest[3] )
@@ -272,6 +272,6 @@ void Q2ModelToMesh::convertNormal( const unsigned char normalIndex, float dest[3
 	dest[2] = normal[2];
 
 	if ( mConvertCoordinates )
-		Quake::convertCoordinate( dest );
+		Quake::convertVector( dest );
 }
 

@@ -240,7 +240,7 @@ void Q3ModelToMesh::convertPosition( const short position[3], float dest[3] )
 	dest[2] = (float)position[2] * MD3_SCALE;
 	
 	if ( mConvertCoordinates )
-		Quake::convertCoordinate( dest );
+		Quake::convertVector( dest );
 }
 
 void Q3ModelToMesh::convertNormal( const short &normal, float dest[3] )
@@ -255,6 +255,6 @@ void Q3ModelToMesh::convertNormal( const short &normal, float dest[3] )
 	dest[2] = (float)( cos(lng) );
 	
 	if ( mConvertCoordinates )
-		Quake::convertCoordinate( dest );	
+		Quake::convertVector( dest );	
 }
 

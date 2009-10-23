@@ -8,7 +8,7 @@
 		<inputfile>bernie/bernie.md5mesh</inputfile>
 		<outputfile>bernie.mesh.xml</outputfile>
 
-		<submeshes>
+		<submeshes maxweights="4">
 		    <submesh index="0"/>
 		    <submesh index="1">
 		        <materialname>md5models/bernie/fx</materialname>

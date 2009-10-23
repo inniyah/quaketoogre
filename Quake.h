@@ -7,7 +7,8 @@
 class Quake
 {
 public:
-	static void convertCoordinate( float vec[3] );	
+	static void convertVector( float vec[3] );
+	static void convertQuaternion( float vec[4] );
 	
 	static const float md2VertexNormals[MD2_NUMVERTEXNORMALS][3];
 };
