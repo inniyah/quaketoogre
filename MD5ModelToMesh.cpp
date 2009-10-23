@@ -196,7 +196,7 @@ void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 		std::stable_sort( weights.rbegin(), weights.rend(), &weightCompare );
 
 		// Remove the least significant weights, so only mMaxWeights weights remain
-		if ( weights.size() > mMaxWeights )
+		if ( mMaxWeights > 0 && weights.size() > (size_t)mMaxWeights )
 			weights.erase( weights.begin() + mMaxWeights, weights.end() );
 
 		// Count the total bias of all the remaining weights
@@ -256,14 +256,13 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 				const struct md5_joint_t *rootJoint = findJoint( mdl, mRootBone );
 				if ( rootJoint )
 				{
-					quat4_t rotate, invRot;
-					vec3_t translate, invTrans;
-					jointDifference( joint, rootJoint, translate, rotate );
+					quat4_t invRot;
+					quat4_t invTrans;
 
-					Quat_inverse( rotate, invRot );
-					Quat_rotatePoint( invRot, translate, invTrans );
+					Quat_inverse( rootJoint->orient, invRot );
+					Quat_rotatePoint( invRot, rootJoint->pos, invTrans );
 
-					Quat_multQuat( invRot, joint->orient, orient );
+					Quat_multQuat( joint->orient, invRot, orient );
 					vec_subtract( joint->pos, invTrans, pos );
 				}
 			}*/

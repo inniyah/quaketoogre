@@ -24,7 +24,7 @@ public:
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
 	void setSkeletonName( const string &name ) { mSkeletonName = name; }
 	void setRootBone( const string &bone ) { mRootBone = bone; }
-	void setMaxWeights( size_t value ) { mMaxWeights = value; }
+	void setMaxWeights( int value ) { mMaxWeights = value; }
 	void addSubMesh( int index, const string &material ) { mSubMeshes[index] = material; }
 	void addAnimation( const string &name, const string &filename ) { mAnimations[name] = filename; }
 
@@ -72,7 +72,7 @@ private:
 
 	typedef map<int, string> SubMeshMap;
 	SubMeshMap mSubMeshes;
-	size_t mMaxWeights;
+	int mMaxWeights;
 };
 
 #endif	// __MD5MODELTOMESH_H__
