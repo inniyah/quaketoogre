@@ -160,53 +160,47 @@ bool processMaterials( TiXmlElement *matsNode, StringMap &dest )
 bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
 {
 	cout << "Doing MD2 Mesh conversion" << endl;
-			
-	string inputFile, outputFile;
-	AnimationList animList;
-	const char *material = NULL;
-	int referenceFrame = 0;
-	
+
+	Q2ModelToMesh builder;
+	builder.setConvertCoordinates( convertCoordinates );
+
 	// Process the configuration XML tree
 	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "inputfile" )
 		{
-			inputFile = node->GetText();
+			builder.setInputFile( node->GetText() );
 		}
 		else if ( nodeName == "outputfile" )
 		{
-			outputFile = node->GetText();		
+			builder.setOutputFile( node->GetText() );
 		}
 		else if ( nodeName == "referenceframe" )
 		{
-			referenceFrame = atoi( node->GetText() );
+			builder.setReferenceFrame( atoi(node->GetText()) );
 		}
 		else if ( nodeName == "animations" )
 		{
+			AnimationList animList;
 			processAnimations( node, animList );
+			for ( AnimationList::iterator iter = animList.begin(); iter != animList.end(); ++iter )
+			{
+				builder.addAnimation( *iter );
+			}
 		}
 		else if ( nodeName == "materialname" )
 		{
-			material = node->GetText();
+			builder.setMaterial( node->GetText() );
 		}
 	}
 	
-	// Try to load the MD3 file
-	MD2Structure md2Struct;
-	if ( !md2Struct.load( inputFile ) )
+	if ( !builder.build() )
 	{
-		cout << "[Error] Could not load input file '" << inputFile << "'" << endl;
+		cout << "[Error] Failed to convert MD2 file" << endl;
 		return false;
 	}
 	
-	Q2ModelToMesh converter( md2Struct, animList, material, referenceFrame, convertCoordinates );
-	if ( !converter.saveFile( outputFile ) )
-	{
-		cout << "[Error] Could not save to file '" << outputFile << "'" << endl;
-		return false;
-	}
-			
 	return true;
 }
 

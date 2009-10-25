@@ -247,7 +247,7 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		quat4_t orient;
 		if ( joint->parent < 0 )
 		{
-			// Root bone, so just copy the bone's world space orientation
+			// Root bone, so just copy the bone's object space orientation
 			vec_copy( joint->pos, pos );
 			Quat_copy( joint->orient, orient );
 
@@ -269,7 +269,7 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		}
 		else
 		{
-			// Convert the bone's orientation from world space to joint local space
+			// Convert the bone's orientation from object space to joint-local space
 			const struct md5_joint_t *parent = &mdl->baseSkel[joint->parent];
 			jointDifference( parent, joint, pos, orient );
 		}

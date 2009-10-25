@@ -27,8 +27,6 @@
 
 using namespace std;
 
-typedef map<string, string> StringMap;
-
 #include "StringUtil.h"
 
 #endif

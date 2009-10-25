@@ -1,24 +1,35 @@
 #include "Common.h"
 #include "Q2ModelToMesh.h"
 
-Q2ModelToMesh::Q2ModelToMesh( 
-	const MD2Structure &model,
-	const AnimationList &animations,
-	const char *material,
-	int referenceFrame, 
-	bool convertCoordinates ):
-	
-	mModel( model ),
-	mAnimations( animations ),
-	mMaterial( material ),
-	mReferenceFrame( referenceFrame ), 
-	mConvertCoordinates( convertCoordinates )
+Q2ModelToMesh::Q2ModelToMesh():
+	mConvertCoords( false ),
+	mReferenceFrame( 0 ),
+	mAutoAnims( false )
 {
+}
+
+bool Q2ModelToMesh::build()
+{
+	if ( !mModel.load( mInputFile ) )
+	{
+		cout << "[Error] Could not load input file '" << mInputFile << "'" << endl;
+		return false;
+	}
+
 	if ( mReferenceFrame >= mModel.header.numFrames )
 		mReferenceFrame = 0;
 
 	restructureVertices();
 	convert();
+
+	cout << "Saving mesh XML file '" << mOutputFile << "'" << endl;
+	if ( !saveFile( mOutputFile ) )
+	{
+		cout << "[Error] Could not save mesh XML file" << endl;
+		return false;
+	}
+
+	return true;
 }
 
 void Q2ModelToMesh::restructureVertices()
@@ -63,9 +74,7 @@ void Q2ModelToMesh::convert()
 
 	// Build SubMeshes
 	openTag( "submeshes" );
-	{
-		buildSubMesh();
-	}
+	buildSubMesh();
 	closeTag();
 
 	// Build Animations
@@ -82,8 +91,8 @@ void Q2ModelToMesh::convert()
 
 void Q2ModelToMesh::buildSubMesh()
 {
-	string materialName = "";
-	if ( mMaterial )
+	string materialName;
+	if ( !mMaterial.empty() )
 		materialName = mMaterial;
 	else if ( mModel.header.numSkins > 0 )
 		materialName = string( (const char*)mModel.skins[0].name );
@@ -213,7 +222,8 @@ void Q2ModelToMesh::buildTrack( int startFrame, int numFrames, int fps )
 	openTag( "keyframes" );
 	for ( int i = 0; i < numFrames; i++ )
 	{
-		buildKeyframe( startFrame + i, time );
+		const MD2Frame &frame = mModel.frames[startFrame + i];
+		buildKeyframe( frame, time );
 		time += timePerFrame;
 	}
 	closeTag();
@@ -221,14 +231,11 @@ void Q2ModelToMesh::buildTrack( int startFrame, int numFrames, int fps )
 	closeTag();
 }
 
-void Q2ModelToMesh::buildKeyframe( int frameIndex, float time )
+void Q2ModelToMesh::buildKeyframe( const MD2Frame &frame, float time )
 {
-	cout << "Building frame " << frameIndex << endl;
-
 	TiXmlElement *kfNode = openTag( "keyframe" );
 	kfNode->SetAttribute( "time", StringUtil::toString( time ) );
 
-	const MD2Frame &frame = mModel.frames[frameIndex];
 	float position[3], normal[3];
 
 	for ( int i = 0; i < (int)mNewVertices.size(); i++ )
@@ -260,7 +267,7 @@ void Q2ModelToMesh::convertPosition( const unsigned char position[3], const MD2F
 	dest[1] = (position[1] * frameHeader.scale[1]) + frameHeader.translate[1];
 	dest[2] = (position[2] * frameHeader.scale[2]) + frameHeader.translate[2];
 
-	if ( mConvertCoordinates )
+	if ( mConvertCoords )
 		Quake::convertVector( dest );	
 }
 
@@ -271,7 +278,7 @@ void Q2ModelToMesh::convertNormal( const unsigned char normalIndex, float dest[3
 	dest[1] = normal[1];
 	dest[2] = normal[2];
 
-	if ( mConvertCoordinates )
+	if ( mConvertCoords )
 		Quake::convertVector( dest );
 }
 

@@ -8,12 +8,17 @@
 class Q2ModelToMesh: public XmlWriter
 {
 public:
-	Q2ModelToMesh( 
-		const MD2Structure &model,
-		const AnimationList &animations,
-		const char *material,	// Can be NULL
-		int referenceFrame = 0,
-		bool convertCoordinates = false );
+	Q2ModelToMesh();
+
+	bool build();
+
+	void setInputFile( const string &filename ) { mInputFile = filename; }
+	void setOutputFile( const string &filename ) { mOutputFile = filename; }
+	void setConvertCoordinates( bool value ) { mConvertCoords = value; }
+	void setMaterial( const string &material ) { mMaterial = material; }
+	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
+	void setAutoDetectAnimations( bool value ) { mAutoAnims = value; }
+	void addAnimation( const Animation &anim ) { mAnimations.push_back( anim ); }
 
 private:
 	struct NewTriangle
@@ -46,16 +51,20 @@ private:
 
 	void buildAnimation( const string &name, int startFrame, int numFrames, int fps );
 	void buildTrack( int startFrame, int numFrames, int fps );
-	void buildKeyframe( int frameIndex, float time );
+	void buildKeyframe( const MD2Frame &frame, float time );
 	
 	void convertPosition( const unsigned char position[3], const MD2FrameHeader &frameHeader, float dest[3] );
 	void convertNormal( const unsigned char normalIndex, float dest[3] );
 
-	const MD2Structure &mModel;
-	const AnimationList &mAnimations;
-	const char *mMaterial;
-	bool mConvertCoordinates;
+	string mInputFile;
+	string mOutputFile;
+	bool mConvertCoords;
+	string mMaterial;
 	int mReferenceFrame;
+	bool mAutoAnims;	// TODO implement this
+	AnimationList mAnimations;
+
+	MD2Structure mModel;
 };
 
 #endif

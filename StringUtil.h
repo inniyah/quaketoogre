@@ -1,6 +1,8 @@
 #ifndef __STRINGUTIL_H__
 #define __STRINGUTIL_H__
 
+typedef map<string, string> StringMap;
+
 class StringUtil
 {
 public:

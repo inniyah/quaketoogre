@@ -19,9 +19,9 @@ public:
 
 	bool build();
 
-	void setConvertCoordinates( bool value ) { mConvertCoords = value; }
 	void setInputFile( const string &filename ) { mInputFile = filename; }
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
+	void setConvertCoordinates( bool value ) { mConvertCoords = value; }
 	void setSkeletonName( const string &name ) { mSkeletonName = name; }
 	void setRootBone( const string &bone ) { mRootBone = bone; }
 	void setMaxWeights( int value ) { mMaxWeights = value; }
