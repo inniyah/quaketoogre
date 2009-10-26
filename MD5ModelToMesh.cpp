@@ -3,8 +3,8 @@
 
 #include "md5model.h"
 
-MD5ModelToMesh::MD5ModelToMesh():
-	mConvertCoords( false ), mMaxWeights( -1 )
+MD5ModelToMesh::MD5ModelToMesh( const GlobalSettings &globals ):
+	mGlobals( globals ), mMaxWeights( -1 )
 {
 }
 
@@ -17,7 +17,7 @@ bool MD5ModelToMesh::build()
 		return false;
 	}
 	
-	if ( mConvertCoords )
+	if ( mGlobals.convertCoords )
 		convertCoordSystem( &mdl );
 
 	buildMesh( &mdl );
@@ -342,7 +342,7 @@ void MD5ModelToMesh::buildAnimations( const struct md5_model_t *mdl )
 			continue;
 		}
 
-		if ( mConvertCoords )
+		if ( mGlobals.convertCoords )
 			convertCoordSystem( &anim );
 
 		buildAnimation( iter->first, mdl, &anim );
@@ -359,6 +359,9 @@ void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_
 	TiXmlElement *animTag = mSkelWriter.openTag( "animation" );
 	animTag->SetAttribute( "name", name );
 	animTag->SetAttribute( "length", StringUtil::toString((float)anim->num_frames / (float)anim->frameRate) );
+
+	// TODO use InterpolateSkeletons() to create a new md5_anim_t with changed fps
+	// Animate() can also come in handy here
 
 	mSkelWriter.openTag( "tracks" );
 	for ( int i = 0; i < anim->num_joints; i++ )

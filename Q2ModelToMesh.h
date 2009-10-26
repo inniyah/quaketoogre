@@ -8,13 +8,12 @@
 class Q2ModelToMesh: public XmlWriter
 {
 public:
-	Q2ModelToMesh();
+	Q2ModelToMesh( const GlobalSettings &globals );
 
 	bool build();
 
 	void setInputFile( const string &filename ) { mInputFile = filename; }
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
-	void setConvertCoordinates( bool value ) { mConvertCoords = value; }
 	void setMaterial( const string &material ) { mMaterial = material; }
 	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
 	void setAutoDetectAnimations( bool value ) { mAutoAnims = value; }
@@ -56,9 +55,10 @@ private:
 	void convertPosition( const unsigned char position[3], const MD2FrameHeader &frameHeader, float dest[3] );
 	void convertNormal( const unsigned char normalIndex, float dest[3] );
 
+	const GlobalSettings &mGlobals;
+
 	string mInputFile;
 	string mOutputFile;
-	bool mConvertCoords;
 	string mMaterial;
 	int mReferenceFrame;
 	bool mAutoAnims;	// TODO implement this

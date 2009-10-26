@@ -16,7 +16,7 @@
 		</submeshes>
 
 		<md5skeleton name="bernie">
-			<md5anim name="SpitAttack">
+			<md5anim name="SpitAttack" changefps="10">
 				<inputfile>bernie/spit_attack1.md5anim</inputfile>
 			</md5anim>
 			<md5anim name="FastWalk">

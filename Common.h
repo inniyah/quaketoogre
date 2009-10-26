@@ -29,4 +29,12 @@ using namespace std;
 
 #include "StringUtil.h"
 
+struct GlobalSettings
+{
+	GlobalSettings();
+
+	bool convertCoords;
+	bool writeMaterials;
+};
+
 #endif

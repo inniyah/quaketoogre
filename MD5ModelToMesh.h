@@ -15,13 +15,12 @@ struct md5_anim_t;
 class MD5ModelToMesh
 {
 public:
-	MD5ModelToMesh();
+	MD5ModelToMesh( const GlobalSettings &globals );
 
 	bool build();
 
 	void setInputFile( const string &filename ) { mInputFile = filename; }
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
-	void setConvertCoordinates( bool value ) { mConvertCoords = value; }
 	void setSkeletonName( const string &name ) { mSkeletonName = name; }
 	void setRootBone( const string &bone ) { mRootBone = bone; }
 	void setMaxWeights( int value ) { mMaxWeights = value; }
@@ -63,7 +62,8 @@ private:
 	XmlWriter mMeshWriter;
 	XmlWriter mSkelWriter;
 
-	bool mConvertCoords;
+	const GlobalSettings &mGlobals;
+
 	string mInputFile;
 	string mOutputFile;
 	string mSkeletonName;

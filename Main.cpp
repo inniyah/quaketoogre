@@ -14,6 +14,13 @@
 void _chdrive( int ) {}
 #endif
 
+GlobalSettings::GlobalSettings():
+	convertCoords( true ), writeMaterials( false )
+{
+}
+
+static GlobalSettings gGlobals;
+
 bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 {
 	cout << "Processing animation file" << endl;
@@ -157,12 +164,11 @@ bool processMaterials( TiXmlElement *matsNode, StringMap &dest )
 	return true;
 }
 
-bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
+bool convertMD2Mesh( TiXmlElement *configNode )
 {
 	cout << "Doing MD2 Mesh conversion" << endl;
 
-	Q2ModelToMesh builder;
-	builder.setConvertCoordinates( convertCoordinates );
+	Q2ModelToMesh builder( gGlobals );
 
 	// Process the configuration XML tree
 	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
@@ -204,7 +210,7 @@ bool convertMD2Mesh( TiXmlElement *configNode, bool convertCoordinates )
 	return true;
 }
 
-bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
+bool convertMD3Mesh( TiXmlElement *configNode )
 {
 	cout << "Doing MD3 Mesh conversion" << endl;
 	
@@ -252,7 +258,7 @@ bool convertMD3Mesh( TiXmlElement *configNode, bool convertCoordinates )
 		return false;
 	}
 	
-	Q3ModelToMesh converter( md3Struct, animList, materialNames, referenceFrame, convertCoordinates );
+	Q3ModelToMesh converter( md3Struct, animList, materialNames, referenceFrame, gGlobals.convertCoords );
 	if ( !converter.saveFile( outputFile ) )
 	{
 		cout << "[Error] Could not save to file '" << outputFile << "'" << endl;
@@ -340,7 +346,7 @@ void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
 	builder.setSkeletonName( name );
 
 	const char *rootBone;
-	if ( rootBone = skelNode->Attribute( "rootbone" ) )
+	if ( rootBone = skelNode->Attribute( "moveorigin" ) )
 		builder.setRootBone( rootBone );
 
 	for ( TiXmlElement *node = skelNode->FirstChildElement(); node; node = node->NextSiblingElement() )
@@ -353,12 +359,11 @@ void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
 	}
 }
 
-bool convertMD5Mesh( TiXmlElement *configNode, bool convertCoordinates )
+bool convertMD5Mesh( TiXmlElement *configNode )
 {
 	cout << "Doing MD5 Mesh conversion" << endl;
 	
-	MD5ModelToMesh builder;
-	builder.setConvertCoordinates( convertCoordinates );
+	MD5ModelToMesh builder( gGlobals );
 
 	// Process the configuration XML tree
 	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
@@ -441,7 +446,7 @@ bool processConfigFile( const string &filepath )
 		return false;
 	}
 	
-	bool convertCoordinates = root->FirstChildElement( "convertcoordinates" ) ? true : false;
+	gGlobals.convertCoords = root->FirstChildElement( "convertcoordinates" ) ? true : false;
 	bool success = false;
 	
 	for ( TiXmlElement *node = root->FirstChildElement(); node; node = node->NextSiblingElement() )
@@ -449,15 +454,15 @@ bool processConfigFile( const string &filepath )
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "md2mesh" )
 		{
-			success = convertMD2Mesh( node, convertCoordinates );
+			success = convertMD2Mesh( node );
 		}
 		else if ( nodeName == "md3mesh" )
 		{
-			success = convertMD3Mesh( node, convertCoordinates );
+			success = convertMD3Mesh( node );
 		}
 		else if ( nodeName == "md5mesh" )
 		{
-			success = convertMD5Mesh( node, convertCoordinates );
+			success = convertMD5Mesh( node );
 		}
 	}
 	

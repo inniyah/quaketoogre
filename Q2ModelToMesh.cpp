@@ -1,10 +1,8 @@
 #include "Common.h"
 #include "Q2ModelToMesh.h"
 
-Q2ModelToMesh::Q2ModelToMesh():
-	mConvertCoords( false ),
-	mReferenceFrame( 0 ),
-	mAutoAnims( false )
+Q2ModelToMesh::Q2ModelToMesh( const GlobalSettings &globals ):
+	mGlobals( globals ), mReferenceFrame( 0 ), mAutoAnims( false )
 {
 }
 
@@ -267,7 +265,7 @@ void Q2ModelToMesh::convertPosition( const unsigned char position[3], const MD2F
 	dest[1] = (position[1] * frameHeader.scale[1]) + frameHeader.translate[1];
 	dest[2] = (position[2] * frameHeader.scale[2]) + frameHeader.translate[2];
 
-	if ( mConvertCoords )
+	if ( mGlobals.convertCoords )
 		Quake::convertVector( dest );	
 }
 
@@ -278,7 +276,7 @@ void Q2ModelToMesh::convertNormal( const unsigned char normalIndex, float dest[3
 	dest[1] = normal[1];
 	dest[2] = normal[2];
 
-	if ( mConvertCoords )
+	if ( mGlobals.convertCoords )
 		Quake::convertVector( dest );
 }
 
