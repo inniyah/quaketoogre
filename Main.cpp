@@ -317,12 +317,17 @@ void processMD5Animation( TiXmlElement *animNode, MD5ModelToMesh &builder )
 	}
 
 	string inputfile;
+	bool lockRoot = false;
 	for ( TiXmlElement *node = animNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "inputfile" )
 		{
 			inputfile = node->GetText();
+		}
+		else if ( nodeName == "lockroot" )
+		{
+			lockRoot = true;
 		}
 	}
 
@@ -332,7 +337,13 @@ void processMD5Animation( TiXmlElement *animNode, MD5ModelToMesh &builder )
 		return;
 	}
 
-	builder.addAnimation( name, inputfile );
+	MD5ModelToMesh::AnimationInfo &anim = builder.getAnimation( name );
+	anim.inputFile = inputfile;
+	anim.lockRoot = lockRoot;
+	
+	int fps;
+	if ( animNode->Attribute( "changefps", &fps ) )
+		anim.fps = fps;
 }
 
 void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )

@@ -326,52 +326,60 @@ void MD5ModelToMesh::buildAnimations( const struct md5_model_t *mdl )
 {
 	mSkelWriter.openTag( "animations" );
 
-	for ( StringMap::iterator iter = mAnimations.begin(); iter != mAnimations.end(); ++iter )
+	for ( AnimationMap::iterator iter = mAnimations.begin(); iter != mAnimations.end(); ++iter )
 	{
-		struct md5_anim_t anim;
-		if ( !ReadMD5Anim( iter->second.c_str(), &anim ) )
-		{
-			cout << "[Warning] Could not load MD5 animation file '" << iter->second << "'" << endl;
-			continue;
-		}
-
-		if ( !CheckAnimValidity( mdl, &anim ) )
-		{
-			cout << "[Warning] MD5 animation file '" << iter->second << "' is not compatible with this model" << endl;
-			FreeAnim( &anim );
-			continue;
-		}
-
-		if ( mGlobals.convertCoords )
-			convertCoordSystem( &anim );
-
-		buildAnimation( iter->first, mdl, &anim );
-		FreeAnim( &anim );
+		buildAnimation( mdl, iter->first, iter->second );
 	}
 
 	mSkelWriter.closeTag();	// animations
 }
 
-void MD5ModelToMesh::buildAnimation( const string &name, const struct md5_model_t *mdl, const struct md5_anim_t *anim )
+void MD5ModelToMesh::buildAnimation( const struct md5_model_t *mdl, const string &name, const AnimationInfo &animInfo )
 {
+	struct md5_anim_t anim;
+	if ( !ReadMD5Anim( animInfo.inputFile.c_str(), &anim ) )
+	{
+		cout << "[Warning] Could not load MD5 animation file '" << animInfo.inputFile << "'" << endl;
+		return;
+	}
+
+	if ( !CheckAnimValidity( mdl, &anim ) )
+	{
+		cout << "[Warning] MD5 animation file '" << animInfo.inputFile << "' is not compatible with this model" << endl;
+		FreeAnim( &anim );
+		return;
+	}
+
+	if ( mGlobals.convertCoords )
+		convertCoordSystem( &anim );
+
 	cout << "Building animation '" << name << "'" << endl;
 
 	TiXmlElement *animTag = mSkelWriter.openTag( "animation" );
 	animTag->SetAttribute( "name", name );
-	animTag->SetAttribute( "length", StringUtil::toString((float)anim->num_frames / (float)anim->frameRate) );
+	animTag->SetAttribute( "length", StringUtil::toString((float)anim.num_frames / (float)anim.frameRate) );
 
-	// TODO use InterpolateSkeletons() to create a new md5_anim_t with changed fps
-	// Animate() can also come in handy here
+	// Resample the animation to change the animation's framerate
+	struct md5_anim_t newAnim, *finalAnim = &anim;
+	if ( animInfo.fps > 0 && animInfo.fps != anim.frameRate )
+	{
+		cout << "Resampling animation to " << animInfo.fps << " fps" << endl;
+		resampleAnimation( &anim, &newAnim, animInfo.fps );
+		finalAnim = &newAnim;
+		FreeAnim( &anim );
+	}
 
 	mSkelWriter.openTag( "tracks" );
-	for ( int i = 0; i < anim->num_joints; i++ )
+	for ( int i = 0; i < anim.num_joints; i++ )
 	{
-		buildTrack( mdl, anim, i );
-		cout << ((i+1) * 100 / anim->num_joints) << "%\r";
+		buildTrack( mdl, finalAnim, i );
+		cout << ((i+1) * 100 / anim.num_joints) << "%\r";
 	}
 	mSkelWriter.closeTag();	// tracks
 
 	mSkelWriter.closeTag();	// animation
+
+	FreeAnim( finalAnim );
 }
 
 void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex )
@@ -469,6 +477,26 @@ void MD5ModelToMesh::generateNormals( const struct md5_mesh_t *mesh, vec3_t *nor
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
 		vec_normalize( normals[i] );
+	}
+}
+
+void MD5ModelToMesh::resampleAnimation( const struct md5_anim_t *in, struct md5_anim_t *out, int fps )
+{
+	memset( out, 0, sizeof(struct md5_anim_t) );
+	out->frameRate = fps;
+	out->num_joints = in->num_joints;	
+	out->num_frames = (in->num_frames * out->frameRate) / in->frameRate;
+	out->skelFrames = (struct md5_joint_t **)malloc( sizeof(struct md5_joint_t *) * out->num_frames );
+
+	float interval = (float)in->frameRate / (float)out->frameRate;
+	for ( int i = 0; i < out->num_frames; i++ )
+	{
+		out->skelFrames[i] = (struct md5_joint_t *)malloc( sizeof(struct md5_joint_t) * out->num_joints );
+
+		float position = i * interval;
+		int frame = (int)floor( position );
+		float interp = position - frame;
+		InterpolateSkeletons( in->skelFrames[frame], in->skelFrames[frame+1], in->num_joints, interp, out->skelFrames[i] );
 	}
 }
 

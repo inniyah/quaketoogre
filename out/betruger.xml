@@ -13,7 +13,7 @@
 		</submeshes>
 
 		<md5skeleton name="betruger_body">
-			<md5anim name="meeting_d">
+			<md5anim name="meeting_d" changefps="10">
 				<inputfile>betruger/meeting_d.md5anim</inputfile>
 			</md5anim>
 		</md5skeleton>
@@ -32,7 +32,7 @@
 		</submeshes>
 
 		<md5skeleton name="betruger_head" moveorigin="neckcontrol">
-			<md5anim name="meeting_d">
+			<md5anim name="meeting_d" changefps="15">
 				<inputfile>betruger/betspeech_d.md5anim</inputfile>
 			</md5anim>
 		</md5skeleton>

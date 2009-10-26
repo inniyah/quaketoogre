@@ -18,6 +18,7 @@ public:
 	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
 	void setAutoDetectAnimations( bool value ) { mAutoAnims = value; }
 	void addAnimation( const Animation &anim ) { mAnimations.push_back( anim ); }
+//	Animation &getAnimation( const string &name ) { }	// TODO implement, replacing the above function
 
 private:
 	struct NewTriangle
