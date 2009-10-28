@@ -1,8 +1,8 @@
 #include "Common.h"
 #include "Q2ModelToMesh.h"
 
-Q2ModelToMesh::Q2ModelToMesh( const GlobalSettings &globals ):
-	mGlobals( globals ), mReferenceFrame( 0 ), mAutoAnims( false )
+Q2ModelToMesh::Q2ModelToMesh( const GlobalOptions &globals ):
+	mGlobals( globals ), mReferenceFrame( 0 )
 {
 }
 

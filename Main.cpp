@@ -14,12 +14,12 @@
 void _chdrive( int ) {}
 #endif
 
-GlobalSettings::GlobalSettings():
+GlobalOptions::GlobalOptions():
 	convertCoords( true ), writeMaterials( false )
 {
 }
 
-static GlobalSettings gGlobals;
+static GlobalOptions gGlobals;
 
 bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 {

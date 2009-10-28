@@ -3,7 +3,7 @@
 
 #include "md5model.h"
 
-MD5ModelToMesh::MD5ModelToMesh( const GlobalSettings &globals ):
+MD5ModelToMesh::MD5ModelToMesh( const GlobalOptions &globals ):
 	mGlobals( globals ), mMaxWeights( -1 )
 {
 }

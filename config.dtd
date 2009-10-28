@@ -1,13 +1,13 @@
 <!-- Root element -->
 <!ELEMENT quake2ogre (convertcoordinates?, (md2mesh|md3mesh|md5mesh)+)>
 
+<!-- Convert vectors to Ogre coordinate system -->
+<!ELEMENT convertcoordinates EMPTY>
+
 <!-- This element determines type of conversion -->
 <!ELEMENT md2mesh (inputfile, outputfile, referenceframe?, animations?, materialname?)>
 <!ELEMENT md3mesh (inputfile, outputfile, referenceframe?, animationfile?, animations?, materials?)>
 <!ELEMENT md5mesh (inputfile, outputfile, submeshes, md5skeleton?)>
-
-<!-- Convert vectors to Ogre coordinate system -->
-<!ELEMENT convertcoordinates EMPTY>
 
 <!-- Filenames -->
 <!ELEMENT inputfile (#PCDATA)>

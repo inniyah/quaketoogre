@@ -29,9 +29,9 @@ using namespace std;
 
 #include "StringUtil.h"
 
-struct GlobalSettings
+struct GlobalOptions
 {
-	GlobalSettings();
+	GlobalOptions();
 
 	bool convertCoords;
 	bool writeMaterials;

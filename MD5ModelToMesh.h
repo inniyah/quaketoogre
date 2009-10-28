@@ -15,7 +15,7 @@ struct md5_anim_t;
 class MD5ModelToMesh
 {
 public:
-	MD5ModelToMesh( const GlobalSettings &globals );
+	MD5ModelToMesh( const GlobalOptions &globals );
 
 	bool build();
 
@@ -78,7 +78,7 @@ private:
 	XmlWriter mMeshWriter;
 	XmlWriter mSkelWriter;
 
-	const GlobalSettings &mGlobals;
+	const GlobalOptions &mGlobals;
 
 	string mInputFile;
 	string mOutputFile;
