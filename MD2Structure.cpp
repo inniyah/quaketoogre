@@ -1,17 +1,17 @@
 #include "Common.h"
 #include "MD2Structure.h"
 
-MD2Structure::MD2Structure():
+MD2Model::MD2Model():
 	skins(NULL), frames(NULL), texCoords(NULL), triangles(NULL)
 {
 }
 
-MD2Structure::~MD2Structure()
+MD2Model::~MD2Model()
 {
 	free();	
 }
 
-bool MD2Structure::load( const string &filename )
+bool MD2Model::load( const string &filename )
 {
 	FILE *f;
 
@@ -55,13 +55,13 @@ bool MD2Structure::load( const string &filename )
 
 	fclose( f );
 
-	printf( "MD2Structure::load() - Loaded %i skins, %i vertices, %i texture coordinates, %i triangles, %i frames\n", 
+	printf( "MD2Model::load() - Loaded %i skins, %i vertices, %i texture coordinates, %i triangles, %i frames\n", 
 		header.numSkins, header.numVertices, header.numTexCoords, header.numTriangles, header.numFrames );
 
 	return true;
 }
 
-void MD2Structure::free()
+void MD2Model::free()
 {
 	if ( skins )
 	{
@@ -92,7 +92,7 @@ void MD2Structure::free()
 	}
 }
 
-void MD2Structure::printInfo() const
+void MD2Model::printInfo() const
 {
 	cout << "MD2 file info" << endl;
 	for ( int i = 0; i < header.numSkins; i++ )

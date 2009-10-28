@@ -1,5 +1,5 @@
-#ifndef __MD2STRUCTURE_H__
-#define __MD2STRUCTURE_H__
+#ifndef __MD2MODEL_H__
+#define __MD2MODEL_H__
 
 #include "Quake.h"
 
@@ -37,8 +37,8 @@ struct MD2Vertex
 
 struct MD2FrameHeader
 {
-	float	scale[3];
-	float	translate[3];
+	vec3_t	scale;
+	vec3_t	translate;
 	char	name[16];
 };
 
@@ -59,11 +59,11 @@ struct MD2TexCoord
 	short	u, v;
 };
 
-class MD2Structure
+class MD2Model
 {
 public:
-	MD2Structure();
-	~MD2Structure();
+	MD2Model();
+	~MD2Model();
 
 	bool load( const string &filename );
 	void free();
@@ -77,4 +77,4 @@ public:
 	MD2Triangle	*triangles;
 };
 
-#endif
+#endif	// __MD2MODEL_H__

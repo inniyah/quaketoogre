@@ -2,7 +2,7 @@
 #include "Q3ModelToMesh.h"
 
 Q3ModelToMesh::Q3ModelToMesh( 
-	const MD3Structure &model,
+	const MD3Model &model,
 	const AnimationList &animations,
 	const StringMap &materials,
 	int referenceFrame, 

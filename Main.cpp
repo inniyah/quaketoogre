@@ -251,14 +251,14 @@ bool convertMD3Mesh( TiXmlElement *configNode )
 	}
 	
 	// Try to load the MD3 file
-	MD3Structure md3Struct;
-	if ( !md3Struct.load( inputFile ) )
+	MD3Model md3model;
+	if ( !md3model.load( inputFile ) )
 	{
 		cout << "[Error] Could not load input file '" << inputFile << "'" << endl;
 		return false;
 	}
 	
-	Q3ModelToMesh converter( md3Struct, animList, materialNames, referenceFrame, gGlobals.convertCoords );
+	Q3ModelToMesh converter( md3model, animList, materialNames, referenceFrame, gGlobals.convertCoords );
 	if ( !converter.saveFile( outputFile ) )
 	{
 		cout << "[Error] Could not save to file '" << outputFile << "'" << endl;
@@ -512,16 +512,16 @@ int main( int argc, char **argv )
 			return 1;
 		}
 		
-		MD2Structure md2Struct;
-		MD3Structure md3Struct;
-		if ( md2Struct.load( argv[2] ) )
+		MD2Model md2model;
+		MD3Model md3model;
+		if ( md2model.load( argv[2] ) )
 		{
-			md2Struct.printInfo();
+			md2model.printInfo();
 			return 0;
 		}
-		else if ( md3Struct.load( argv[2] ) )
+		else if ( md3model.load( argv[2] ) )
 		{
-			md3Struct.printInfo();
+			md3model.printInfo();
 			return 0;
 		}
 		else if ( MD5ModelToMesh::isMD5Mesh( argv[2] ) || MD5ModelToMesh::isMD5Anim( argv[2] ) )

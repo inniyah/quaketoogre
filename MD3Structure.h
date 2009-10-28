@@ -1,5 +1,5 @@
-#ifndef __MD3STRUCTURE_H__
-#define __MD3STRUCTURE_H__
+#ifndef __MD3MODEL_H__
+#define __MD3MODEL_H__
 
 #include "Quake.h"
 
@@ -82,11 +82,11 @@ struct MD3Mesh
 	MD3Vertex		*vertices;
 };
 
-class MD3Structure
+class MD3Model
 {
 public:
-	MD3Structure();
-	~MD3Structure();
+	MD3Model();
+	~MD3Model();
 
 	bool load( const string &filename );
 	void free();
@@ -99,7 +99,4 @@ public:
 	MD3Mesh		*meshes;
 };
 
-typedef vector<const MD3Structure *> MD3StructureList;
-typedef map<string, const MD3Structure *> MD3StructureMap;
-
-#endif
+#endif	// __MD3MODEL_H__

@@ -9,7 +9,7 @@ class Q3ModelToMesh: public XmlWriter
 {
 public:
 	Q3ModelToMesh( 
-		const MD3Structure &model,
+		const MD3Model &model,
 		const AnimationList &animations,
 		const StringMap &materials,
 		int referenceFrame = 0,
@@ -31,7 +31,7 @@ private:
 	void convertPosition( const short position[3], float dest[3] );
 	void convertNormal( const short &normal, float dest[3] );
 
-	const MD3Structure &mModel;
+	const MD3Model &mModel;
 	const AnimationList &mAnimations;
 	const StringMap &mMaterials;
 	bool mConvertCoordinates;

@@ -1,19 +1,17 @@
 #include "Common.h"
 #include "Quake.h"
 
-#include "quaternion.h"
-
-const float Quake::md2VertexNormals[MD2_NUMVERTEXNORMALS][3] =
+const vec3_t Quake::md2VertexNormals[MD2_NUMVERTEXNORMALS] =
 {
 #include "anorms.h"
 };
 
-void Quake::convertVector( float vec[3] )
+void Quake::convertVector( vec3_t v )
 {
 	float tmp;
-	tmp = vec[1];
-	vec[1] = vec[2];
-	vec[2] = -tmp;
+	tmp = v[1];
+	v[1] = v[2];
+	v[2] = -tmp;
 }
 
 void Quake::convertQuaternion( quat4_t q )

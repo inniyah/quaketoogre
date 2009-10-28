@@ -40,7 +40,6 @@ public:
 	void setRootBone( const string &bone ) { mRootBone = bone; }
 	void setMaxWeights( int value ) { mMaxWeights = value; }
 	void addSubMesh( int index, const string &material ) { mSubMeshes[index] = material; }
-	//void addAnimation( const string &name, const string &filename ) { mAnimations[name] = filename; }
 	AnimationInfo &getAnimation( const string &name ) { return mAnimations[name]; }
 
 	static bool isMD5Mesh( const string &filename );

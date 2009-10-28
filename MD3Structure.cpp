@@ -1,17 +1,17 @@
 #include "Common.h"
 #include "MD3Structure.h"
 
-MD3Structure::MD3Structure():
+MD3Model::MD3Model():
 	frames(NULL), tags(NULL), meshes(NULL)
 {
 }
 
-MD3Structure::~MD3Structure()
+MD3Model::~MD3Model()
 {
 	free();
 }
 
-bool MD3Structure::load( const string &filename )
+bool MD3Model::load( const string &filename )
 {
 	FILE *f;
 
@@ -67,13 +67,13 @@ bool MD3Structure::load( const string &filename )
 		offset += mesh.header.length;
 	}
 
-	printf( "MD3Structure::load() - Loaded %i frames, %i meshes\n", header.numFrames, header.numMeshes );
+	printf( "MD3Model::load() - Loaded %i frames, %i meshes\n", header.numFrames, header.numMeshes );
 
 	fclose( f );
 	return true;
 }
 
-void MD3Structure::free()
+void MD3Model::free()
 {
 	if ( frames )
 	{
@@ -101,7 +101,7 @@ void MD3Structure::free()
 	}
 }
 
-void MD3Structure::printInfo() const
+void MD3Model::printInfo() const
 {
 	cout << "MD3 file info" << endl;
 	for ( int i = 0; i < header.numFrames; i++ )

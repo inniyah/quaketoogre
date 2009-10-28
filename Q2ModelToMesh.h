@@ -65,7 +65,7 @@ private:
 	bool mAutoAnims;	// TODO implement this
 	AnimationList mAnimations;
 
-	MD2Structure mModel;
+	MD2Model mModel;
 };
 
 #endif
