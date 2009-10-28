@@ -186,11 +186,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MD2Structure.cpp"
+				RelativePath=".\MD2Model.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\MD3Structure.cpp"
+				RelativePath=".\MD3Model.cpp"
 				>
 			</File>
 			<File
@@ -264,11 +264,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MD2Structure.h"
+				RelativePath=".\MD2Model.h"
 				>
 			</File>
 			<File
-				RelativePath=".\MD3Structure.h"
+				RelativePath=".\MD3Model.h"
 				>
 			</File>
 			<File

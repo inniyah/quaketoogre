@@ -1,6 +1,6 @@
 #include "Common.h"
-#include "MD2Structure.h"
-#include "MD3Structure.h"
+#include "MD2Model.h"
+#include "MD3Model.h"
 #include "Q2ModelToMesh.h"
 #include "Q3ModelToMesh.h"
 #include "MD5ModelToMesh.h"

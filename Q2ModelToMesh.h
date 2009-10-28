@@ -2,7 +2,7 @@
 #define __Q2MODELTOMESH_H__
 
 #include "XmlWriter.h"
-#include "MD2Structure.h"
+#include "MD2Model.h"
 #include "Animation.h"
 
 class Q2ModelToMesh: public XmlWriter

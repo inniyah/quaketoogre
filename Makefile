@@ -6,8 +6,8 @@ OBJ = \
 	tinyxmlparser.o \
 	Main.o \
 	Quake.o \
-	MD2Structure.o \
-	MD3Structure.o \
+	MD2Model.o \
+	MD3Model.o \
 	Animation.o \
 	XmlWriter.o \
 	Q2ModelToMesh.o \

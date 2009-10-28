@@ -1,5 +1,5 @@
 #include "Common.h"
-#include "MD2Structure.h"
+#include "MD2Model.h"
 
 MD2Model::MD2Model():
 	skins(NULL), frames(NULL), texCoords(NULL), triangles(NULL)

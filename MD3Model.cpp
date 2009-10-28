@@ -1,5 +1,5 @@
 #include "Common.h"
-#include "MD3Structure.h"
+#include "MD3Model.h"
 
 MD3Model::MD3Model():
 	frames(NULL), tags(NULL), meshes(NULL)

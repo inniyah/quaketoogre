@@ -2,7 +2,7 @@
 #define __Q3MODELTOMESH_H__
 
 #include "XmlWriter.h"
-#include "MD3Structure.h"
+#include "MD3Model.h"
 #include "Animation.h"
 
 class Q3ModelToMesh: public XmlWriter
