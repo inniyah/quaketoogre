@@ -21,7 +21,7 @@ GlobalOptions::GlobalOptions():
 
 static GlobalOptions gGlobals;
 
-bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
+bool processAnimationFile( TiXmlElement *animFileNode, Q3ModelToMesh &builder )
 {
 	cout << "Processing animation file" << endl;
 
@@ -49,7 +49,7 @@ bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 			const AnimationMap &animMap = animFile.getLowerAnimations();
 			for ( AnimationMap::const_iterator i = animMap.begin(); i != animMap.end(); ++i )
 			{
-				dest.push_back( i->second );
+				builder.addAnimation( i->second );
 			}
 			break;
 		}
@@ -59,7 +59,7 @@ bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 			const AnimationMap &animMap = animFile.getUpperAnimations();
 			for ( AnimationMap::const_iterator i = animMap.begin(); i != animMap.end(); ++i )
 			{
-				dest.push_back( i->second );
+				builder.addAnimation( i->second );
 			}
 			break;
 		}
@@ -77,7 +77,7 @@ bool processAnimationFile( TiXmlElement *animFileNode, AnimationList &dest )
 					if ( i != animMap.end() )
 					{
 						cout << "Adding animation '" << animName << "'" << endl;
-						dest.push_back( i->second );
+						builder.addAnimation( i->second );
 					}
 					else
 					{
@@ -125,7 +125,7 @@ bool processAnimations( TiXmlElement *animsNode, AnimationList &dest )
 	return true;
 }
 
-bool processMaterials( TiXmlElement *matsNode, StringMap &dest )
+bool processMaterials( TiXmlElement *matsNode, Q3ModelToMesh &builder )
 {
 	cout << "Processing materials" << endl;
 	
@@ -157,7 +157,7 @@ bool processMaterials( TiXmlElement *matsNode, StringMap &dest )
 			}
 			
 			cout << "Using material '" << value << "' for submesh '" << key << "'" << endl;
-			dest[key] = value;
+			builder.setSubMeshMaterial( key, value );
 		}
 	}
 	
@@ -188,9 +188,9 @@ bool convertMD2Mesh( TiXmlElement *configNode )
 		}
 		else if ( nodeName == "animations" )
 		{
-			AnimationList animList;
-			processAnimations( node, animList );
-			for ( AnimationList::iterator iter = animList.begin(); iter != animList.end(); ++iter )
+			AnimationList anims;
+			processAnimations( node, anims );
+			for ( AnimationList::iterator iter = anims.begin(); iter != anims.end(); ++iter )
 			{
 				builder.addAnimation( *iter );
 			}
@@ -214,10 +214,7 @@ bool convertMD3Mesh( TiXmlElement *configNode )
 {
 	cout << "Doing MD3 Mesh conversion" << endl;
 	
-	string inputFile, outputFile;
-	AnimationList animList;
-	StringMap materialNames;
-	int referenceFrame = 0;
+	Q3ModelToMesh builder( gGlobals );
 	
 	// Process the configuration XML tree
 	for ( TiXmlElement *node = configNode->FirstChildElement(); node; node = node->NextSiblingElement() )
@@ -225,43 +222,39 @@ bool convertMD3Mesh( TiXmlElement *configNode )
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "inputfile" )
 		{
-			inputFile = node->GetText();
+			builder.setInputFile( node->GetText() );
 		}
 		else if ( nodeName == "outputfile" )
 		{
-			outputFile = node->GetText();		
+			builder.setOutputFile( node->GetText() );
 		}
 		else if ( nodeName == "referenceframe" )
 		{
-			referenceFrame = atoi( node->GetText() );
+			builder.setReferenceFrame( atoi( node->GetText() ) );
 		}
 		else if ( nodeName == "animationfile" )
 		{
-			if ( !processAnimationFile( node, animList ) )
+			if ( !processAnimationFile( node, builder ) )
 				cout << "[Warning] Failed to process animation file" << endl;
 		}
 		else if ( nodeName == "animations" )
 		{
-			processAnimations( node, animList );
+			AnimationList anims;
+			processAnimations( node, anims );
+			for ( AnimationList::iterator iter = anims.begin(); iter != anims.end(); ++iter )
+			{
+				builder.addAnimation( *iter );
+			}
 		}
 		else if ( nodeName == "materials" )
 		{
-			processMaterials( node, materialNames );
+			processMaterials( node, builder );
 		}
 	}
 	
-	// Try to load the MD3 file
-	MD3Model md3model;
-	if ( !md3model.load( inputFile ) )
+	if ( !builder.build() )
 	{
-		cout << "[Error] Could not load input file '" << inputFile << "'" << endl;
-		return false;
-	}
-	
-	Q3ModelToMesh converter( md3model, animList, materialNames, referenceFrame, gGlobals.convertCoords );
-	if ( !converter.saveFile( outputFile ) )
-	{
-		cout << "[Error] Could not save to file '" << outputFile << "'" << endl;
+		cout << "[Error] Failed to convert MD3 file" << endl;
 		return false;
 	}
 	

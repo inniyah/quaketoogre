@@ -8,12 +8,15 @@
 class Q3ModelToMesh: public XmlWriter
 {
 public:
-	Q3ModelToMesh( 
-		const MD3Model &model,
-		const AnimationList &animations,
-		const StringMap &materials,
-		int referenceFrame = 0,
-		bool convertCoordinates = false );
+	Q3ModelToMesh( const GlobalOptions &globals );
+
+	bool build();
+
+	void setInputFile( const string &filename ) { mInputFile = filename; }
+	void setOutputFile( const string &filename ) { mOutputFile = filename; }
+	void setSubMeshMaterial( const string &subMesh, const string &material ) { mMaterials[subMesh] = material; }
+	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
+	void addAnimation( const Animation &anim ) { mAnimations.push_back( anim ); }
 
 private:
 	void convert();
@@ -31,11 +34,15 @@ private:
 	void convertPosition( const short position[3], float dest[3] );
 	void convertNormal( const short &normal, float dest[3] );
 
-	const MD3Model &mModel;
-	const AnimationList &mAnimations;
-	const StringMap &mMaterials;
-	bool mConvertCoordinates;
+	const GlobalOptions &mGlobals;
+
+	string mInputFile;
+	string mOutputFile;
+	StringMap mMaterials;
 	int mReferenceFrame;
+	AnimationList mAnimations;
+
+	MD3Model mModel;
 };
 
 #endif

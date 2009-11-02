@@ -1,20 +1,32 @@
 #include "Common.h"
 #include "Q3ModelToMesh.h"
 
-Q3ModelToMesh::Q3ModelToMesh( 
-	const MD3Model &model,
-	const AnimationList &animations,
-	const StringMap &materials,
-	int referenceFrame, 
-	bool convertCoordinates ):
-	
-	mModel( model ),
-	mAnimations( animations ),
-	mMaterials( materials ),
-	mReferenceFrame( referenceFrame ), 
-	mConvertCoordinates( convertCoordinates )
+Q3ModelToMesh::Q3ModelToMesh( const GlobalOptions &globals ):
+	mGlobals( globals ), mReferenceFrame( 0 )
 {
+}
+
+bool Q3ModelToMesh::build()
+{
+	if ( !mModel.load( mInputFile ) )
+	{
+		cout << "[Error] Could not load input file '" << mInputFile << "'" << endl;
+		return false;
+	}
+
+	if ( mReferenceFrame >= mModel.header.numFrames )
+		mReferenceFrame = 0;
+
 	convert();
+
+	cout << "Saving mesh XML file '" << mOutputFile << "'" << endl;
+	if ( !saveFile( mOutputFile ) )
+	{
+		cout << "[Error] Could not save mesh XML file" << endl;
+		return false;
+	}
+
+	return true;
 }
 
 void Q3ModelToMesh::convert()
@@ -239,7 +251,7 @@ void Q3ModelToMesh::convertPosition( const short position[3], float dest[3] )
 	dest[1] = (float)position[1] * MD3_SCALE;
 	dest[2] = (float)position[2] * MD3_SCALE;
 	
-	if ( mConvertCoordinates )
+	if ( mGlobals.convertCoords )
 		Quake::convertVector( dest );
 }
 
@@ -254,7 +266,7 @@ void Q3ModelToMesh::convertNormal( const short &normal, float dest[3] )
 	dest[1] = (float)( sin(lat) * sin(lng) );
 	dest[2] = (float)( cos(lng) );
 	
-	if ( mConvertCoordinates )
+	if ( mGlobals.convertCoords )
 		Quake::convertVector( dest );	
 }
 
