@@ -2,23 +2,25 @@
 Introduction
 ------------
 
-The modding communities for both Quake 2 and Quake 3 have created a wealth of 
-3D models that are readily available on the internet. Many of these models
-could be useful for game development projects using Ogre, but since Ogre has
-its own custom mesh format, it cannot directly load any Quake models.
+The modding communities for games using id Tech engines (Quake, Doom, etc) have
+created a wealth of 3D models that are readily available on the internet. Many
+of these models could be useful for game development projects using Ogre, but
+since Ogre has its own custom mesh format, it cannot directly load any Quake or
+Doom models.
 
-For this reason, I present to you the Quake To Ogre Mesh Converter. 
-This tool can take a 3D model from either Quake 2 or Quake 3 and convert it to
-an equivalent Ogre mesh, including (a selection of) the original model's
-animations.
+For this reason, I present to you the Quake To Ogre Mesh Converter.
+This tool can take a 3D model from either Quake 2, Quake 3 or Doom 3 and 
+convert it to an equivalent Ogre mesh, including (a selection of) the original
+model's animations.
 
 --------
 Features
 --------
 
-- Convert MD2 or MD3 files to Ogre Mesh XML
+- Convert MD2, MD3 or MD5 model files to Ogre Mesh XML
 - Convert Quake's vertex animations to Ogre's morph animations
-- Specify a selection of animations to convert (both MD2 and MD3), or load
+- Convert Doom 3's skeletal animations to Ogre's skeletal animations
+- Specify a selection of animations to convert (all input formats), or load
   them from a player model's animation file (MD3 only)
 - Convert vertices and normals from Quake's coordinate system to Ogre's system
 - Specify material names for each submesh
@@ -34,7 +36,7 @@ and the standard C math library.
 For Windows users, I've included a Visual C++ .NET 2005 (VC8) project file.
 The program can be compiled directly from that.
 
-For GNU/Linux, a Makefile has been included that uses 'g++' for compilation. 
+For GNU/Linux, a Makefile has been included that uses 'g++' for compilation.
 To compile the code, just run "make" from the command line. The compiled binary
 will be placed in the 'out' directory.
 
@@ -59,8 +61,8 @@ about a Quake mesh by running the program as follows:
 
 QuakeToOgre -i [mesh file]
 
-This will list the names of every frame, submesh, tag and shader contained in
-the mesh file.
+This will list the names of every frame, submesh, joint, tag and shader
+contained in the mesh file.
 
 -------------
 Configuration
@@ -116,7 +118,19 @@ for most frames, resulting in weird lighting behaviour.
 Licensing
 ---------
 
-The entire source code for this application is licensed under the MIT License,
-as described in the LICENSE file. The only exception to this is the file 
-'anorms.h', which is copyrighted by id Software and licensed under GPLv2.
+All original source code for this application is licensed under the MIT 
+License, as described in the LICENSE file. Third-party source code is licensed
+under a variety of licenses, which are described at the start of each source
+file.
 
+--------------
+Special thanks
+--------------
+
+- The OGRE team, for creating such an incredibly powerful and clever, yet easy
+  to use graphics engine.
+- The OGRE community, for motivating me to keep working on this project.
+- Lee Thomason, Yves Berquin and Andrew Ellerton, for creating the delightfully
+  simple and lightweight TinyXML library.
+- David Henry, for saving me the trouble of having to write an MD5 parser and
+  processor myself.

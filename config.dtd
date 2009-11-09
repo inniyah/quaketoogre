@@ -36,12 +36,12 @@
 <!ELEMENT md5skeleton (md5anim*)>
 <!ATTLIST md5skeleton
     name        CDATA   #REQUIRED
-    moveorigin  CDATA   #IMPLIED>   <!-- Moves the root bone to the position and orientation of this bone. -->
+    moveorigin  CDATA   #IMPLIED>   <!-- Moves the root bone to the position and orientation of this bone. (not implemented yet) -->
 <!ELEMENT md5anim (inputfile, lockroot?)>
 <!ATTLIST md5anim
     name        CDATA   #REQUIRED
     changefps   CDATA   #IMPLIED>   <!-- Interpolate animation frames to decrease the number of frames per second. -->
-<!ELEMENT lockroot EMPTY>   <!-- Locks the root bone in place, i.e. translation is always zero. -->
+<!ELEMENT lockroot EMPTY>   <!-- Locks the root bone in place, i.e. translation is always zero. (not implemented yet) -->
 
 <!-- Individual animation definitions -->
 <!ELEMENT animations (animationsequence+)>
