@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "MD3Model.h"
 #include "Animation.h"
 
-class Q3ModelToMesh: public XmlWriter
+class Q3ModelToMesh
 {
 public:
 	Q3ModelToMesh( const GlobalOptions &globals );
@@ -58,6 +58,8 @@ private:
 	void convertNormal( const short &normal, float dest[3] );
 
 	const GlobalOptions &mGlobals;
+
+	XmlWriter mMeshWriter;
 
 	string mInputFile;
 	string mOutputFile;

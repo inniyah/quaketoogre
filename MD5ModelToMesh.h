@@ -98,10 +98,10 @@ private:
 	static void convertCoordSystem( struct md5_model_t *mdl );
 	static void convertCoordSystem( struct md5_anim_t *anim );
 
+	const GlobalOptions &mGlobals;
+
 	XmlWriter mMeshWriter;
 	XmlWriter mSkelWriter;
-
-	const GlobalOptions &mGlobals;
 
 	string mInputFile;
 	string mOutputFile;

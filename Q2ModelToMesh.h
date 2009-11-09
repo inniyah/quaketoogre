@@ -28,7 +28,7 @@ THE SOFTWARE.
 #include "MD2Model.h"
 #include "Animation.h"
 
-class Q2ModelToMesh: public XmlWriter
+class Q2ModelToMesh
 {
 public:
 	Q2ModelToMesh( const GlobalOptions &globals );
@@ -79,6 +79,8 @@ private:
 	void convertNormal( const unsigned char normalIndex, float dest[3] );
 
 	const GlobalOptions &mGlobals;
+
+	XmlWriter mMeshWriter;
 
 	string mInputFile;
 	string mOutputFile;
