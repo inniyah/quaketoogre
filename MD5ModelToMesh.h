@@ -62,7 +62,7 @@ public:
 	void setSkeletonName( const string &name ) { mSkeletonName = name; }
 	void setRootBone( const string &bone ) { mRootBone = bone; }
 	void setMaxWeights( int value ) { mMaxWeights = value; }
-	void addSubMesh( int index, const string &material ) { mSubMeshes[index] = material; }
+	SubMeshInfo &getSubMesh( int index ) { return mSubMeshes[index]; }
 	AnimationInfo &getAnimation( const string &name ) { return mAnimations[name]; }
 
 	static bool isMD5Mesh( const string &filename );
@@ -71,7 +71,7 @@ public:
 
 private:
 	void buildMesh( const struct md5_model_t *mdl );
-	void buildSubMesh( const struct md5_mesh_t *mesh, const string &material );
+	void buildSubMesh( const struct md5_mesh_t *mesh, const SubMeshInfo &subMeshInfo );
 	void buildFace( const struct md5_triangle_t *triangle );
 	void buildVertexBuffers( const struct md5_mesh_t *mesh );
 	void buildVertex( const float position[3], const float normal[3] );
@@ -108,7 +108,7 @@ private:
 	string mSkeletonName;
 	string mRootBone;
 
-	typedef map<int, string> SubMeshMap;
+	typedef map<int, SubMeshInfo> SubMeshMap;
 	SubMeshMap mSubMeshes;
 	int mMaxWeights;
 

@@ -95,14 +95,29 @@ void MD5ModelToMesh::buildMesh( const struct md5_model_t *mdl )
 		mMeshWriter.closeTag();
 	}
 
+	mMeshWriter.openTag( "submeshnames" );
+	for ( SubMeshMap::const_iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter )
+	{
+		int index = iter->first;
+		const SubMeshInfo &info = iter->second;
+		if ( info.name.empty() )
+			continue;
+
+		TiXmlElement *nameNode = mMeshWriter.openTag( "submeshname" );
+		nameNode->SetAttribute( "index", index );
+		nameNode->SetAttribute( "name", info.name );
+		mMeshWriter.closeTag();	// submeshname
+	}
+	mMeshWriter.closeTag();	// submeshnames
+
 	mMeshWriter.closeTag();	// mesh
 }
 
-void MD5ModelToMesh::buildSubMesh( const struct md5_mesh_t *mesh, const string &material )
+void MD5ModelToMesh::buildSubMesh( const struct md5_mesh_t *mesh, const SubMeshInfo &subMeshInfo )
 {
 	TiXmlElement *submeshNode = mMeshWriter.openTag( "submesh" );
 
-	string matName = (material.empty() ? mesh->shader : material);
+	string matName = (subMeshInfo.material.empty() ? mesh->shader : subMeshInfo.material);
 	submeshNode->SetAttribute( "material", matName );
 	submeshNode->SetAttribute( "usesharedvertices", "false" );
 	submeshNode->SetAttribute( "operationtype", "triangle_list" );

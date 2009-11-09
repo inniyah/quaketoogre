@@ -287,12 +287,18 @@ bool convertMD3Mesh( TiXmlElement *configNode )
 void processSubMesh( TiXmlElement *subMeshNode, MD5ModelToMesh &builder )
 {
 	int index = -1;
-	string material;
-
 	if ( !subMeshNode->Attribute( "index", &index ) )
 	{
 		cout << "[Warning] Submesh with no index" << endl;
 		return;
+	}
+
+	MD5ModelToMesh::SubMeshInfo &smInfo = builder.getSubMesh( index );
+
+	const char *name;
+	if ( name = subMeshNode->Attribute( "name" ) )
+	{
+		smInfo.name = name;
 	}
 
 	for ( TiXmlElement *node = subMeshNode->FirstChildElement(); node; node = node->NextSiblingElement() )
@@ -300,11 +306,9 @@ void processSubMesh( TiXmlElement *subMeshNode, MD5ModelToMesh &builder )
 		const string &nodeName = node->ValueStr();
 		if ( nodeName == "materialname" )
 		{
-			material = node->GetText();
+			smInfo.material = node->GetText();
 		}
 	}
-
-	builder.addSubMesh( index, material );
 }
 
 void processSubMeshes( TiXmlElement *subMeshesNode, MD5ModelToMesh &builder )
