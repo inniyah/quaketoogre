@@ -77,10 +77,9 @@ void Q3ModelToMesh::convert()
 
 	// Build Animations
 	mMeshWriter.openTag( "animations" );
-	for ( AnimationList::const_iterator i = mAnimations.begin(); i != mAnimations.end(); ++i )
+	for ( AnimationMap::const_iterator i = mAnimations.begin(); i != mAnimations.end(); ++i )
 	{
-		const Animation &anim = *i;
-		buildAnimation( anim.name, anim.startFrame, anim.numFrames, anim.framesPerSecond );
+		buildAnimation( i->first, i->second );
 	}
 	mMeshWriter.closeTag();
 
@@ -195,25 +194,25 @@ void Q3ModelToMesh::buildTexCoord( const MD3TexCoord &texCoord )
 	mMeshWriter.closeTag();
 }
 
-void Q3ModelToMesh::buildAnimation( const string &name, int startFrame, int numFrames, int fps )
+void Q3ModelToMesh::buildAnimation( const string &name, const AnimationInfo &animInfo )
 {
 	cout << "Building animation '" << name << "'" << endl;
 
 	TiXmlElement *animNode = mMeshWriter.openTag( "animation" );
 	animNode->SetAttribute( "name", name );
-	animNode->SetAttribute( "length", StringUtil::toString( (float)numFrames / (float)fps ) );
+	animNode->SetAttribute( "length", StringUtil::toString( (float)animInfo.numFrames / (float)animInfo.framesPerSecond ) );
 
 	mMeshWriter.openTag( "tracks" );
 	for ( int i = 0; i < mModel.header.numMeshes; i++ )
 	{
-		buildTrack( i, startFrame, numFrames, fps );
+		buildTrack( i, animInfo );
 	}
 	mMeshWriter.closeTag();
 
 	mMeshWriter.closeTag();
 }
 
-void Q3ModelToMesh::buildTrack( int meshIndex, int startFrame, int numFrames, int fps )
+void Q3ModelToMesh::buildTrack( int meshIndex, const AnimationInfo &animInfo )
 {
 	const MD3Mesh &mesh = mModel.meshes[meshIndex];
 
@@ -223,12 +222,12 @@ void Q3ModelToMesh::buildTrack( int meshIndex, int startFrame, int numFrames, in
 	trackNode->SetAttribute( "index", meshIndex );
 
 	float time = 0.0f;
-	float timePerFrame = 1.0f / (float)fps;
+	float timePerFrame = 1.0f / (float)animInfo.framesPerSecond;
 
 	mMeshWriter.openTag( "keyframes" );
-	for ( int i = 0; i < numFrames; i++ )
+	for ( int i = 0; i < animInfo.numFrames; i++ )
 	{
-		buildKeyframe( mesh, startFrame + i, time );
+		buildKeyframe( mesh, animInfo.startFrame + i, time );
 		time += timePerFrame;
 	}
 	mMeshWriter.closeTag();

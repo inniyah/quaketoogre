@@ -72,7 +72,7 @@ bool processAnimationFile( TiXmlElement *animFileNode, Q3ModelToMesh &builder )
 			const AnimationMap &animMap = animFile.getLowerAnimations();
 			for ( AnimationMap::const_iterator i = animMap.begin(); i != animMap.end(); ++i )
 			{
-				builder.addAnimation( i->second );
+				builder.getAnimation( i->first ) = i->second;
 			}
 			break;
 		}
@@ -82,7 +82,7 @@ bool processAnimationFile( TiXmlElement *animFileNode, Q3ModelToMesh &builder )
 			const AnimationMap &animMap = animFile.getUpperAnimations();
 			for ( AnimationMap::const_iterator i = animMap.begin(); i != animMap.end(); ++i )
 			{
-				builder.addAnimation( i->second );
+				builder.getAnimation( i->first ) = i->second;
 			}
 			break;
 		}
@@ -100,7 +100,7 @@ bool processAnimationFile( TiXmlElement *animFileNode, Q3ModelToMesh &builder )
 					if ( i != animMap.end() )
 					{
 						cout << "Adding animation '" << animName << "'" << endl;
-						builder.addAnimation( i->second );
+						builder.getAnimation( i->first ) = i->second;
 					}
 					else
 					{
@@ -115,7 +115,7 @@ bool processAnimationFile( TiXmlElement *animFileNode, Q3ModelToMesh &builder )
 	return true;
 }
 
-bool processAnimations( TiXmlElement *animsNode, AnimationList &dest )
+bool processAnimations( TiXmlElement *animsNode, AnimationMap &dest )
 {
 	cout << "Processing manual animation definitions" << endl;
 
@@ -134,14 +134,14 @@ bool processAnimations( TiXmlElement *animsNode, AnimationList &dest )
 				continue;
 			}
 			
-			Animation anim;
-			anim.name = animNameNode->GetText();
+			AnimationInfo anim;
+			string animName = animNameNode->GetText();
 			anim.startFrame = atoi( startFrameNode->GetText() );
 			anim.numFrames = atoi( numFramesNode->GetText() );
 			anim.framesPerSecond = atoi( fpsNode->GetText() );
 			
-			cout << "Adding animation '" << anim.name << "'" << endl;
-			dest.push_back( anim );
+			cout << "Adding animation '" << animName << "'" << endl;
+			dest[animName] = anim;
 		}
 	}
 
@@ -211,11 +211,11 @@ bool convertMD2Mesh( TiXmlElement *configNode )
 		}
 		else if ( nodeName == "animations" )
 		{
-			AnimationList anims;
+			AnimationMap anims;
 			processAnimations( node, anims );
-			for ( AnimationList::iterator iter = anims.begin(); iter != anims.end(); ++iter )
+			for ( AnimationMap::const_iterator iter = anims.begin(); iter != anims.end(); ++iter )
 			{
-				builder.addAnimation( *iter );
+				builder.getAnimation( iter->first ) = iter->second;
 			}
 		}
 		else if ( nodeName == "materialname" )
@@ -262,11 +262,11 @@ bool convertMD3Mesh( TiXmlElement *configNode )
 		}
 		else if ( nodeName == "animations" )
 		{
-			AnimationList anims;
+			AnimationMap anims;
 			processAnimations( node, anims );
-			for ( AnimationList::iterator iter = anims.begin(); iter != anims.end(); ++iter )
+			for ( AnimationMap::const_iterator iter = anims.begin(); iter != anims.end(); ++iter )
 			{
-				builder.addAnimation( *iter );
+				builder.getAnimation( iter->first ) = iter->second;
 			}
 		}
 		else if ( nodeName == "materials" )

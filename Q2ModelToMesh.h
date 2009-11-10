@@ -39,8 +39,7 @@ public:
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
 	void setMaterial( const string &material ) { mMaterial = material; }
 	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
-	void addAnimation( const Animation &anim ) { mAnimations.push_back( anim ); }
-//	Animation &getAnimation( const string &name ) { }	// TODO implement, replacing the above function
+	AnimationInfo &getAnimation( const string &name ) { return mAnimations[name]; }
 
 private:
 	struct NewTriangle
@@ -71,8 +70,8 @@ private:
 	void buildVertex( const MD2Frame &frame, int vertIndex );
 	void buildTexCoord( const MD2TexCoord &texCoord );
 
-	void buildAnimation( const string &name, int startFrame, int numFrames, int fps );
-	void buildTrack( int startFrame, int numFrames, int fps );
+	void buildAnimation( const string &name, const AnimationInfo &animInfo );
+	void buildTrack( const AnimationInfo &animInfo );
 	void buildKeyframe( const MD2Frame &frame, float time );
 	
 	void convertPosition( const unsigned char position[3], const MD2FrameHeader &frameHeader, float dest[3] );
@@ -86,7 +85,7 @@ private:
 	string mOutputFile;
 	string mMaterial;
 	int mReferenceFrame;
-	AnimationList mAnimations;
+	AnimationMap mAnimations;
 
 	MD2Model mModel;
 };

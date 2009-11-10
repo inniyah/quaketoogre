@@ -100,10 +100,9 @@ void Q2ModelToMesh::convert()
 
 	// Build Animations
 	mMeshWriter.openTag( "animations" );
-	for ( AnimationList::const_iterator i = mAnimations.begin(); i != mAnimations.end(); ++i )
+	for ( AnimationMap::const_iterator i = mAnimations.begin(); i != mAnimations.end(); ++i )
 	{
-		const Animation &anim = *i;
-		buildAnimation( anim.name, anim.startFrame, anim.numFrames, anim.framesPerSecond );
+		buildAnimation( i->first, i->second );
 	}
 	mMeshWriter.closeTag();
 
@@ -215,22 +214,22 @@ void Q2ModelToMesh::buildTexCoord( const MD2TexCoord &texCoord )
 	mMeshWriter.closeTag();
 }
 
-void Q2ModelToMesh::buildAnimation( const string &name, int startFrame, int numFrames, int fps )
+void Q2ModelToMesh::buildAnimation( const string &name, const AnimationInfo &animInfo )
 {
 	cout << "Building animation '" << name << "'" << endl;
 
 	TiXmlElement *animNode = mMeshWriter.openTag( "animation" );
 	animNode->SetAttribute( "name", name );
-	animNode->SetAttribute( "length", StringUtil::toString( (float)numFrames / (float)fps ) );
+	animNode->SetAttribute( "length", StringUtil::toString( (float)animInfo.numFrames / (float)animInfo.framesPerSecond ) );
 
 	mMeshWriter.openTag( "tracks" );
-	buildTrack( startFrame, numFrames, fps );
+	buildTrack( animInfo );
 	mMeshWriter.closeTag();
 
 	mMeshWriter.closeTag();
 }
 
-void Q2ModelToMesh::buildTrack( int startFrame, int numFrames, int fps )
+void Q2ModelToMesh::buildTrack( const AnimationInfo &animInfo )
 {
 	TiXmlElement *trackNode = mMeshWriter.openTag( "track" );
 	trackNode->SetAttribute( "target", "submesh" );
@@ -238,12 +237,12 @@ void Q2ModelToMesh::buildTrack( int startFrame, int numFrames, int fps )
 	trackNode->SetAttribute( "index", 0 );
 
 	float time = 0.0f;
-	float timePerFrame = 1.0f / (float)fps;
+	float timePerFrame = 1.0f / (float)animInfo.framesPerSecond;
 
 	mMeshWriter.openTag( "keyframes" );
-	for ( int i = 0; i < numFrames; i++ )
+	for ( int i = 0; i < animInfo.numFrames; i++ )
 	{
-		const MD2Frame &frame = mModel.frames[startFrame + i];
+		const MD2Frame &frame = mModel.frames[animInfo.startFrame + i];
 		buildKeyframe( frame, time );
 		time += timePerFrame;
 	}

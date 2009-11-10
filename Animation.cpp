@@ -77,8 +77,9 @@ bool AnimationFile::load( const string &filename )
 			break;
 		}
 
-		Animation anim;
-		anim.name = pmAnimationNames[animationIndex];
+		string animName = pmAnimationNames[animationIndex];
+
+		AnimationInfo anim;
 		anim.startFrame = atoi( token );
 
 		linePtr = getNextToken( linePtr, token, 16 );
@@ -92,24 +93,23 @@ bool AnimationFile::load( const string &filename )
 		{
 			// BOTH_ animation
 			numBothFrames = anim.startFrame + anim.numFrames;
-			mLowerAnimations[anim.name] = anim;
-			mUpperAnimations[anim.name] = anim;
+			mLowerAnimations[animName] = anim;
+			mUpperAnimations[animName] = anim;
 		}
 		else if ( animationIndex < pmLegsStart )
 		{
 			// TORSO_ animation
 			numTorsoFrames = anim.startFrame + anim.numFrames;
-			mUpperAnimations[anim.name] = anim;
+			mUpperAnimations[animName] = anim;
 		}
 		else
 		{
 			// LEGS_ animation
 			anim.startFrame -= (numTorsoFrames - numBothFrames);
-			mLowerAnimations[anim.name] = anim;
+			mLowerAnimations[animName] = anim;
 		}
 		
-		mAnimations[anim.name] = anim;
-
+		mAnimations[animName] = anim;
 		animationIndex++;
 	}
 

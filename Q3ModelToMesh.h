@@ -39,7 +39,7 @@ public:
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
 	void setSubMeshMaterial( const string &subMesh, const string &material ) { mMaterials[subMesh] = material; }
 	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
-	void addAnimation( const Animation &anim ) { mAnimations.push_back( anim ); }
+	AnimationInfo &getAnimation( const string &name ) { return mAnimations[name]; }
 
 private:
 	void convert();
@@ -50,8 +50,8 @@ private:
 	void buildVertex( const MD3Vertex &vert );
 	void buildTexCoord( const MD3TexCoord &texCoord );
 
-	void buildAnimation( const string &name, int startFrame, int numFrames, int fps );
-	void buildTrack( int meshIndex, int startFrame, int numFrames, int fps );
+	void buildAnimation( const string &name, const AnimationInfo &animInfo );
+	void buildTrack( int meshIndex, const AnimationInfo &animInfo );
 	void buildKeyframe( const MD3Mesh &mesh, int frame, float time );
 	
 	void convertPosition( const short position[3], float dest[3] );
@@ -65,7 +65,7 @@ private:
 	string mOutputFile;
 	StringMap mMaterials;
 	int mReferenceFrame;
-	AnimationList mAnimations;
+	AnimationMap mAnimations;
 
 	MD3Model mModel;
 };
