@@ -376,9 +376,9 @@ void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
 	}
 	builder.setSkeletonName( name );
 
-	const char *rootBone;
-	if ( rootBone = skelNode->Attribute( "moveorigin" ) )
-		builder.setRootBone( rootBone );
+	const char *originBone;
+	if ( originBone = skelNode->Attribute( "moveorigin" ) )
+		builder.setOriginBone( originBone );
 
 	for ( TiXmlElement *node = skelNode->FirstChildElement(); node; node = node->NextSiblingElement() )
 	{

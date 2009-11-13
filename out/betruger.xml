@@ -23,14 +23,20 @@
 		<inputfile>betruger/betruger.md5mesh</inputfile>
 		<outputfile>betruger_head.mesh.xml</outputfile>
 
+        <!-- Just include all the submeshes with the default settings, and
+            give them a name for easier reference. Remember that you can call
+            up information about MD5 submeshes using 'QuakeToOgre -i' -->
 		<submeshes>
-		    <submesh index="0"/>
-            <submesh index="1"/>
-            <submesh index="2"/>
-		    <submesh index="3"/>
-            <submesh index="4"/>
+		    <submesh index="0" name="Tongue"/>
+            <submesh index="1" name="Teeth"/>
+            <submesh index="2" name="RightEye"/>
+		    <submesh index="3" name="LeftEye"/>
+            <submesh index="4" name="Head"/>
 		</submeshes>
 
+        <!-- Moving the skeleton so that the 'nextcontrol' bones sits on the
+            origin makes it easier to attach the head to the 'nextcontrol'
+            bone of the body. -->
 		<md5skeleton name="betruger_head" moveorigin="neckcontrol">
 			<md5anim name="meeting_d" changefps="15">
 				<inputfile>betruger/betspeech_d.md5anim</inputfile>

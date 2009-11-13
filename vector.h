@@ -27,6 +27,7 @@ THE SOFTWARE.
 typedef float vec2_t[2];
 typedef float vec3_t[3];
 
+void vec_assign( vec3_t v, float x, float y, float z );
 void vec_copy( const vec3_t in, vec3_t out );
 void vec_add( const vec3_t a, const vec3_t b, vec3_t out );
 void vec_subtract( const vec3_t a, const vec3_t b, vec3_t out );

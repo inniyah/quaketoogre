@@ -24,6 +24,13 @@ THE SOFTWARE.
 #include "vector.h"
 #include <math.h>
 
+void vec_assign( vec3_t v, float x, float y, float z )
+{
+	v[0] = x;
+	v[1] = y;
+	v[2] = z;
+}
+
 void vec_copy( const vec3_t in, vec3_t out )
 {
 	out[0] = in[0];

@@ -60,7 +60,7 @@ public:
 	void setInputFile( const string &filename ) { mInputFile = filename; }
 	void setOutputFile( const string &filename ) { mOutputFile = filename; }
 	void setSkeletonName( const string &name ) { mSkeletonName = name; }
-	void setRootBone( const string &bone ) { mRootBone = bone; }
+	void setOriginBone( const string &bone ) { mOriginBone = bone; }
 	void setMaxWeights( int value ) { mMaxWeights = value; }
 	SubMeshInfo &getSubMesh( int index ) { return mSubMeshes[index]; }
 	AnimationInfo &getAnimation( const string &name ) { return mAnimations[name]; }
@@ -83,7 +83,7 @@ private:
 	void buildBoneHierarchy( const struct md5_model_t *mdl );
 	void buildAnimations( const struct md5_model_t *mdl );
 	void buildAnimation( const struct md5_model_t *mdl, const string &name, const AnimationInfo &animInfo );
-	void buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex );
+	void buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex, const AnimationInfo &animInfo );
 	void buildKeyFrame( float time, const vec3_t translate, const quat4_t rotate );
 
 	static void generateNormals( const struct md5_mesh_t *mesh, vec3_t *normals );
@@ -106,7 +106,7 @@ private:
 	string mInputFile;
 	string mOutputFile;
 	string mSkeletonName;
-	string mRootBone;
+	string mOriginBone;
 
 	typedef map<int, SubMeshInfo> SubMeshMap;
 	SubMeshMap mSubMeshes;

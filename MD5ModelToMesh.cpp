@@ -289,16 +289,16 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 			vec_copy( joint->pos, pos );
 			Quat_copy( joint->orient, orient );
 
-/*			if ( !mRootBone.empty() )
+/*			if ( !mOriginBone.empty() )
 			{
-				const struct md5_joint_t *rootJoint = findJoint( mdl, mRootBone );
-				if ( rootJoint )
+				const struct md5_joint_t *originJoint = findJoint( mdl, mOriginBone );
+				if ( originJoint )
 				{
 					quat4_t invRot;
 					quat4_t invTrans;
 
-					Quat_inverse( rootJoint->orient, invRot );
-					Quat_rotatePoint( invRot, rootJoint->pos, invTrans );
+					Quat_inverse( originJoint->orient, invRot );
+					Quat_rotatePoint( invRot, originJoint->pos, invTrans );
 
 					Quat_multQuat( joint->orient, invRot, orient );
 					vec_subtract( joint->pos, invTrans, pos );
@@ -410,7 +410,7 @@ void MD5ModelToMesh::buildAnimation( const struct md5_model_t *mdl, const string
 	mSkelWriter.openTag( "tracks" );
 	for ( int i = 0; i < anim.num_joints; i++ )
 	{
-		buildTrack( mdl, finalAnim, i );
+		buildTrack( mdl, finalAnim, i, animInfo );
 		cout << ((i+1) * 100 / anim.num_joints) << "%\r";
 	}
 	mSkelWriter.closeTag();	// tracks
@@ -420,7 +420,7 @@ void MD5ModelToMesh::buildAnimation( const struct md5_model_t *mdl, const string
 	FreeAnim( finalAnim );
 }
 
-void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex )
+void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex, const AnimationInfo &animInfo )
 {
 	const struct md5_joint_t *baseJoint = &mdl->baseSkel[jointIndex];
 	static vec3_t translate;
@@ -447,6 +447,12 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 		}
 			
 		animationDelta( baseParent, animParent, baseJoint, animJoint, rotate, translate );
+
+		if ( parentIndex < 0 && animInfo.lockRoot )
+		{
+			// Lock the root bone in place
+			vec_assign( translate, 0, 0, 0 );
+		}
 
 		buildKeyFrame( time, translate, rotate );
 	}
