@@ -53,7 +53,7 @@ struct joint_info_t
 struct baseframe_joint_t
 {
   Vector3 pos;
-  quat4_t orient;
+  Quaternion orient;
 };
 
 /**
@@ -101,11 +101,11 @@ BuildFrameSkeleton (const struct joint_info_t *jointInfos,
     {
       const struct baseframe_joint_t *baseJoint = &baseFrame[i];
       Vector3 animatedPos;
-      quat4_t animatedOrient;
+      Quaternion animatedOrient;
       int j = 0;
 
 	  animatedPos = baseJoint->pos;
-      memcpy (animatedOrient, baseJoint->orient, sizeof (quat4_t));
+	  animatedOrient = baseJoint->orient;
 
       if (jointInfos[i].flags & 1) /* Tx */
 	{
@@ -127,19 +127,19 @@ BuildFrameSkeleton (const struct joint_info_t *jointInfos,
 
       if (jointInfos[i].flags & 8) /* Qx */
 	{
-	  animatedOrient[0] = animFrameData[jointInfos[i].startIndex + j];
+	  animatedOrient.x = animFrameData[jointInfos[i].startIndex + j];
 	  ++j;
 	}
 
       if (jointInfos[i].flags & 16) /* Qy */
 	{
-	  animatedOrient[1] = animFrameData[jointInfos[i].startIndex + j];
+	  animatedOrient.y = animFrameData[jointInfos[i].startIndex + j];
 	  ++j;
 	}
 
       if (jointInfos[i].flags & 32) /* Qz */
 	{
-	  animatedOrient[2] = animFrameData[jointInfos[i].startIndex + j];
+	  animatedOrient.z = animFrameData[jointInfos[i].startIndex + j];
 	  ++j;
 	}
 
@@ -159,7 +159,7 @@ BuildFrameSkeleton (const struct joint_info_t *jointInfos,
       if (thisJoint->parent < 0)
 	{
 		thisJoint->pos = animatedPos;
-	  memcpy (thisJoint->orient, animatedOrient, sizeof (quat4_t));
+		thisJoint->orient = animatedOrient;
 	}
       else
 	{
@@ -167,12 +167,12 @@ BuildFrameSkeleton (const struct joint_info_t *jointInfos,
 	  Vector3 rpos; /* Rotated position */
 
 	  /* Add positions */
-	  Quat_rotatePoint (parentJoint->orient, animatedPos, rpos);
+	  rpos = parentJoint->orient * animatedPos;
 	  thisJoint->pos = rpos + parentJoint->pos;
 
 	  /* Concatenate rotations */
-	  Quat_multQuat (parentJoint->orient, animatedOrient, thisJoint->orient);
-	  Quat_normalize (thisJoint->orient);
+	  thisJoint->orient = parentJoint->orient * animatedOrient;
+	  thisJoint->orient.normalise();
 	}
     }
 }
@@ -295,8 +295,8 @@ ReadMD5Anim (const char *filename, struct md5_anim_t *anim)
 	      /* Read base frame joint */
 	      if (sscanf (buff, " ( %f %f %f ) ( %f %f %f )",
 			  &baseFrame[i].pos[0], &baseFrame[i].pos[1],
-			  &baseFrame[i].pos[2], &baseFrame[i].orient[0],
-			  &baseFrame[i].orient[1], &baseFrame[i].orient[2]) == 6)
+			  &baseFrame[i].pos[2], &baseFrame[i].orient.x,
+			  &baseFrame[i].orient.y, &baseFrame[i].orient.z) == 6)
 		{
 		  /* Compute the w component */
 		  Quat_computeW (baseFrame[i].orient);
@@ -382,7 +382,7 @@ InterpolateSkeletons (const struct md5_joint_t *skelA,
       out[i].pos[2] = skelA[i].pos[2] + interp * (skelB[i].pos[2] - skelA[i].pos[2]);
 
       /* Spherical linear interpolation for orientation */
-      Quat_slerp (skelA[i].orient, skelB[i].orient, interp, out[i].orient);
+	  out[i].orient = Quaternion::Slerp( interp, skelA[i].orient, skelB[i].orient );
     }
 }
 

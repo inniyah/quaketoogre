@@ -37,11 +37,10 @@ void Quake::convertVector( Vector3 &v )
 	v.z = -tmp;
 }
 
-void Quake::convertQuaternion( quat4_t q )
+void Quake::convertQuaternion( Quaternion &q )
 {
-	static const quat4_t trsf = {0.707107f, 0, 0, -0.707107f};
+	static const Quaternion trsf( -0.707107f, 0.707107f, 0, 0 );
 	
-	quat4_t tmp;
-	Quat_multQuat( trsf, q, tmp );
-	Quat_copy( tmp, q );
+	Quaternion tmp = trsf * q;
+	q = tmp;
 }

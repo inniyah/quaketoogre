@@ -33,28 +33,26 @@
 #include "vector.h"
 
 /* Quaternion (x, y, z, w) */
-typedef float quat4_t[4];
+//typedef float quat4_t[4];
 
-enum {
-  X, Y, Z, W
-//	W, X, Y, Z
-};
+//enum {
+//  X, Y, Z, W
+//};
 
 /**
  * Quaternion prototypes
- */
-void Quat_computeW (quat4_t q);	// TODO implement outside Quaternion class
+ *
 void Quat_normalize (quat4_t q);
 void Quat_multQuat (const quat4_t qa, const quat4_t qb, quat4_t out);
-void Quat_multVec (const quat4_t q, const Vector3 &v, quat4_t out);
-void Quat_rotatePoint (const quat4_t q, const Vector3 &in, Vector3 &out);
+void Quat_multVec (const quat4_t q, const Vector3 &v, quat4_t out);	// NOTE only used internally
+void Quat_rotatePoint (const quat4_t q, const Vector3 &in, Vector3 &out);	// NOTE replaced by operator*
 float Quat_dotProduct (const quat4_t qa, const quat4_t qb);
 void Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out);
 void Quat_copy(const quat4_t q, quat4_t out);
-void Quat_conjugate(const quat4_t q, quat4_t out);
-void Quat_inverse(const quat4_t q, quat4_t out);
+void Quat_conjugate(const quat4_t q, quat4_t out);	// NOTE replaced by UnitInverse
+void Quat_inverse(const quat4_t q, quat4_t out);	// NOTE replaced by Inverse
 void Quat_toAngleAxis(const quat4_t q, float *angle, Vector3 &axis);
-
+*/
 class Quaternion
 {
 public:
@@ -64,7 +62,26 @@ public:
 	Quaternion( float w, float x, float y, float z ): w(w), x(x), y(y), z(z) {}
 	Quaternion( const Quaternion &other ): w(other.w), x(other.x), y(other.y), z(other.z) {}
 
-	
+	Quaternion &operator=( const Quaternion &other )
+	{
+		w = other.w;
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		return *this;
+	}
+
+	float normalise();
+	float Dot( const Quaternion &other ) const;
+	void ToAngleAxis( float &angle, Vector3 &axis ) const;
+
+	Quaternion Inverse() const;
+	Quaternion UnitInverse() const;
+
+	Quaternion operator*( const Quaternion &other ) const;
+	Vector3 operator*( const Vector3 &v ) const;
+
+	static Quaternion Slerp( float t, const Quaternion &qa, const Quaternion &qb );
 };
 
 #endif	// __QUATERNION_H__

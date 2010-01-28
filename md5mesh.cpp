@@ -103,8 +103,8 @@ ReadMD5Model (const char *filename, struct md5_model_t *mdl)
 
 	      if (sscanf (buff, "%s %d ( %f %f %f ) ( %f %f %f )",
 			  joint->name, &joint->parent, &joint->pos[0],
-			  &joint->pos[1], &joint->pos[2], &joint->orient[0],
-			  &joint->orient[1], &joint->orient[2]) == 8)
+			  &joint->pos[1], &joint->pos[2], &joint->orient.x,
+			  &joint->orient.y, &joint->orient.z) == 8)
 		{
 		  /* Compute the w component */
 		  Quat_computeW (joint->orient);
@@ -285,8 +285,7 @@ PrepareMesh (struct md5_mesh_t *mesh,
 	    = &skeleton[weight->joint];
 
 	  /* Calculate transformed vertex for this weight */
-	  Vector3 wv;
-	  Quat_rotatePoint (joint->orient, weight->pos, wv);
+	  Vector3 wv = joint->orient * weight->pos;
 
 	  /* The sum of all weight->bias should be 1.0 */
 	  finalVertex += (joint->pos + wv) * weight->bias;
@@ -294,4 +293,15 @@ PrepareMesh (struct md5_mesh_t *mesh,
 
 	  vertexArray[i] = finalVertex;
     }
+}
+
+void
+Quat_computeW (Quaternion &q)
+{
+  float t = 1.0f - (q.x * q.x) - (q.y * q.y) - (q.z * q.z);
+
+  if (t < 0.0f)
+    q.w = 0.0f;
+  else
+    q.w = -sqrt (t);
 }

@@ -283,9 +283,9 @@ void Q2ModelToMesh::buildKeyframe( const MD2Frame &frame, float time )
 
 void Q2ModelToMesh::convertPosition( const unsigned char position[3], const MD2FrameHeader &frameHeader, Vector3 &dest )
 {
-	dest[0] = (position[0] * frameHeader.scale[0]) + frameHeader.translate[0];
-	dest[1] = (position[1] * frameHeader.scale[1]) + frameHeader.translate[1];
-	dest[2] = (position[2] * frameHeader.scale[2]) + frameHeader.translate[2];
+	dest.x = (position[0] * frameHeader.scale.x) + frameHeader.translate.x;
+	dest.y = (position[1] * frameHeader.scale.y) + frameHeader.translate.y;
+	dest.z = (position[2] * frameHeader.scale.z) + frameHeader.translate.z;
 
 	if ( mGlobals.convertCoords )
 		Quake::convertVector( dest );	

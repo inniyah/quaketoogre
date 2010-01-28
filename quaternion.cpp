@@ -40,23 +40,10 @@
  * Basic quaternion operations.
  */
 
-void
-Quat_computeW (quat4_t q)
-{
-  float t = 1.0f - (q[X] * q[X]) - (q[Y] * q[Y]) - (q[Z] * q[Z]);
-
-  if (t < 0.0f)
-    q[W] = 0.0f;
-  else
-    q[W] = -sqrt (t);
-}
-
-void
-Quat_normalize (quat4_t q)
+float Quaternion::normalise()
 {
   /* compute magnitude of the quaternion */
-  float mag = sqrt ((q[X] * q[X]) + (q[Y] * q[Y])
-		    + (q[Z] * q[Z]) + (q[W] * q[W]));
+  float mag = static_cast<float>( sqrt ((x*x) + (y*y) + (z*z) + (w*w)) );
 
   /* check for bogus length, to protect against divide by zero */
   if (mag > 0.0f)
@@ -64,86 +51,77 @@ Quat_normalize (quat4_t q)
       /* normalize it */
       float oneOverMag = 1.0f / mag;
 
-      q[X] *= oneOverMag;
-      q[Y] *= oneOverMag;
-      q[Z] *= oneOverMag;
-      q[W] *= oneOverMag;
+      x *= oneOverMag;
+      y *= oneOverMag;
+      z *= oneOverMag;
+      w *= oneOverMag;
     }
+
+  return mag;
 }
 
-void
-Quat_multQuat (const quat4_t qa, const quat4_t qb, quat4_t out)
+Quaternion Quaternion::operator*(const Quaternion &qb) const
 {
-  out[W] = (qa[W] * qb[W]) - (qa[X] * qb[X]) - (qa[Y] * qb[Y]) - (qa[Z] * qb[Z]);
-  out[X] = (qa[X] * qb[W]) + (qa[W] * qb[X]) + (qa[Y] * qb[Z]) - (qa[Z] * qb[Y]);
-  out[Y] = (qa[Y] * qb[W]) + (qa[W] * qb[Y]) + (qa[Z] * qb[X]) - (qa[X] * qb[Z]);
-  out[Z] = (qa[Z] * qb[W]) + (qa[W] * qb[Z]) + (qa[X] * qb[Y]) - (qa[Y] * qb[X]);
+	Quaternion out;
+	out.w = (w * qb.w) - (x * qb.x) - (y * qb.y) - (z * qb.z);
+	out.x = (x * qb.w) + (w * qb.x) + (y * qb.z) - (z * qb.y);
+	out.y = (y * qb.w) + (w * qb.y) + (z * qb.x) - (x * qb.z);
+	out.z = (z * qb.w) + (w * qb.z) + (x * qb.y) - (y * qb.x);
+	return out;
 }
 
-void
-Quat_multVec (const quat4_t q, const Vector3 &v, quat4_t out)
+static Quaternion Quat_multVec (const Quaternion &q, const Vector3 &v)
 {
-  out[W] = - (q[X] * v[X]) - (q[Y] * v[Y]) - (q[Z] * v[Z]);
-  out[X] =   (q[W] * v[X]) + (q[Y] * v[Z]) - (q[Z] * v[Y]);
-  out[Y] =   (q[W] * v[Y]) + (q[Z] * v[X]) - (q[X] * v[Z]);
-  out[Z] =   (q[W] * v[Z]) + (q[X] * v[Y]) - (q[Y] * v[X]);
+	Quaternion out;
+	out.w = - (q.x * v.x) - (q.y * v.y) - (q.z * v.z);
+	out.x =   (q.w * v.x) + (q.y * v.z) - (q.z * v.y);
+	out.y =   (q.w * v.y) + (q.z * v.x) - (q.x * v.z);
+	out.z =   (q.w * v.z) + (q.x * v.y) - (q.y * v.x);
+	return out;
 }
 
-void
-Quat_rotatePoint (const quat4_t q, const Vector3 &in, Vector3 &out)
+Vector3 Quaternion::operator*( const Vector3 &v ) const
 {
-  quat4_t tmp, inv, final;
+	Quaternion inv = Inverse();
+	Quaternion tmp = Quat_multVec( *this, v );
+	Quaternion final = tmp * inv;
 
-  inv[X] = -q[X]; inv[Y] = -q[Y];
-  inv[Z] = -q[Z]; inv[W] =  q[W];
-
-  Quat_normalize (inv);
-
-  Quat_multVec (q, in, tmp);
-  Quat_multQuat (tmp, inv, final);
-
-  out[X] = final[X];
-  out[Y] = final[Y];
-  out[Z] = final[Z];
+	return Vector3( final.x, final.y, final.z );
 }
 
 /**
  * More quaternion operations for skeletal animation.
  */
 
-float
-Quat_dotProduct (const quat4_t qa, const quat4_t qb)
+float Quaternion::Dot(const Quaternion &qb) const
 {
-  return ((qa[X] * qb[X]) + (qa[Y] * qb[Y]) + (qa[Z] * qb[Z]) + (qa[W] * qb[W]));
+	return ((x * qb.x) + (y * qb.y) + (z * qb.z) + (w * qb.w));
 }
 
-void
-Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out)
+Quaternion Quaternion::Slerp( float t, const Quaternion &qa, const Quaternion &qb )
 {
   /* Check for out-of range parameter and return edge points if so */
-  if (t <= 0.0)
+	if (t <= 0.0)
     {
-      memcpy (out, qa, sizeof(quat4_t));
-      return;
+		return qa;
     }
 
-  if (t >= 1.0)
+	if (t >= 1.0)
     {
-      memcpy (out, qb, sizeof (quat4_t));
-      return;
+		return qb;
     }
 
   /* Compute "cosine of angle between quaternions" using dot product */
-  float cosOmega = Quat_dotProduct (qa, qb);
+	float cosOmega = qa.Dot( qb );
 
   /* If negative dot, use -q1.  Two quaternions q and -q
      represent the same rotation, but may produce
      different slerp.  We chose q or -q to rotate using
      the acute angle. */
-  float q1w = qb[W];
-  float q1x = qb[X];
-  float q1y = qb[Y];
-  float q1z = qb[Z];
+  float q1w = qb.w;
+  float q1x = qb.x;
+  float q1y = qb.y;
+  float q1z = qb.z;
 
   if (cosOmega < 0.0f)
     {
@@ -173,7 +151,7 @@ Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out)
     {
       /* Compute the sin of the angle using the
 	 trig identity sin^2(omega) + cos^2(omega) = 1 */
-      float sinOmega = sqrt (1.0f - (cosOmega * cosOmega));
+      float sinOmega = static_cast<float>( sqrt (1.0f - (cosOmega * cosOmega)) );
 
       /* Compute the angle from its sin and cosine */
       float omega = atan2 (sinOmega, cosOmega);
@@ -183,59 +161,50 @@ Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out)
       float oneOverSinOmega = 1.0f / sinOmega;
 
       /* Compute interpolation parameters */
-      k0 = sin ((1.0f - t) * omega) * oneOverSinOmega;
-      k1 = sin (t * omega) * oneOverSinOmega;
+      k0 = static_cast<float>( sin ((1.0f - t) * omega) * oneOverSinOmega );
+      k1 = static_cast<float>( sin (t * omega) * oneOverSinOmega );
     }
 
-  /* Interpolate and return new quaternion */
-  out[W] = (k0 * qa[3]) + (k1 * q1w);
-  out[X] = (k0 * qa[0]) + (k1 * q1x);
-  out[Y] = (k0 * qa[1]) + (k1 * q1y);
-  out[Z] = (k0 * qa[2]) + (k1 * q1z);
+	/* Interpolate and return new quaternion */
+	Quaternion out;
+	out.w = (k0 * qa.w) + (k1 * q1w);
+	out.x = (k0 * qa.x) + (k1 * q1x);
+	out.y = (k0 * qa.y) + (k1 * q1y);
+	out.z = (k0 * qa.z) + (k1 * q1z);
+	return out;
 }
 
-void Quat_copy(const quat4_t q, quat4_t out)
+Quaternion Quaternion::UnitInverse() const
 {
-	out[W] = q[W];
-	out[X] = q[X];
-	out[Y] = q[Y];
-	out[Z] = q[Z];
+	return Quaternion( w, -x, -y, -z );
 }
 
-void Quat_conjugate(const quat4_t q, quat4_t out)
+Quaternion Quaternion::Inverse() const
 {
-	out[W] = q[W];
-	out[X] = -q[X];
-	out[Y] = -q[Y];
-	out[Z] = -q[Z];
+	Quaternion out = UnitInverse();
+	out.normalise();
+	return out;
 }
 
-void Quat_inverse(const quat4_t q, quat4_t out)
+void Quaternion::ToAngleAxis( float &angle, Vector3 &axis ) const
 {
-	Quat_conjugate( q, out );
-	Quat_normalize( out );
-}
+	Quaternion qp( *this );
+	qp.normalise();
 
-void Quat_toAngleAxis( const quat4_t q, float *angle, Vector3 &axis )
-{
-	quat4_t qp;
-	Quat_copy( q, qp );
-	Quat_normalize( qp );
-
-	float lenSqr = qp[X]*qp[X] + qp[Y]*qp[Y] + qp[Z]*qp[Z];
-	if ( qp[W] <= 1.0f && lenSqr > 0.0f )
+	float lenSqr = qp.x*qp.x + qp.y*qp.y + qp.z*qp.z;
+	if ( qp.w <= 1.0f && lenSqr > 0.0f )
     {
-        *angle = 2.0f * (float)acos(qp[W]);
+        angle = 2.0f * (float)acos(qp.w);
         float invLen = 1.0f / (float)sqrt(lenSqr);
-        axis[X] = qp[X]*invLen;
-        axis[Y] = qp[Y]*invLen;
-        axis[Z] = qp[Z]*invLen;
+        axis.x = qp.x*invLen;
+        axis.y = qp.y*invLen;
+        axis.z = qp.z*invLen;
     }
     else
     {
-        *angle = 0.0f;
-        axis[X] = 1.0f;
-        axis[Y] = 0.0f;
-        axis[Z] = 0.0f;
+        angle = 0.0f;
+        axis.x = 1.0f;
+        axis.y = 0.0f;
+        axis.z = 0.0f;
     }
 }

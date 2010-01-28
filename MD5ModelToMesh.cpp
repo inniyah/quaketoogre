@@ -282,25 +282,22 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		boneNode->SetAttribute( "name", StringUtil::stripQuotes(joint->name) );
 
 		Vector3 pos;
-		quat4_t orient;
+		Quaternion orient;
 		if ( joint->parent < 0 )
 		{
 			// Root bone, so just copy the bone's object space orientation
 			pos = joint->pos;
-			Quat_copy( joint->orient, orient );
+			orient = joint->orient;
 
 /*			if ( !mOriginBone.empty() )
 			{
 				const struct md5_joint_t *originJoint = findJoint( mdl, mOriginBone );
 				if ( originJoint )
 				{
-					quat4_t invRot;
-					quat4_t invTrans;
+					Quaternion invRot = originJoint->orient.Inverse();
+					Vector3 invTrans = invRot * originJoint->pos;
 
-					Quat_inverse( originJoint->orient, invRot );
-					Quat_rotatePoint( invRot, originJoint->pos, invTrans );
-
-					Quat_multQuat( joint->orient, invRot, orient );
+					orient = joint->orient * invRot;
 					pos = joint->pos - invTrans;
 				}
 			}*/
@@ -315,7 +312,7 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		// Ogre's mesh format wants its rotations as axis+angle
 		Vector3 axis;
 		float angle;
-		Quat_toAngleAxis( orient, &angle, axis );
+		orient.ToAngleAxis( angle, axis );
 
 		TiXmlElement *posNode = mSkelWriter.openTag( "position" );
 		posNode->SetAttribute( "x", StringUtil::toString( pos.x ) );
@@ -424,7 +421,7 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 {
 	const struct md5_joint_t *baseJoint = &mdl->baseSkel[jointIndex];
 	static Vector3 translate;
-	static quat4_t rotate;
+	static Quaternion rotate;
 
 	TiXmlElement *trackTag = mSkelWriter.openTag( "track" );
 	trackTag->SetAttribute( "bone", StringUtil::stripQuotes( baseJoint->name ) );
@@ -462,7 +459,7 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 	mSkelWriter.closeTag();	// track
 }
 
-void MD5ModelToMesh::buildKeyFrame( float time, const Vector3 &translate, const quat4_t rotate )
+void MD5ModelToMesh::buildKeyFrame( float time, const Vector3 &translate, const Quaternion &rotate )
 {
 	TiXmlElement *frameTag = mSkelWriter.openTag( "keyframe" );
 	frameTag->SetAttribute( "time", StringUtil::toString( time ) );
@@ -475,7 +472,7 @@ void MD5ModelToMesh::buildKeyFrame( float time, const Vector3 &translate, const 
 
 	Vector3 axis;
 	float angle;
-	Quat_toAngleAxis( rotate, &angle, axis );
+	rotate.ToAngleAxis( angle, axis );
 
 	TiXmlElement *rotateTag = mSkelWriter.openTag( "rotate" );
 	rotateTag->SetAttribute( "angle", StringUtil::toString( angle ) );
@@ -552,45 +549,36 @@ const struct md5_joint_t *MD5ModelToMesh::findJoint( const struct md5_model_t *m
 
 // This computes the transformation from one given joint to another
 void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, 
-									 Vector3 &translate, quat4_t rotate )
+									 Vector3 &translate, Quaternion &rotate )
 {
+	Quaternion fromOrientInv = from->orient.Inverse();
+
 	// rotate = inv(from->orient) * to->orient
-	quat4_t fromOrientInv;
-	Quat_inverse( from->orient, fromOrientInv );
-	Quat_multQuat( fromOrientInv, to->orient, rotate );
+	rotate = fromOrientInv * to->orient;
 
 	// translate = inv(from->orient) * (to->pos - from->pos)
-	Vector3 tmp = to->pos - from->pos;
-	Quat_rotatePoint( fromOrientInv, tmp, translate );
+	translate = fromOrientInv * (to->pos - from->pos);
 }
 
 void MD5ModelToMesh::animationDelta( const struct md5_joint_t *baseParent, const struct md5_joint_t *animParent, 
 									const struct md5_joint_t *baseJoint, const struct md5_joint_t *animJoint, 
-									quat4_t rotate, Vector3 &translate )
+									Quaternion &rotate, Vector3 &translate )
 {
 	if ( baseParent && animParent )
 	{
 		struct md5_joint_t relJoint;
 		jointDifference( baseParent, baseJoint, relJoint.pos, relJoint.orient );
 		
-		quat4_t animParentInv, relJointInv, q1;
-		Quat_inverse( animParent->orient, animParentInv );
-		Quat_inverse( relJoint.orient, relJointInv );
+		Quaternion animParentInv = animParent->orient.Inverse();
 		
-		Quat_multQuat( animParentInv, animJoint->orient, q1 );
-		Quat_multQuat( relJointInv, q1, rotate );
+		rotate = relJoint.orient.Inverse() * (animParentInv * animJoint->orient);
 		
-		Vector3 v1, v2;
-		v1 = animJoint->pos - animParent->pos;
-		Quat_rotatePoint( animParentInv, v1, v2 );
-		translate = v2 - relJoint.pos;
+		Vector3 tmp = animParentInv * (animJoint->pos - animParent->pos);
+		translate = tmp - relJoint.pos;
 	}
 	else
 	{
-		quat4_t invBaseJoint;
-		Quat_inverse( baseJoint->orient, invBaseJoint );
-		Quat_multQuat( invBaseJoint, animJoint->orient, rotate );
-		
+		rotate = baseJoint->orient.Inverse() * animJoint->orient;
 		translate = animJoint->pos - baseJoint->pos;
 	}
 }

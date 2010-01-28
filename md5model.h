@@ -40,7 +40,7 @@ struct md5_joint_t
   int parent;
 
   Vector3 pos;
-  quat4_t orient;
+  Quaternion orient;
 };
 
 /* Vertex */
@@ -144,5 +144,8 @@ void InterpolateSkeletons (const struct md5_joint_t *skelA,
 			   struct md5_joint_t *out);
 void Animate (const struct md5_anim_t *anim,
 	      struct anim_info_t *animInfo, double dt);
+
+// Utility function
+void Quat_computeW (Quaternion &q);
 
 #endif /* __MD5MODEL_H__ */

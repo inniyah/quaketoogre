@@ -34,7 +34,7 @@ class Quake
 {
 public:
 	static void convertVector( Vector3 &v );
-	static void convertQuaternion( quat4_t q );
+	static void convertQuaternion( Quaternion &q );
 	
 	static const float md2VertexNormals[MD2_NUMVERTEXNORMALS][3];
 };
