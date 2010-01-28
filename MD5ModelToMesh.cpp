@@ -295,10 +295,9 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 				if ( originJoint )
 				{
 					Quaternion invRot = originJoint->orient.Inverse();
-					Vector3 invTrans = invRot * originJoint->pos;
 
 					orient = joint->orient * invRot;
-					pos = joint->pos - invTrans;
+					pos = joint->pos - (invRot * originJoint->pos);
 				}
 			}*/
 		}
@@ -552,10 +551,7 @@ void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const stru
 {
 	Quaternion fromOrientInv = from->orient.Inverse();
 
-	// rotate = inv(from->orient) * to->orient
 	rotate = fromOrientInv * to->orient;
-
-	// translate = inv(from->orient) * (to->pos - from->pos)
 	translate = fromOrientInv * (to->pos - from->pos);
 }
 
