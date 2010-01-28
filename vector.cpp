@@ -22,7 +22,7 @@ THE SOFTWARE.
 -------------------------------------------------------------------------------
 */
 #include "vector.h"
-#include <math.h>
+#include <cmath>
 
 float Vector3::normalise()
 {

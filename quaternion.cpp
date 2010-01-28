@@ -26,15 +26,11 @@
  * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * gcc -Wall -ansi -lGL -lGLU -lglut md5anim.c md5anim.c -o md5model
  */
 
 #include "quaternion.h"
-#include <limits>
-#include <math.h>
-#include <assert.h>
-#include <memory.h>
+#include <cmath>
+#include <cassert>
 
 /**
  * Basic quaternion operations.

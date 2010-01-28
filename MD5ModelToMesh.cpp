@@ -499,13 +499,12 @@ void MD5ModelToMesh::generateNormals( const struct md5_mesh_t *mesh, Vector3 *no
 		Vector3 &v2 = mesh->vertexArray[tri->index[2]];
 
 		// Compute face normal
-		Vector3 faceNormal = (v2 - v0).crossProduct( (v1 - v0) );
+		Vector3 faceNormal = (v2 - v0).crossProduct( v1 - v0 );
 
 		// Add face normal to the normal of each face vertex
 		for ( int j = 0; j < 3; j++ )
 		{
-			Vector3 &normal = normals[tri->index[j]];
-			normal += faceNormal;
+			normals[tri->index[j]] += faceNormal;
 		}
 	}
 
@@ -571,10 +570,8 @@ void MD5ModelToMesh::animationDelta( const struct md5_joint_t *baseParent, const
 		
 		Quaternion animParentInv = animParent->orient.Inverse();
 		
-		rotate = relJoint.orient.Inverse() * (animParentInv * animJoint->orient);
-		
-		Vector3 tmp = animParentInv * (animJoint->pos - animParent->pos);
-		translate = tmp - relJoint.pos;
+		rotate = relJoint.orient.Inverse() * (animParentInv * animJoint->orient);		
+		translate = (animParentInv * (animJoint->pos - animParent->pos)) - relJoint.pos;
 	}
 	else
 	{

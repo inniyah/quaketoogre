@@ -23,8 +23,6 @@
  * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
  * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * gcc -Wall -ansi -lGL -lGLU -lglut md5anim.c md5anim.c -o md5model
  */
 
 #ifndef __QUATERNION_H__
@@ -32,26 +30,8 @@
 
 #include "vector.h"
 
-/* Quaternion (x, y, z, w) */
-//typedef float quat4_t[4];
-
-//enum {
-//  X, Y, Z, W
-//};
-
 /**
- * Quaternion prototypes
- *
-void Quat_normalize (quat4_t q);
-void Quat_multQuat (const quat4_t qa, const quat4_t qb, quat4_t out);
-void Quat_multVec (const quat4_t q, const Vector3 &v, quat4_t out);	// NOTE only used internally
-void Quat_rotatePoint (const quat4_t q, const Vector3 &in, Vector3 &out);	// NOTE replaced by operator*
-float Quat_dotProduct (const quat4_t qa, const quat4_t qb);
-void Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out);
-void Quat_copy(const quat4_t q, quat4_t out);
-void Quat_conjugate(const quat4_t q, quat4_t out);	// NOTE replaced by UnitInverse
-void Quat_inverse(const quat4_t q, quat4_t out);	// NOTE replaced by Inverse
-void Quat_toAngleAxis(const quat4_t q, float *angle, Vector3 &axis);
+This class has the same interface as Ogre's Quaternion class, so they should be interchangeable.
 */
 class Quaternion
 {

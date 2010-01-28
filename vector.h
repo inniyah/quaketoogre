@@ -24,6 +24,9 @@ THE SOFTWARE.
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 
+/**
+This class has the same interface as Ogre's Vector3 class, so they should be interchangeable.
+*/
 class Vector3
 {
 public:
