@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "XmlWriter.h"
 #include "MD3Model.h"
 #include "Animation.h"
+#include "vector.h"
 
 class Q3ModelToMesh
 {
@@ -54,8 +55,8 @@ private:
 	void buildTrack( int meshIndex, const AnimationInfo &animInfo );
 	void buildKeyframe( const MD3Mesh &mesh, int frame, float time );
 	
-	void convertPosition( const short position[3], float dest[3] );
-	void convertNormal( const short &normal, float dest[3] );
+	void convertPosition( const short position[3], Vector3 &dest );
+	void convertNormal( const short &normal, Vector3 &dest );
 
 	const GlobalOptions &mGlobals;
 

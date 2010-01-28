@@ -27,6 +27,7 @@ THE SOFTWARE.
 #include "XmlWriter.h"
 #include "MD2Model.h"
 #include "Animation.h"
+#include "vector.h"
 
 class Q2ModelToMesh
 {
@@ -74,8 +75,8 @@ private:
 	void buildTrack( const AnimationInfo &animInfo );
 	void buildKeyframe( const MD2Frame &frame, float time );
 	
-	void convertPosition( const unsigned char position[3], const MD2FrameHeader &frameHeader, float dest[3] );
-	void convertNormal( const unsigned char normalIndex, float dest[3] );
+	void convertPosition( const unsigned char position[3], const MD2FrameHeader &frameHeader, Vector3 &dest );
+	void convertNormal( const unsigned char normalIndex, Vector3 &dest );
 
 	const GlobalOptions &mGlobals;
 

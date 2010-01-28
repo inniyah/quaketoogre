@@ -159,7 +159,7 @@ void Q3ModelToMesh::buildVertexBuffers( const MD3Mesh &mesh )
 
 void Q3ModelToMesh::buildVertex( const MD3Vertex &vert )
 {
-	float position[3], normal[3];
+	Vector3 position, normal;
 	convertPosition( vert.position, position );
 	convertNormal( vert.normal, normal );
 
@@ -167,16 +167,16 @@ void Q3ModelToMesh::buildVertex( const MD3Vertex &vert )
 
 	// Position
 	TiXmlElement *posNode = mMeshWriter.openTag( "position" );
-	posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
-	posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
-	posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
+	posNode->SetAttribute( "x", StringUtil::toString( position.x ) );
+	posNode->SetAttribute( "y", StringUtil::toString( position.y ) );
+	posNode->SetAttribute( "z", StringUtil::toString( position.z ) );
 	mMeshWriter.closeTag();
 	
 	// Normal
 	TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
-	normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
-	normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
-	normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
+	normNode->SetAttribute( "x", StringUtil::toString( normal.x ) );
+	normNode->SetAttribute( "y", StringUtil::toString( normal.y ) );
+	normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
 	mMeshWriter.closeTag();
 
 	mMeshWriter.closeTag();
@@ -243,7 +243,7 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 	kfNode->SetAttribute( "time", StringUtil::toString( time ) );
 
 	const MD3Vertex *verts = &mesh.vertices[frame * mesh.header.numVertices];
-	float position[3], normal[3];
+	Vector3 position, normal;
 
 	for ( int i = 0; i < mesh.header.numVertices; i++ )
 	{
@@ -252,41 +252,41 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 		convertNormal( vertex.normal, normal );
 
 		TiXmlElement *posNode = mMeshWriter.openTag( "position" );
-		posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
-		posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
-		posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
+		posNode->SetAttribute( "x", StringUtil::toString( position.x ) );
+		posNode->SetAttribute( "y", StringUtil::toString( position.y ) );
+		posNode->SetAttribute( "z", StringUtil::toString( position.z ) );
 		mMeshWriter.closeTag();
 		
 		TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
-		normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
-		normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
-		normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
+		normNode->SetAttribute( "x", StringUtil::toString( normal.x ) );
+		normNode->SetAttribute( "y", StringUtil::toString( normal.y ) );
+		normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
 		mMeshWriter.closeTag();		
 	}
 
 	mMeshWriter.closeTag();
 }
 
-void Q3ModelToMesh::convertPosition( const short position[3], float dest[3] )
+void Q3ModelToMesh::convertPosition( const short position[3], Vector3 &dest )
 {
-	dest[0] = (float)position[0] * MD3_SCALE;
-	dest[1] = (float)position[1] * MD3_SCALE;
-	dest[2] = (float)position[2] * MD3_SCALE;
+	dest.x = (float)position[0] * MD3_SCALE;
+	dest.y = (float)position[1] * MD3_SCALE;
+	dest.z = (float)position[2] * MD3_SCALE;
 	
 	if ( mGlobals.convertCoords )
 		Quake::convertVector( dest );
 }
 
-void Q3ModelToMesh::convertNormal( const short &normal, float dest[3] )
+void Q3ModelToMesh::convertNormal( const short &normal, Vector3 &dest )
 {
 	double lat = (double)( ( normal >> 8 ) & 0xFF ) / 255.0;
 	double lng = (double)( normal & 0xFF ) / 255.0;
 	lat *= 6.2831853;
 	lng *= 6.2831853;
 
-	dest[0] = (float)( cos(lat) * sin(lng) );
-	dest[1] = (float)( sin(lat) * sin(lng) );
-	dest[2] = (float)( cos(lng) );
+	dest.x = (float)( cos(lat) * sin(lng) );
+	dest.y = (float)( sin(lat) * sin(lng) );
+	dest.z = (float)( cos(lng) );
 	
 	if ( mGlobals.convertCoords )
 		Quake::convertVector( dest );	

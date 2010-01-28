@@ -74,7 +74,7 @@ private:
 	void buildSubMesh( const struct md5_mesh_t *mesh, const SubMeshInfo &subMeshInfo );
 	void buildFace( const struct md5_triangle_t *triangle );
 	void buildVertexBuffers( const struct md5_mesh_t *mesh );
-	void buildVertex( const float position[3], const float normal[3] );
+	void buildVertex( const Vector3 &position, const Vector3 &normal );
 	void buildTexCoord( const float texCoord[2] );
 	void buildBoneAssignments( const struct md5_mesh_t *mesh );
 
@@ -84,16 +84,16 @@ private:
 	void buildAnimations( const struct md5_model_t *mdl );
 	void buildAnimation( const struct md5_model_t *mdl, const string &name, const AnimationInfo &animInfo );
 	void buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex, const AnimationInfo &animInfo );
-	void buildKeyFrame( float time, const vec3_t translate, const quat4_t rotate );
+	void buildKeyFrame( float time, const Vector3 &translate, const quat4_t rotate );
 
-	static void generateNormals( const struct md5_mesh_t *mesh, vec3_t *normals );
+	static void generateNormals( const struct md5_mesh_t *mesh, Vector3 *normals );
 	static void resampleAnimation( const struct md5_anim_t *in, struct md5_anim_t *out, int fps );
 	static const struct md5_joint_t *findJoint( const struct md5_model_t *mdl, const string &name );
 	static void jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, 
-								vec3_t translate, quat4_t rotate );
+								Vector3 &translate, quat4_t rotate );
 	static void animationDelta( const struct md5_joint_t *baseParent, const struct md5_joint_t *animParent, 
 								const struct md5_joint_t *baseJoint, const struct md5_joint_t *animJoint, 
-								quat4_t rotate, vec3_t translate );
+								quat4_t rotate, Vector3 &translate );
 
 	static void convertCoordSystem( struct md5_model_t *mdl );
 	static void convertCoordSystem( struct md5_anim_t *anim );

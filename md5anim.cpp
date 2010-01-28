@@ -52,7 +52,7 @@ struct joint_info_t
 /* Base frame joint */
 struct baseframe_joint_t
 {
-  vec3_t pos;
+  Vector3 pos;
   quat4_t orient;
 };
 
@@ -100,11 +100,11 @@ BuildFrameSkeleton (const struct joint_info_t *jointInfos,
   for (i = 0; i < num_joints; ++i)
     {
       const struct baseframe_joint_t *baseJoint = &baseFrame[i];
-      vec3_t animatedPos;
+      Vector3 animatedPos;
       quat4_t animatedOrient;
       int j = 0;
 
-      memcpy (animatedPos, baseJoint->pos, sizeof (vec3_t));
+	  animatedPos = baseJoint->pos;
       memcpy (animatedOrient, baseJoint->orient, sizeof (quat4_t));
 
       if (jointInfos[i].flags & 1) /* Tx */
@@ -158,19 +158,17 @@ BuildFrameSkeleton (const struct joint_info_t *jointInfos,
       /* Has parent? */
       if (thisJoint->parent < 0)
 	{
-	  memcpy (thisJoint->pos, animatedPos, sizeof (vec3_t));
+		thisJoint->pos = animatedPos;
 	  memcpy (thisJoint->orient, animatedOrient, sizeof (quat4_t));
 	}
       else
 	{
 	  struct md5_joint_t *parentJoint = &skelFrame[parent];
-	  vec3_t rpos; /* Rotated position */
+	  Vector3 rpos; /* Rotated position */
 
 	  /* Add positions */
 	  Quat_rotatePoint (parentJoint->orient, animatedPos, rpos);
-	  thisJoint->pos[0] = rpos[0] + parentJoint->pos[0];
-	  thisJoint->pos[1] = rpos[1] + parentJoint->pos[1];
-	  thisJoint->pos[2] = rpos[2] + parentJoint->pos[2];
+	  thisJoint->pos = rpos + parentJoint->pos;
 
 	  /* Concatenate rotations */
 	  Quat_multQuat (parentJoint->orient, animatedOrient, thisJoint->orient);

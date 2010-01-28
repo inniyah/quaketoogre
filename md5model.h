@@ -39,14 +39,14 @@ struct md5_joint_t
   char name[64];
   int parent;
 
-  vec3_t pos;
+  Vector3 pos;
   quat4_t orient;
 };
 
 /* Vertex */
 struct md5_vertex_t
 {
-  vec2_t st;
+  float st[2];
 
   int start; /* start weight */
   int count; /* weight count */
@@ -64,14 +64,14 @@ struct md5_weight_t
   int joint;
   float bias;
 
-  vec3_t pos;
+  Vector3 pos;
 };
 
 /* Bounding box */
 struct md5_bbox_t
 {
-  vec3_t min;
-  vec3_t max;
+  Vector3 min;
+  Vector3 max;
 };
 
 /* MD5 mesh */
@@ -87,7 +87,7 @@ struct md5_mesh_t
 
   char shader[256];
 
-  vec3_t *vertexArray;
+  Vector3 *vertexArray;
 };
 
 /* MD5 model structure */

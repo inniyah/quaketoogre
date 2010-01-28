@@ -81,7 +81,7 @@ Quat_multQuat (const quat4_t qa, const quat4_t qb, quat4_t out)
 }
 
 void
-Quat_multVec (const quat4_t q, const vec3_t v, quat4_t out)
+Quat_multVec (const quat4_t q, const Vector3 &v, quat4_t out)
 {
   out[W] = - (q[X] * v[X]) - (q[Y] * v[Y]) - (q[Z] * v[Z]);
   out[X] =   (q[W] * v[X]) + (q[Y] * v[Z]) - (q[Z] * v[Y]);
@@ -90,7 +90,7 @@ Quat_multVec (const quat4_t q, const vec3_t v, quat4_t out)
 }
 
 void
-Quat_rotatePoint (const quat4_t q, const vec3_t in, vec3_t out)
+Quat_rotatePoint (const quat4_t q, const Vector3 &in, Vector3 &out)
 {
   quat4_t tmp, inv, final;
 
@@ -216,7 +216,7 @@ void Quat_inverse(const quat4_t q, quat4_t out)
 	Quat_normalize( out );
 }
 
-void Quat_toAngleAxis( const quat4_t q, float *angle, vec3_t axis )
+void Quat_toAngleAxis( const quat4_t q, float *angle, Vector3 &axis )
 {
 	quat4_t qp;
 	Quat_copy( q, qp );

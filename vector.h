@@ -24,15 +24,82 @@ THE SOFTWARE.
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 
-typedef float vec2_t[2];
-typedef float vec3_t[3];
+class Vector3
+{
+public:
+	float x, y, z;
 
-void vec_assign( vec3_t v, float x, float y, float z );
-void vec_copy( const vec3_t in, vec3_t out );
-void vec_add( const vec3_t a, const vec3_t b, vec3_t out );
-void vec_subtract( const vec3_t a, const vec3_t b, vec3_t out );
-void vec_scale( const vec3_t v, float f, vec3_t out );
-void vec_crossProduct( const vec3_t a, const vec3_t b, vec3_t out );
-void vec_normalize( vec3_t v );
+	Vector3(): x(0), y(0), z(0) {}
+	Vector3( const Vector3 &other ): x(other.x), y(other.y), z(other.z) {}
+	Vector3( float x, float y, float z ): x(x), y(y), z(z) {}
+
+	Vector3 crossProduct( const Vector3 &other ) const
+	{
+		Vector3 out;
+		out.x = y * other.z - other.y * z;
+		out.y = z * other.x - other.z * x;
+		out.z = x * other.y - other.x * y;
+		return out;
+	}
+
+	float normalise();
+
+	float operator[]( const size_t i ) const
+	{
+		return *(&x + i);
+	}
+
+	float &operator[]( const size_t i )
+	{
+		return *(&x + i);
+	}
+
+	Vector3 &operator=( const Vector3 &other )
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		return *this;
+	}
+
+	Vector3 operator+( const Vector3 &other ) const
+	{
+		return Vector3( x + other.x, y + other.y, z + other.z );
+	}
+
+	Vector3 operator-( const Vector3 &other ) const
+	{
+		return Vector3( x - other.x, y - other.y, z - other.z );
+	}
+
+	Vector3 operator*( float scale ) const
+	{
+		return Vector3( x * scale, y * scale, z * scale );
+	}
+
+	Vector3 &operator+=( const Vector3 &other )
+	{
+		x += other.x;
+		y += other.y;
+		z += other.z;
+		return *this;
+	}
+
+	Vector3 &operator-=( const Vector3 &other )
+	{
+		x -= other.x;
+		y -= other.y;
+		z -= other.z;
+		return *this;
+	}
+
+	Vector3 &operator*=( float scale )
+	{
+		x *= scale;
+		y *= scale;
+		z *= scale;
+		return *this;
+	}
+};
 
 #endif

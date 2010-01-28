@@ -156,7 +156,7 @@ void MD5ModelToMesh::buildFace( const struct md5_triangle_t *triangle )
 
 void MD5ModelToMesh::buildVertexBuffers( const struct md5_mesh_t *mesh )
 {
-	vec3_t *normals = new vec3_t[mesh->num_verts];
+	Vector3 *normals = new Vector3[mesh->num_verts];
 	generateNormals( mesh, normals );
 
 	// Vertices and normals
@@ -182,20 +182,20 @@ void MD5ModelToMesh::buildVertexBuffers( const struct md5_mesh_t *mesh )
 	mMeshWriter.closeTag();
 }
 
-void MD5ModelToMesh::buildVertex( const float position[3], const float normal[3] )
+void MD5ModelToMesh::buildVertex( const Vector3 &position, const Vector3 &normal )
 {
 	mMeshWriter.openTag( "vertex" );
 
 	TiXmlElement *posNode = mMeshWriter.openTag( "position" );
-	posNode->SetAttribute( "x", StringUtil::toString( position[0] ) );
-	posNode->SetAttribute( "y", StringUtil::toString( position[1] ) );
-	posNode->SetAttribute( "z", StringUtil::toString( position[2] ) );
+	posNode->SetAttribute( "x", StringUtil::toString( position.x ) );
+	posNode->SetAttribute( "y", StringUtil::toString( position.y ) );
+	posNode->SetAttribute( "z", StringUtil::toString( position.z ) );
 	mMeshWriter.closeTag();
 	
 	TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
-	normNode->SetAttribute( "x", StringUtil::toString( normal[0] ) );
-	normNode->SetAttribute( "y", StringUtil::toString( normal[1] ) );
-	normNode->SetAttribute( "z", StringUtil::toString( normal[2] ) );
+	normNode->SetAttribute( "x", StringUtil::toString( normal.x ) );
+	normNode->SetAttribute( "y", StringUtil::toString( normal.y ) );
+	normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
 	mMeshWriter.closeTag();
 
 	mMeshWriter.closeTag();	// vertex
@@ -281,12 +281,12 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		boneNode->SetAttribute( "id", i );
 		boneNode->SetAttribute( "name", StringUtil::stripQuotes(joint->name) );
 
-		vec3_t pos;
+		Vector3 pos;
 		quat4_t orient;
 		if ( joint->parent < 0 )
 		{
 			// Root bone, so just copy the bone's object space orientation
-			vec_copy( joint->pos, pos );
+			pos = joint->pos;
 			Quat_copy( joint->orient, orient );
 
 /*			if ( !mOriginBone.empty() )
@@ -301,7 +301,7 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 					Quat_rotatePoint( invRot, originJoint->pos, invTrans );
 
 					Quat_multQuat( joint->orient, invRot, orient );
-					vec_subtract( joint->pos, invTrans, pos );
+					pos = joint->pos - invTrans;
 				}
 			}*/
 		}
@@ -313,23 +313,23 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 		}
 
 		// Ogre's mesh format wants its rotations as axis+angle
-		vec3_t axis;
+		Vector3 axis;
 		float angle;
 		Quat_toAngleAxis( orient, &angle, axis );
 
 		TiXmlElement *posNode = mSkelWriter.openTag( "position" );
-		posNode->SetAttribute( "x", StringUtil::toString( pos[0] ) );
-		posNode->SetAttribute( "y", StringUtil::toString( pos[1] ) );
-		posNode->SetAttribute( "z", StringUtil::toString( pos[2] ) );
+		posNode->SetAttribute( "x", StringUtil::toString( pos.x ) );
+		posNode->SetAttribute( "y", StringUtil::toString( pos.y ) );
+		posNode->SetAttribute( "z", StringUtil::toString( pos.z ) );
 		mSkelWriter.closeTag();	// position
 
 		TiXmlElement *rotNode = mSkelWriter.openTag( "rotation" );
 		rotNode->SetAttribute( "angle", StringUtil::toString( angle ) );
 
 		TiXmlElement *axisNode = mSkelWriter.openTag( "axis" );
-		axisNode->SetAttribute( "x", StringUtil::toString( axis[0] ) );
-		axisNode->SetAttribute( "y", StringUtil::toString( axis[1] ) );
-		axisNode->SetAttribute( "z", StringUtil::toString( axis[2] ) );
+		axisNode->SetAttribute( "x", StringUtil::toString( axis.x ) );
+		axisNode->SetAttribute( "y", StringUtil::toString( axis.y ) );
+		axisNode->SetAttribute( "z", StringUtil::toString( axis.z ) );
 		mSkelWriter.closeTag();	// axis
 		mSkelWriter.closeTag();	// rotation
 
@@ -423,7 +423,7 @@ void MD5ModelToMesh::buildAnimation( const struct md5_model_t *mdl, const string
 void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex, const AnimationInfo &animInfo )
 {
 	const struct md5_joint_t *baseJoint = &mdl->baseSkel[jointIndex];
-	static vec3_t translate;
+	static Vector3 translate;
 	static quat4_t rotate;
 
 	TiXmlElement *trackTag = mSkelWriter.openTag( "track" );
@@ -451,7 +451,7 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 		if ( parentIndex < 0 && animInfo.lockRoot )
 		{
 			// Lock the root bone in place
-			vec_assign( translate, 0, 0, 0 );
+			translate = Vector3( 0, 0, 0 );
 		}
 
 		buildKeyFrame( time, translate, rotate );
@@ -462,65 +462,60 @@ void MD5ModelToMesh::buildTrack( const struct md5_model_t *mdl, const struct md5
 	mSkelWriter.closeTag();	// track
 }
 
-void MD5ModelToMesh::buildKeyFrame( float time, const vec3_t translate, const quat4_t rotate )
+void MD5ModelToMesh::buildKeyFrame( float time, const Vector3 &translate, const quat4_t rotate )
 {
 	TiXmlElement *frameTag = mSkelWriter.openTag( "keyframe" );
 	frameTag->SetAttribute( "time", StringUtil::toString( time ) );
 
 	TiXmlElement *translateTag = mSkelWriter.openTag( "translate" );
-	translateTag->SetAttribute( "x", StringUtil::toString( translate[0] ) );
-	translateTag->SetAttribute( "y", StringUtil::toString( translate[1] ) );
-	translateTag->SetAttribute( "z", StringUtil::toString( translate[2] ) );
+	translateTag->SetAttribute( "x", StringUtil::toString( translate.x ) );
+	translateTag->SetAttribute( "y", StringUtil::toString( translate.y ) );
+	translateTag->SetAttribute( "z", StringUtil::toString( translate.z ) );
 	mSkelWriter.closeTag();	// translate
 
-	vec3_t axis;
+	Vector3 axis;
 	float angle;
 	Quat_toAngleAxis( rotate, &angle, axis );
 
 	TiXmlElement *rotateTag = mSkelWriter.openTag( "rotate" );
 	rotateTag->SetAttribute( "angle", StringUtil::toString( angle ) );
 	TiXmlElement *axisTag = mSkelWriter.openTag( "axis" );
-	axisTag->SetAttribute( "x", StringUtil::toString( axis[0] ) );
-	axisTag->SetAttribute( "y", StringUtil::toString( axis[1] ) );
-	axisTag->SetAttribute( "z", StringUtil::toString( axis[2] ) );
+	axisTag->SetAttribute( "x", StringUtil::toString( axis.x ) );
+	axisTag->SetAttribute( "y", StringUtil::toString( axis.y ) );
+	axisTag->SetAttribute( "z", StringUtil::toString( axis.z ) );
 	mSkelWriter.closeTag();	// axis
 	mSkelWriter.closeTag();	// rotate
 
 	mSkelWriter.closeTag();	// keyframe
 }
 
-void MD5ModelToMesh::generateNormals( const struct md5_mesh_t *mesh, vec3_t *normals )
+void MD5ModelToMesh::generateNormals( const struct md5_mesh_t *mesh, Vector3 *normals )
 {
-	memset( normals, 0, sizeof(vec3_t) * mesh->num_verts );
+	memset( normals, 0, sizeof(Vector3) * mesh->num_verts );
 
 	for ( int i = 0; i < mesh->num_tris; i++ )
 	{
 		const struct md5_triangle_t *tri = &mesh->triangles[i];
 
-		vec3_t &v0 = mesh->vertexArray[tri->index[0]];
-		vec3_t &v1 = mesh->vertexArray[tri->index[1]];
-		vec3_t &v2 = mesh->vertexArray[tri->index[2]];
+		Vector3 &v0 = mesh->vertexArray[tri->index[0]];
+		Vector3 &v1 = mesh->vertexArray[tri->index[1]];
+		Vector3 &v2 = mesh->vertexArray[tri->index[2]];
 
 		// Compute face normal
-		vec3_t dir[2];
-		vec_subtract( v2, v0, dir[0] );
-		vec_subtract( v1, v0, dir[1] );
-
-		vec3_t faceNormal;
-		vec_crossProduct( dir[0], dir[1], faceNormal );
+		Vector3 faceNormal = (v2 - v0).crossProduct( (v1 - v0) );
 
 		// Add face normal to the normal of each face vertex
 		for ( int j = 0; j < 3; j++ )
 		{
-			vec3_t &normal = normals[tri->index[j]];
-			vec_add( normal, faceNormal, normal );
+			Vector3 &normal = normals[tri->index[j]];
+			normal += faceNormal;
 		}
 	}
 
 	// Normalize each vertex normal
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
-		vec_normalize( normals[i] );
+		normals[i].normalise();
 	}
 }
 
@@ -557,7 +552,7 @@ const struct md5_joint_t *MD5ModelToMesh::findJoint( const struct md5_model_t *m
 
 // This computes the transformation from one given joint to another
 void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const struct md5_joint_t *to, 
-									 vec3_t translate, quat4_t rotate )
+									 Vector3 &translate, quat4_t rotate )
 {
 	// rotate = inv(from->orient) * to->orient
 	quat4_t fromOrientInv;
@@ -565,14 +560,13 @@ void MD5ModelToMesh::jointDifference( const struct md5_joint_t *from, const stru
 	Quat_multQuat( fromOrientInv, to->orient, rotate );
 
 	// translate = inv(from->orient) * (to->pos - from->pos)
-	vec3_t tmp;
-	vec_subtract( to->pos, from->pos, tmp );
+	Vector3 tmp = to->pos - from->pos;
 	Quat_rotatePoint( fromOrientInv, tmp, translate );
 }
 
 void MD5ModelToMesh::animationDelta( const struct md5_joint_t *baseParent, const struct md5_joint_t *animParent, 
 									const struct md5_joint_t *baseJoint, const struct md5_joint_t *animJoint, 
-									quat4_t rotate, vec3_t translate )
+									quat4_t rotate, Vector3 &translate )
 {
 	if ( baseParent && animParent )
 	{
@@ -586,10 +580,10 @@ void MD5ModelToMesh::animationDelta( const struct md5_joint_t *baseParent, const
 		Quat_multQuat( animParentInv, animJoint->orient, q1 );
 		Quat_multQuat( relJointInv, q1, rotate );
 		
-		vec3_t v1, v2;
-		vec_subtract( animJoint->pos, animParent->pos, v1 );
+		Vector3 v1, v2;
+		v1 = animJoint->pos - animParent->pos;
 		Quat_rotatePoint( animParentInv, v1, v2 );
-		vec_subtract( v2, relJoint.pos, translate );
+		translate = v2 - relJoint.pos;
 	}
 	else
 	{
@@ -597,7 +591,7 @@ void MD5ModelToMesh::animationDelta( const struct md5_joint_t *baseParent, const
 		Quat_inverse( baseJoint->orient, invBaseJoint );
 		Quat_multQuat( invBaseJoint, animJoint->orient, rotate );
 		
-		vec_subtract( animJoint->pos, baseJoint->pos, translate );
+		translate = animJoint->pos - baseJoint->pos;
 	}
 }
 

@@ -150,7 +150,7 @@ ReadMD5Model (const char *filename, struct md5_model_t *mdl)
 		      mesh->vertices = (struct md5_vertex_t *)
 			malloc (sizeof (struct md5_vertex_t) * mesh->num_verts);
 
-			  mesh->vertexArray = (vec3_t *)malloc (sizeof (vec3_t) * mesh->num_verts);
+			  mesh->vertexArray = (Vector3 *)malloc (sizeof (Vector3) * mesh->num_verts);
 		    }
 		}
 	      else if (sscanf (buff, " numtris %d", &mesh->num_tris) == 1)
@@ -269,12 +269,12 @@ PrepareMesh (struct md5_mesh_t *mesh,
 {
   int i, j;
 
-  vec3_t *vertexArray = mesh->vertexArray;
+  Vector3 *vertexArray = mesh->vertexArray;
 
   /* Setup vertices */
   for (i = 0; i < mesh->num_verts; ++i)
     {
-      vec3_t finalVertex = { 0.0f, 0.0f, 0.0f };
+      Vector3 finalVertex;
 
       /* Calculate final vertex to draw with weights */
       for (j = 0; j < mesh->vertices[i].count; ++j)
@@ -285,17 +285,13 @@ PrepareMesh (struct md5_mesh_t *mesh,
 	    = &skeleton[weight->joint];
 
 	  /* Calculate transformed vertex for this weight */
-	  vec3_t wv;
+	  Vector3 wv;
 	  Quat_rotatePoint (joint->orient, weight->pos, wv);
 
 	  /* The sum of all weight->bias should be 1.0 */
-	  finalVertex[0] += (joint->pos[0] + wv[0]) * weight->bias;
-	  finalVertex[1] += (joint->pos[1] + wv[1]) * weight->bias;
-	  finalVertex[2] += (joint->pos[2] + wv[2]) * weight->bias;
+	  finalVertex += (joint->pos + wv) * weight->bias;
 	}
 
-      vertexArray[i][0] = finalVertex[0];
-      vertexArray[i][1] = finalVertex[1];
-      vertexArray[i][2] = finalVertex[2];
+	  vertexArray[i] = finalVertex;
     }
 }

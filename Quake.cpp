@@ -24,17 +24,17 @@ THE SOFTWARE.
 #include "Common.h"
 #include "Quake.h"
 
-const vec3_t Quake::md2VertexNormals[MD2_NUMVERTEXNORMALS] =
+const float Quake::md2VertexNormals[MD2_NUMVERTEXNORMALS][3] =
 {
 #include "anorms.h"
 };
 
-void Quake::convertVector( vec3_t v )
+void Quake::convertVector( Vector3 &v )
 {
 	float tmp;
-	tmp = v[1];
-	v[1] = v[2];
-	v[2] = -tmp;
+	tmp = v.y;
+	v.y = v.z;
+	v.z = -tmp;
 }
 
 void Quake::convertQuaternion( quat4_t q )

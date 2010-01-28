@@ -60,8 +60,8 @@ struct MD2Vertex
 
 struct MD2FrameHeader
 {
-	vec3_t	scale;
-	vec3_t	translate;
+	Vector3	scale;
+	Vector3	translate;
 	char	name[16];
 };
 

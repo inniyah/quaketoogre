@@ -37,21 +37,34 @@ typedef float quat4_t[4];
 
 enum {
   X, Y, Z, W
+//	W, X, Y, Z
 };
 
 /**
  * Quaternion prototypes
  */
-void Quat_computeW (quat4_t q);
+void Quat_computeW (quat4_t q);	// TODO implement outside Quaternion class
 void Quat_normalize (quat4_t q);
 void Quat_multQuat (const quat4_t qa, const quat4_t qb, quat4_t out);
-void Quat_multVec (const quat4_t q, const vec3_t v, quat4_t out);
-void Quat_rotatePoint (const quat4_t q, const vec3_t in, vec3_t out);
+void Quat_multVec (const quat4_t q, const Vector3 &v, quat4_t out);
+void Quat_rotatePoint (const quat4_t q, const Vector3 &in, Vector3 &out);
 float Quat_dotProduct (const quat4_t qa, const quat4_t qb);
 void Quat_slerp (const quat4_t qa, const quat4_t qb, float t, quat4_t out);
 void Quat_copy(const quat4_t q, quat4_t out);
 void Quat_conjugate(const quat4_t q, quat4_t out);
 void Quat_inverse(const quat4_t q, quat4_t out);
-void Quat_toAngleAxis(const quat4_t q, float *angle, vec3_t axis);
+void Quat_toAngleAxis(const quat4_t q, float *angle, Vector3 &axis);
+
+class Quaternion
+{
+public:
+	float w, x, y, z;
+
+	Quaternion(): w(1), x(0), y(0), z(0) {}
+	Quaternion( float w, float x, float y, float z ): w(w), x(x), y(y), z(z) {}
+	Quaternion( const Quaternion &other ): w(other.w), x(other.x), y(other.y), z(other.z) {}
+
+	
+};
 
 #endif	// __QUATERNION_H__
