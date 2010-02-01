@@ -85,6 +85,7 @@ void MD5ModelToMesh::buildMesh( const struct md5_model_t *mdl )
 
 		struct md5_mesh_t *mesh = &mdl->meshes[index];
 		PrepareMesh( mesh, mdl->baseSkel );
+		transformMesh( mdl, mesh );
 		buildSubMesh( mesh, iter->second );
 	}
 	mMeshWriter.closeTag();	// submeshes
@@ -289,17 +290,17 @@ void MD5ModelToMesh::buildBones( const struct md5_model_t *mdl )
 			pos = joint->pos;
 			orient = joint->orient;
 
-/*			if ( !mOriginBone.empty() )
+			// Transform the root bone so that the 'origin bone' gets placed on the origin
+			if ( !mOriginBone.empty() )
 			{
 				const struct md5_joint_t *originJoint = findJoint( mdl, mOriginBone );
 				if ( originJoint )
 				{
-					Quaternion invRot = originJoint->orient.Inverse();
-
-					orient = joint->orient * invRot;
-					pos = joint->pos - (invRot * originJoint->pos);
+					Quaternion invRotate = originJoint->orient.Inverse();
+					orient = invRotate * joint->orient;
+					pos = invRotate * (pos - originJoint->pos);
 				}
-			}*/
+			}
 		}
 		else
 		{
@@ -483,6 +484,24 @@ void MD5ModelToMesh::buildKeyFrame( float time, const Vector3 &translate, const 
 	mSkelWriter.closeTag();	// rotate
 
 	mSkelWriter.closeTag();	// keyframe
+}
+
+void MD5ModelToMesh::transformMesh( const struct md5_model_t *mdl, struct md5_mesh_t *mesh )
+{
+	if ( mOriginBone.empty() )
+		return;
+
+	const struct md5_joint_t *originJoint = findJoint( mdl, mOriginBone );
+	if ( !originJoint )
+		return;
+
+	Quaternion invRotate = originJoint->orient.Inverse();
+
+	for ( int i = 0; i < mesh->num_verts; ++i )
+	{
+		Vector3 &v = mesh->vertexArray[i];
+		v = invRotate * (v - originJoint->pos);
+	}
 }
 
 void MD5ModelToMesh::generateNormals( const struct md5_mesh_t *mesh, Vector3 *normals )

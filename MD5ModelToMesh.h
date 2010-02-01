@@ -86,6 +86,8 @@ private:
 	void buildTrack( const struct md5_model_t *mdl, const struct md5_anim_t *anim, int jointIndex, const AnimationInfo &animInfo );
 	void buildKeyFrame( float time, const Vector3 &translate, const Quaternion &rotate );
 
+	void transformMesh( const struct md5_model_t *mdl, struct md5_mesh_t *mesh );
+
 	static void generateNormals( const struct md5_mesh_t *mesh, Vector3 *normals );
 	static void resampleAnimation( const struct md5_anim_t *in, struct md5_anim_t *out, int fps );
 	static const struct md5_joint_t *findJoint( const struct md5_model_t *mdl, const string &name );

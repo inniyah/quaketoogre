@@ -36,7 +36,7 @@
 <!ELEMENT md5skeleton (md5anim*)>
 <!ATTLIST md5skeleton
     name        CDATA   #REQUIRED
-    moveorigin  CDATA   #IMPLIED>   <!-- Moves the skeleton so that this bone sits on the origin. (not implemented yet) -->
+    moveorigin  CDATA   #IMPLIED>   <!-- Moves the skeleton so that this bone sits on the origin. -->
 <!ELEMENT md5anim (inputfile, lockroot?)>
 <!ATTLIST md5anim
     name        CDATA   #REQUIRED

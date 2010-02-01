@@ -75,6 +75,11 @@ public:
 		return Vector3( x - other.x, y - other.y, z - other.z );
 	}
 
+	Vector3 operator-() const
+	{
+		return Vector3( -x, -y, -z );
+	}
+
 	Vector3 operator*( float scale ) const
 	{
 		return Vector3( x * scale, y * scale, z * scale );
