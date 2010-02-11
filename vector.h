@@ -24,6 +24,8 @@ THE SOFTWARE.
 #ifndef __VECTOR_H__
 #define __VECTOR_H__
 
+#include <cstddef>
+
 /**
 This class has the same interface as Ogre's Vector3 class, so they should be interchangeable.
 */
@@ -111,3 +113,4 @@ public:
 };
 
 #endif
+
