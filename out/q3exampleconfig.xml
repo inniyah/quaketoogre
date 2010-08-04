@@ -11,8 +11,9 @@
 		<referenceframe>157</referenceframe>
 		
 		<animationfile>
-			<inputfile>models/players/visor/animation.cfg</inputfile>
-			<!--<convertlegs/>-->
+      <includenormals/>
+      <inputfile>models/players/visor/animation.cfg</inputfile>
+      <!--<convertlegs/>-->
 			<convertselection>
 				<animationname>LEGS_WALK</animationname>
 				<animationname>LEGS_RUN</animationname>

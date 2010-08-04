@@ -11,6 +11,7 @@
 		<referenceframe>0</referenceframe>
 
 		<animations>
+      <includenormals/>
 			<animationsequence>
 				<animationname>run</animationname>
 				<startframe>40</startframe>

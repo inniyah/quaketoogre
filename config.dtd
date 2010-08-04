@@ -13,11 +13,12 @@
 <!ELEMENT inputfile (#PCDATA)>
 <!ELEMENT outputfile (#PCDATA)>
 
-<!-- Frame that will be used for the non-animated pose. The model's normals will be taken from this frame. -->
+<!-- Specifies the frame that will be used for the non-animated pose. 
+  The model's base normals will be taken from this frame. Default is frame #0. -->
 <!ELEMENT referenceframe (#PCDATA)>
 
 <!-- Quake 3 animation file -->
-<!ELEMENT animationfile (inputfile, (convertlegs|converttorso|convertselection))>
+<!ELEMENT animationfile (includenormals?, inputfile, (convertlegs|converttorso|convertselection))>
 <!ELEMENT convertlegs EMPTY>    <!-- Convert all LEGS_ and BOTH_ animations -->
 <!ELEMENT converttorso EMPTY>   <!-- Convert all TORSO_ and BOTH_ animations -->
 <!ELEMENT convertselection (animationname+)>    <!-- Convert only specific animations -->
@@ -44,7 +45,7 @@
 <!ELEMENT lockroot EMPTY>   <!-- Locks the root bone in place, i.e. translation is always zero. -->
 
 <!-- Individual animation definitions -->
-<!ELEMENT animations (animationsequence+)>
+<!ELEMENT animations (includenormals?, animationsequence+)>
 <!ELEMENT animationsequence (animationname, startframe, numframes, fps)>
 <!ELEMENT startframe (#PCDATA)>
 <!ELEMENT numframes (#PCDATA)>
@@ -56,3 +57,7 @@
 <!ELEMENT submeshname (#PCDATA)>
 <!ELEMENT materialname (#PCDATA)>
 
+<!-- If this element is included, the mesh will include normals for each morph animation keyframe.
+  As of Ogre v1.8, this feature is incompatible with stencil shadowing, which is why it's optional.
+  This element has no effect on MD5 models. -->
+<!ELEMENT includenormals EMPTY>
