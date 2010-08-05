@@ -2,31 +2,31 @@
 <!DOCTYPE quake2ogre SYSTEM "../config.dtd">
 
 <quake2ogre>
-    <convertcoordinates/>
+  <convertcoordinates/>
 
-	<md2mesh>
-		<inputfile>players/male/tris.md2</inputfile>
-		<outputfile>q2male.mesh.xml</outputfile>
+  <md2mesh>
+    <inputfile>players/male/tris.md2</inputfile>
+    <outputfile>q2male.mesh.xml</outputfile>
 
-		<referenceframe>0</referenceframe>
+    <referenceframe>0</referenceframe>
 
-		<animations>
+    <animations>
       <includenormals/>
-			<animationsequence>
-				<animationname>run</animationname>
-				<startframe>40</startframe>
-				<numframes>6</numframes>
-				<fps>10</fps>
-			</animationsequence>
-			<animationsequence>
-				<animationname>taunt</animationname>
-				<startframe>95</startframe>
-				<numframes>17</numframes>
-				<fps>10</fps>
-			</animationsequence>
-		</animations>
+      <animationsequence>
+        <animationname>run</animationname>
+        <startframe>40</startframe>
+        <numframes>6</numframes>
+        <fps>10</fps>
+      </animationsequence>
+      <animationsequence>
+        <animationname>taunt</animationname>
+        <startframe>95</startframe>
+        <numframes>17</numframes>
+        <fps>10</fps>
+      </animationsequence>
+    </animations>
 
-		<materialname>q2male/skin</materialname>
-	</md2mesh>
+    <materialname>q2male/skin</materialname>
+  </md2mesh>
 </quake2ogre>
 

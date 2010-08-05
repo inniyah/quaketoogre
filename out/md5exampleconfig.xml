@@ -2,47 +2,47 @@
 <!DOCTYPE quake2ogre SYSTEM "../config.dtd">
 
 <quake2ogre>
-    <!-- Convert all of the model's positions, normals and orientations from
-        Doom 3's right-handed (Z up) coordinate system to OGRE's standard
-        left-handed coordinate system. -->
-	<convertcoordinates/>
+  <!-- Convert all of the model's positions, normals and orientations from
+    Doom 3's right-handed (Z up) coordinate system to OGRE's standard
+    left-handed coordinate system. -->
+  <convertcoordinates/>
 
-	<md5mesh>
-		<inputfile>bernie/bernie.md5mesh</inputfile>
-		<outputfile>bernie.mesh.xml</outputfile>
+  <md5mesh>
+    <inputfile>bernie/bernie.md5mesh</inputfile>
+    <outputfile>bernie.mesh.xml</outputfile>
 
-        <!-- Limiting the number of weights saves both memory and processing
-            power, at a negligible cost in quality. -->
-		<submeshes maxweights="4">
-    		<!-- Keep the material name as defined in the MD5 file. -->
-		    <submesh index="0"/>
-            <!-- Setting the 'name' attribute allows the resulting SubMesh to
-                be retrieved using Ogre::Entity::getSubEntity('name') -->
-		    <submesh index="1" name="BurnMarks">
-    		    <!-- Define a custom material name. -->
-		        <materialname>md5models/bernie/fx</materialname>
-		    </submesh>
-		</submeshes>
+    <!-- Limiting the number of weights saves both memory and processing
+      power, at a negligible cost in quality. -->
+    <submeshes maxweights="4">
+      <!-- Keep the material name as defined in the MD5 file. -->
+      <submesh index="0"/>
+      <!-- Setting the 'name' attribute allows the resulting SubMesh to
+        be retrieved using Ogre::Entity::getSubEntity('name') -->
+      <submesh index="1" name="BurnMarks">
+        <!-- Define a custom material name. -->
+        <materialname>md5models/bernie/fx</materialname>
+      </submesh>
+    </submeshes>
 
-        <!-- The skeleton's 'name' attribute affects both the skeleton filename
-            and the skeleton link inside the mesh file. -->
-		<md5skeleton name="bernie">
-            <!-- The animation's 'name' attribute can be used to retrieve the
-                corresponding AnimationState object with
-                Ogre::Entity::getAnimationState('name') -->
-			<md5anim name="SpitAttack">
-				<inputfile>bernie/spit_attack1.md5anim</inputfile>
-			</md5anim>
-            <!-- Resampling an animation to a lower framerate will further save
-                memory. -->
-			<md5anim name="FastWalk" changefps="10">
-			    <inputfile>bernie/fastwalk.md5anim</inputfile>
-                <!-- Set the skeleton root bone's translation always to zero,
-                    this prevents the model from moving around and out of its
-                    bounding box. -->
-			    <lockroot/>
-			</md5anim>
-		</md5skeleton>
-	</md5mesh>
+    <!-- The skeleton's 'name' attribute affects both the skeleton filename
+      and the skeleton link inside the mesh file. -->
+    <md5skeleton name="bernie">
+      <!-- The animation's 'name' attribute can be used to retrieve the
+        corresponding AnimationState object with
+        Ogre::Entity::getAnimationState('name') -->
+      <md5anim name="SpitAttack">
+        <inputfile>bernie/spit_attack1.md5anim</inputfile>
+      </md5anim>
+      <!-- Resampling an animation to a lower framerate will further save
+        memory. -->
+      <md5anim name="FastWalk" changefps="10">
+        <inputfile>bernie/fastwalk.md5anim</inputfile>
+        <!-- Set the skeleton root bone's translation always to zero,
+          this prevents the model from moving around and out of its
+          bounding box. -->
+        <lockroot/>
+      </md5anim>
+    </md5skeleton>
+  </md5mesh>
 </quake2ogre>
 

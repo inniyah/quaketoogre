@@ -97,10 +97,10 @@ convert can be supplied.
 
 - materials
 Most (but not all) Quake models contain references to the materials (or shaders
-in Quake terminology) they use. In many cases, these shader names are not 
+in Quake terminology) they use. In many cases, these shader names will not be
 correct for whatever Ogre project you're working on. To fix this, you have the
-option to specify new material names for every submesh.
-The important thing to note here is that this option only affects the
+option to specify new material names for each submesh.
+One important thing to note here is that this option only affects the
 references to materials in the resulting Ogre mesh. You still have to write the
 material scripts yourself.
 
