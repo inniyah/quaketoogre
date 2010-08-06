@@ -257,11 +257,14 @@ void Q3ModelToMesh::buildKeyframe( const MD3Mesh &mesh, int frame, float time )
 		posNode->SetAttribute( "z", StringUtil::toString( position.z ) );
 		mMeshWriter.closeTag();
 		
-		TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
-		normNode->SetAttribute( "x", StringUtil::toString( normal.x ) );
-		normNode->SetAttribute( "y", StringUtil::toString( normal.y ) );
-		normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
-		mMeshWriter.closeTag();		
+		if ( mIncludeNormals )
+		{
+			TiXmlElement *normNode = mMeshWriter.openTag( "normal" );
+			normNode->SetAttribute( "x", StringUtil::toString( normal.x ) );
+			normNode->SetAttribute( "y", StringUtil::toString( normal.y ) );
+			normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
+			mMeshWriter.closeTag();
+		}
 	}
 
 	mMeshWriter.closeTag();
