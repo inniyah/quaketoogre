@@ -64,3 +64,12 @@ void XmlWriter::closeTag()
 {
 	mNodeStack.pop_back();
 }
+
+void XmlWriter::cancelTag()
+{
+    TiXmlNode *node = mNodeStack.back();
+    mNodeStack.pop_back();
+    
+    TiXmlNode *parent = node->Parent();
+    parent->RemoveChild( node );
+}

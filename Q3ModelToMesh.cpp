@@ -140,24 +140,16 @@ void Q3ModelToMesh::buildVertexBuffers( const MD3Mesh &mesh )
 	TiXmlElement *vbNode = mMeshWriter.openTag( "vertexbuffer" );
 	vbNode->SetAttribute( "positions", "true" );
 	vbNode->SetAttribute( "normals", "true" );
+	vbNode->SetAttribute( "texture_coords", 1 );
+	vbNode->SetAttribute( "texture_coord_dimensions_0", 2 );	
 	for ( int i = 0; i < mesh.header.numVertices; i++ )
 	{
-		buildVertex( verts[i] );
-	}
-	mMeshWriter.closeTag();
-
-	// Texture coordinates
-	TiXmlElement *tcNode = mMeshWriter.openTag( "vertexbuffer" );
-	tcNode->SetAttribute( "texture_coords", 1 );
-	tcNode->SetAttribute( "texture_coord_dimensions_0", 2 );
-	for ( int i = 0; i < mesh.header.numVertices; i++ )
-	{
-		buildTexCoord( mesh.texCoords[i] );
+		buildVertex( verts[i], mesh.texCoords[i] );
 	}
 	mMeshWriter.closeTag();
 }
 
-void Q3ModelToMesh::buildVertex( const MD3Vertex &vert )
+void Q3ModelToMesh::buildVertex( const MD3Vertex &vert, const MD3TexCoord &texCoord )
 {
 	Vector3 position, normal;
 	convertPosition( vert.position, position );
@@ -179,13 +171,7 @@ void Q3ModelToMesh::buildVertex( const MD3Vertex &vert )
 	normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
 	mMeshWriter.closeTag();
 
-	mMeshWriter.closeTag();
-}
-
-void Q3ModelToMesh::buildTexCoord( const MD3TexCoord &texCoord )
-{
-	mMeshWriter.openTag( "vertex" );
-
+    // Texture coordinates
 	TiXmlElement *tcNode = mMeshWriter.openTag( "texcoord" );
 	tcNode->SetAttribute( "u", StringUtil::toString( texCoord.uv[0] ) );
 	tcNode->SetAttribute( "v", StringUtil::toString( texCoord.uv[1] ) );

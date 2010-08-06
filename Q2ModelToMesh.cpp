@@ -156,20 +156,11 @@ void Q2ModelToMesh::buildVertexBuffers( const MD2Frame &frame )
 	TiXmlElement *vbNode = mMeshWriter.openTag( "vertexbuffer" );
 	vbNode->SetAttribute( "positions", "true" );
 	vbNode->SetAttribute( "normals", "true" );
+	vbNode->SetAttribute( "texture_coords", 1 );
+	vbNode->SetAttribute( "texture_coord_dimensions_0", 2 );	
 	for ( int i = 0; i < (int)mNewVertices.size(); i++ )
 	{
 		buildVertex( frame, i );
-	}
-	mMeshWriter.closeTag();
-
-	// Texture coordinates
-	TiXmlElement *tcNode = mMeshWriter.openTag( "vertexbuffer" );
-	tcNode->SetAttribute( "texture_coords", 1 );
-	tcNode->SetAttribute( "texture_coord_dimensions_0", 2 );
-	for ( int i = 0; i < (int)mNewVertices.size(); i++ )
-	{
-		const NewVertex &newVert = mNewVertices[i];
-		buildTexCoord( mModel.texCoords[newVert.second] );
 	}
 	mMeshWriter.closeTag();
 }
@@ -177,7 +168,7 @@ void Q2ModelToMesh::buildVertexBuffers( const MD2Frame &frame )
 void Q2ModelToMesh::buildVertex( const MD2Frame &frame, int vertIndex )
 {
 	const NewVertex &newVert = mNewVertices[vertIndex];
-	const MD2Vertex &vert = frame.vertices[newVert.first];
+	const MD2Vertex &vert = frame.vertices[newVert.first];	
 	
 	Vector3 position, normal;
 	convertPosition( vert.vertex, frame.header, position );
@@ -198,20 +189,15 @@ void Q2ModelToMesh::buildVertex( const MD2Frame &frame, int vertIndex )
 	normNode->SetAttribute( "y", StringUtil::toString( normal.y ) );
 	normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
 	mMeshWriter.closeTag();
-
-	mMeshWriter.closeTag();	
-}
-
-void Q2ModelToMesh::buildTexCoord( const MD2TexCoord &texCoord )
-{
-	mMeshWriter.openTag( "vertex" );
-
+	
+	// Texture coordinates
+	const MD2TexCoord &texCoord = mModel.texCoords[newVert.second];
 	TiXmlElement *tcNode = mMeshWriter.openTag( "texcoord" );
 	tcNode->SetAttribute( "u", StringUtil::toString( (float)texCoord.u / (float)mModel.header.skinWidth ) );
 	tcNode->SetAttribute( "v", StringUtil::toString( (float)texCoord.v / (float)mModel.header.skinHeight ) );
-	mMeshWriter.closeTag();
+	mMeshWriter.closeTag();	
 
-	mMeshWriter.closeTag();
+	mMeshWriter.closeTag();	
 }
 
 void Q2ModelToMesh::buildAnimation( const string &name, const AnimationInfo &animInfo )

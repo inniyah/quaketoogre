@@ -49,8 +49,7 @@ private:
 	void buildSubMesh( const MD3Mesh &mesh );
 	void buildFace( const MD3Triangle &triangle );
 	void buildVertexBuffers( const MD3Mesh &mesh );
-	void buildVertex( const MD3Vertex &vert );
-	void buildTexCoord( const MD3TexCoord &texCoord );
+	void buildVertex( const MD3Vertex &vert, const MD3TexCoord &texCoord );
 
 	void buildAnimation( const string &name, const AnimationInfo &animInfo );
 	void buildTrack( int meshIndex, const AnimationInfo &animInfo );

@@ -96,20 +96,24 @@ void MD5ModelToMesh::buildMesh( const struct md5_model_t *mdl )
 		mMeshWriter.closeTag();
 	}
 
-	mMeshWriter.openTag( "submeshnames" );
-	for ( SubMeshMap::const_iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter )
-	{
-		int index = iter->first;
-		const SubMeshInfo &info = iter->second;
-		if ( info.name.empty() )
-			continue;
+    TiXmlElement *submeshNamesNode = mMeshWriter.openTag( "submeshnames" );
+    for ( SubMeshMap::const_iterator iter = mSubMeshes.begin(); iter != mSubMeshes.end(); ++iter )
+    {
+	    int index = iter->first;
+	    const SubMeshInfo &info = iter->second;
+	    if ( info.name.empty() )
+		    continue;
 
-		TiXmlElement *nameNode = mMeshWriter.openTag( "submeshname" );
-		nameNode->SetAttribute( "index", index );
-		nameNode->SetAttribute( "name", info.name );
-		mMeshWriter.closeTag();	// submeshname
-	}
-	mMeshWriter.closeTag();	// submeshnames
+	    TiXmlElement *nameNode = mMeshWriter.openTag( "submeshname" );
+	    nameNode->SetAttribute( "index", index );
+	    nameNode->SetAttribute( "name", info.name );
+	    mMeshWriter.closeTag();	// submeshname
+    }
+    
+    if ( submeshNamesNode->NoChildren() )
+        mMeshWriter.cancelTag(); // submeshnames
+    else
+        mMeshWriter.closeTag();	// submeshnames
 
 	mMeshWriter.closeTag();	// mesh
 }
@@ -160,30 +164,21 @@ void MD5ModelToMesh::buildVertexBuffers( const struct md5_mesh_t *mesh )
 	Vector3 *normals = new Vector3[mesh->num_verts];
 	generateNormals( mesh, normals );
 
-	// Vertices and normals
 	TiXmlElement *vbNode = mMeshWriter.openTag( "vertexbuffer" );
 	vbNode->SetAttribute( "positions", "true" );
 	vbNode->SetAttribute( "normals", "true" );
+	vbNode->SetAttribute( "texture_coords", 1 );
+	vbNode->SetAttribute( "texture_coord_dimensions_0", 2 );	
 	for ( int i = 0; i < mesh->num_verts; i++ )
 	{
-		buildVertex( mesh->vertexArray[i], normals[i] );
+		buildVertex( mesh->vertexArray[i], normals[i], mesh->vertices[i].st );
 	}
 	mMeshWriter.closeTag();	// vertexbuffer
 
 	delete[] normals;
-
-	// Texture coordinates
-	TiXmlElement *tcNode = mMeshWriter.openTag( "vertexbuffer" );
-	tcNode->SetAttribute( "texture_coords", 1 );
-	tcNode->SetAttribute( "texture_coord_dimensions_0", 2 );
-	for ( int i = 0; i < mesh->num_verts; i++ )
-	{
-		buildTexCoord( mesh->vertices[i].st );
-	}
-	mMeshWriter.closeTag();
 }
 
-void MD5ModelToMesh::buildVertex( const Vector3 &position, const Vector3 &normal )
+void MD5ModelToMesh::buildVertex( const Vector3 &position, const Vector3 &normal, const float texCoord[2] )
 {
 	mMeshWriter.openTag( "vertex" );
 
@@ -199,19 +194,12 @@ void MD5ModelToMesh::buildVertex( const Vector3 &position, const Vector3 &normal
 	normNode->SetAttribute( "z", StringUtil::toString( normal.z ) );
 	mMeshWriter.closeTag();
 
-	mMeshWriter.closeTag();	// vertex
-}
-
-void MD5ModelToMesh::buildTexCoord( const float texCoord[2] )
-{
-	mMeshWriter.openTag( "vertex" );
-
 	TiXmlElement *tcNode = mMeshWriter.openTag( "texcoord" );
 	tcNode->SetAttribute( "u", StringUtil::toString( texCoord[0] ) );
 	tcNode->SetAttribute( "v", StringUtil::toString( texCoord[1] ) );
 	mMeshWriter.closeTag();
 
-	mMeshWriter.closeTag();
+	mMeshWriter.closeTag();	// vertex
 }
 
 static bool weightCompare( const struct md5_weight_t *a, const struct md5_weight_t *b )

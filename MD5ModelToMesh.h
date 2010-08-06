@@ -74,8 +74,7 @@ private:
 	void buildSubMesh( const struct md5_mesh_t *mesh, const SubMeshInfo &subMeshInfo );
 	void buildFace( const struct md5_triangle_t *triangle );
 	void buildVertexBuffers( const struct md5_mesh_t *mesh );
-	void buildVertex( const Vector3 &position, const Vector3 &normal );
-	void buildTexCoord( const float texCoord[2] );
+	void buildVertex( const Vector3 &position, const Vector3 &normal, const float texCoord[2] );
 	void buildBoneAssignments( const struct md5_mesh_t *mesh );
 
 	void buildSkeleton( const struct md5_model_t *mdl );

@@ -35,6 +35,7 @@ public:
 
 	TiXmlElement *openTag( const string &name );
 	void closeTag();
+	void cancelTag();
 	
 private:
 	TiXmlDocument mDoc;

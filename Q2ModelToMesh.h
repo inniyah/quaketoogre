@@ -70,7 +70,6 @@ private:
 	void buildFace( const NewTriangle &triangle );
 	void buildVertexBuffers( const MD2Frame &frame );
 	void buildVertex( const MD2Frame &frame, int vertIndex );
-	void buildTexCoord( const MD2TexCoord &texCoord );
 
 	void buildAnimation( const string &name, const AnimationInfo &animInfo );
 	void buildTrack( const AnimationInfo &animInfo );
