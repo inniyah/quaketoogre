@@ -41,6 +41,7 @@ public:
 	void setSubMeshMaterial( const string &subMesh, const string &material ) { mMaterials[subMesh] = material; }
 	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
 	AnimationInfo &getAnimation( const string &name ) { return mAnimations[name]; }
+	void setIncludeNormals( bool enable ) { mIncludeNormals = enable; }
 
 private:
 	void convert();
@@ -67,6 +68,7 @@ private:
 	StringMap mMaterials;
 	int mReferenceFrame;
 	AnimationMap mAnimations;
+	bool mIncludeNormals;
 
 	MD3Model mModel;
 };

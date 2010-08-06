@@ -211,6 +211,9 @@ bool convertMD2Mesh( TiXmlElement *configNode )
 		}
 		else if ( nodeName == "animations" )
 		{
+			if ( node->FirstChildElement( "includenormals" ) )
+				builder.setIncludeNormals( true );
+
 			AnimationMap anims;
 			processAnimations( node, anims );
 			for ( AnimationMap::const_iterator iter = anims.begin(); iter != anims.end(); ++iter )
@@ -257,11 +260,17 @@ bool convertMD3Mesh( TiXmlElement *configNode )
 		}
 		else if ( nodeName == "animationfile" )
 		{
+			if ( node->FirstChildElement( "includenormals" ) )
+				builder.setIncludeNormals( true );
+
 			if ( !processAnimationFile( node, builder ) )
 				cout << "[Warning] Failed to process animation file" << endl;
 		}
 		else if ( nodeName == "animations" )
 		{
+			if ( node->FirstChildElement( "includenormals" ) )
+				builder.setIncludeNormals( true );
+
 			AnimationMap anims;
 			processAnimations( node, anims );
 			for ( AnimationMap::const_iterator iter = anims.begin(); iter != anims.end(); ++iter )

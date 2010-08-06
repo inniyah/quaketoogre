@@ -41,6 +41,7 @@ public:
 	void setMaterial( const string &material ) { mMaterial = material; }
 	void setReferenceFrame( int frame ) { mReferenceFrame = frame; }
 	AnimationInfo &getAnimation( const string &name ) { return mAnimations[name]; }
+	void setIncludeNormals( bool enable ) { mIncludeNormals = enable; }
 
 private:
 	struct NewTriangle
@@ -87,6 +88,7 @@ private:
 	string mMaterial;
 	int mReferenceFrame;
 	AnimationMap mAnimations;
+	bool mIncludeNormals;
 
 	MD2Model mModel;
 };

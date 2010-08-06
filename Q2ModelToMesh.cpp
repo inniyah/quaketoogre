@@ -25,7 +25,7 @@ THE SOFTWARE.
 #include "Q2ModelToMesh.h"
 
 Q2ModelToMesh::Q2ModelToMesh( const GlobalOptions &globals ):
-	mGlobals( globals ), mReferenceFrame( 0 )
+	mGlobals( globals ), mReferenceFrame( 0 ), mIncludeNormals( false )
 {
 }
 
