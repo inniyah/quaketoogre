@@ -11,6 +11,8 @@
     <referenceframe>157</referenceframe>
 		
     <animationfile>
+      <!-- This will also affect the manually defined animation sequences. -->
+      <!--<includenormals/>-->
       <inputfile>models/players/visor/animation.cfg</inputfile>
       <!--<convertlegs/>-->
       <convertselection>
