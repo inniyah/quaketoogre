@@ -91,6 +91,7 @@ void Q2ModelToMesh::restructureVertices()
 
 void Q2ModelToMesh::convert()
 {
+    mMeshWriter.setDocType( "mesh", "ogremeshxml.dtd" );    
 	mMeshWriter.openTag( "mesh" );
 
 	// Build SubMeshes

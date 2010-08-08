@@ -37,8 +37,11 @@ public:
 	void closeTag();
 	void cancelTag();
 	
+	void setDocType( const string &type, const string &dtd );
+	
 private:
 	TiXmlDocument mDoc;
+	TiXmlNode *mDocType;
 	vector<TiXmlNode*> mNodeStack;
 };
 

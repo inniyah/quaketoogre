@@ -54,6 +54,7 @@ bool Q3ModelToMesh::build()
 
 void Q3ModelToMesh::convert()
 {
+    mMeshWriter.setDocType( "mesh", "ogremeshxml.dtd" );
 	mMeshWriter.openTag( "mesh" );
 
 	// Build SubMeshes

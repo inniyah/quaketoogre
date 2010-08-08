@@ -69,6 +69,7 @@ bool MD5ModelToMesh::build()
 
 void MD5ModelToMesh::buildMesh( const struct md5_model_t *mdl )
 {
+    mMeshWriter.setDocType( "mesh", "ogremeshxml.dtd" );
 	mMeshWriter.openTag( "mesh" );
 
 	mMeshWriter.openTag( "submeshes" );
@@ -248,6 +249,7 @@ void MD5ModelToMesh::buildBoneAssignments( const struct md5_mesh_t *mesh )
 
 void MD5ModelToMesh::buildSkeleton( const struct md5_model_t *mdl )
 {
+    mSkelWriter.setDocType( "skeleton", "ogreskeletonxml.dtd" );
 	mSkelWriter.openTag( "skeleton" );
 	
 	buildBones( mdl );
@@ -495,6 +497,7 @@ void MD5ModelToMesh::transformMesh( const struct md5_model_t *mdl, struct md5_me
 void MD5ModelToMesh::generateNormals( const struct md5_mesh_t *mesh, Vector3 *normals )
 {
 	memset( normals, 0, sizeof(Vector3) * mesh->num_verts );
+
 
 	for ( int i = 0; i < mesh->num_tris; i++ )
 	{

@@ -24,7 +24,7 @@ THE SOFTWARE.
 #include "Common.h"
 #include "XmlWriter.h"
 
-XmlWriter::XmlWriter()
+XmlWriter::XmlWriter(): mDocType( NULL )
 {
 	mDoc.LinkEndChild( new TiXmlDeclaration( "1.0", "", "" ) );
 	mNodeStack.push_back( &mDoc );
@@ -73,3 +73,17 @@ void XmlWriter::cancelTag()
     TiXmlNode *parent = node->Parent();
     parent->RemoveChild( node );
 }
+
+void XmlWriter::setDocType( const string &type, const string &dtd )
+{
+    if ( !mDocType )
+    {
+    	mDocType = mDoc.InsertAfterChild( mDoc.FirstChild(), TiXmlUnknown() );
+	}
+
+    stringstream ss;
+    ss << "!DOCTYPE " << type << " SYSTEM \"" << dtd << "\"";
+
+    mDocType->SetValue( ss.str() );
+}
+
