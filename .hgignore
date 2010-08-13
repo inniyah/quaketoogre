@@ -1,0 +1,7 @@
+relre:Debug/
+relre:Release/
+glob:*.suo
+glob:*.ncb
+glob:*.user
+glob:*.o
+relre:out/(?!dummy)

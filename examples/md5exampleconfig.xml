@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE quake2ogre SYSTEM "../config.dtd">
+<!DOCTYPE quake2ogre SYSTEM "config.dtd">
 
 <quake2ogre>
   <!-- Convert all of the model's positions, normals and orientations from
