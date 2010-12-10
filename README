@@ -8,7 +8,7 @@ of these models could be useful for game development projects using Ogre, but
 since Ogre has its own custom mesh format, it cannot directly load any Quake or
 Doom models.
 
-For this reason, I present to you the Quake To Ogre Mesh Converter.
+For this reason, I have created the Quake To Ogre Mesh Converter.
 This tool can take a 3D model from either Quake 2, Quake 3 or Doom 3 and 
 convert it to an equivalent Ogre mesh, including (a selection of) the original
 model's animations.
@@ -70,10 +70,9 @@ Configuration
 
 The configuration file is an XML document containing conversion parameters as
 defined by the Document Type Definition in the 'config.dtd' file. Most of the
-specification from the DTD file should be pretty self-explanatory, and two
-example configuration files have been supplied to show you how to write a 
-config XML file. There are a couple of specific details I will explain here
-though:
+specification from the DTD file should be pretty self-explanatory, and a bunch
+of example configuration files has been supplied that can be used as templates.
+There are a couple of specific details though, that I will explain here:
 
 - convertcoordinates
 The Quake engines use a different coordinate system than Ogre uses. When this
@@ -104,24 +103,14 @@ One important thing to note here is that this option only affects the
 references to materials in the resulting Ogre mesh. You still have to write the
 material scripts yourself.
 
---------------
-Known problems
---------------
-
-Ogre does not support interpolation of normals for morph animated meshes.
-Consequently, converted MD2 and MD3 models can only have one single set of
-normals, namely those taken from the reference frame. With extensively animated
-meshes (such as player models) this means that the normals will be incorrect
-for most frames, resulting in weird lighting behaviour.
-
 ---------
 Licensing
 ---------
 
 All original source code for this application is licensed under the MIT 
 License, as described in the LICENSE file. Third-party source code is licensed
-under a variety of licenses, which are described at the start of each source
-file.
+under a variety of licenses, which are described in the headers of the source
+files in question.
 
 --------------
 Special thanks
