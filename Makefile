@@ -1,35 +1,82 @@
-OUTDIR = out
-BIN = QuakeToOgre
-OBJ = \
-	tinyxml.o \
-	tinyxmlerror.o \
-	tinyxmlparser.o \
-	Main.o \
-	Quake.o \
-	MD2Model.o \
-	MD3Model.o \
-	Animation.o \
-	XmlWriter.o \
-	Q2ModelToMesh.o \
-	Q3ModelToMesh.o \
-	md5mesh.o \
-	md5anim.o \
-	MD5ModelToMesh.o \
-	quaternion.o \
-	vector.o \
-	StringUtil.o
+#!/usr/bin/make -f
 
-CC = g++
-INCLUDE =
-LIB = -lm
+CC= gcc
+CXX= g++
+RM= rm -f
 
-all : $(OBJ)
-	$(CC) -o $(OUTDIR)/$(BIN) $(OBJ) $(LIB)
+PKGCONFIG= pkg-config
+PACKAGES= tinyxml
 
-rebuild: clean all
+CFLAGS= \
+	-Wall \
+	-fstack-protector-strong \
+	-Wall \
+	-Wformat \
+	-Werror=format-security \
+	-Wdate-time \
+	-D_FORTIFY_SOURCE=2 \
+	$(shell $(PKGCONFIG) --cflags $(PACKAGES))
+
+LDFLAGS= \
+	-Wl,--as-needed \
+	-Wl,--no-undefined \
+	-Wl,--no-allow-shlib-undefined
+
+CSTD=-std=c11
+CPPSTD=-std=c++11
+
+OPTS= -O2 -g
+DEFS=
+INCS=
+
+LIBS= $(shell $(PKGCONFIG) --libs $(PACKAGES)) -lm
+
+BINARY= QuakeToOgre
+
+BINARY_SRCS= \
+	Main.cpp \
+	Quake.cpp \
+	MD2Model.cpp \
+	MD3Model.cpp \
+	Animation.cpp \
+	XmlWriter.cpp \
+	Q2ModelToMesh.cpp \
+	Q3ModelToMesh.cpp \
+	md5mesh.cpp \
+	md5anim.cpp \
+	MD5ModelToMesh.cpp \
+	quaternion.cpp \
+	vector.cpp \
+	StringUtil.cpp
+
+BINARY_OBJS= $(subst .cpp,.o,$(BINARY_SRCS))
+
+all: $(BINARY)
+
+$(BINARY): $(BINARY_OBJS)
+	$(CXX) $(CPPSTD) $(CSTD) $(LDFLAGS) -o $@ $(BINARY_OBJS) $(LIBS)
+
+%.o: %.cpp
+	$(CXX) $(CPPSTD) $(OPTS) -o $@ -c $< $(DEFS) $(INCS) $(CFLAGS)
+
+%.o: %.cc
+	$(CXX) $(CPPSTD) $(OPTS) -o $@ -c $< $(DEFS) $(INCS) $(CFLAGS)
+
+%.o: %.c
+	$(CC) $(CSTD) $(OPTS) -o $@ -c $< $(DEFS) $(INCS) $(CFLAGS)
+
+depend: .depend
+
+.depend: $(PINOCCHIO_SRCS) $(BINARY_SRCS)
+	$(RM) ./.depend
+	$(CXX) $(CPPSTD) $(DEFS) $(INCS) $(CFLAGS) -MM $^>>./.depend;
 
 clean:
-	rm -rf $(OBJ)
+	$(RM) $(PINOCCHIO_OBJS) $(BINARY_OBJS) $(BINARY)
+	$(RM) -fv *~ .depend core *.out *.bak
+	$(RM) -fv *.o *.a *~
+	$(RM) -fv */*.o */*.a */*~
 
-%.o : %.cpp
-	$(CC) -c $< $(INCLUDE) -o $@
+include .depend
+
+.PHONY: all depend clean
