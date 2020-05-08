@@ -67,11 +67,11 @@ void Q2ModelToMesh::restructureVertices()
 		
 		for ( int j = 0; j < 3; j++ )
 		{
-			const int &vertIndex = triangle.vertexIndices[j];
-			const int &tcIndex = triangle.textureIndices[j];
+			int vertIndex = triangle.vertexIndices[j];
+			int tcIndex = triangle.textureIndices[j];
 			int newIndex;
 			
-			NewVertex newVert = make_pair<int, int>( vertIndex, tcIndex );
+			NewVertex newVert = make_pair<int, int>( std::move(vertIndex), std::move(tcIndex) );
 			NewIndexMap::iterator iter = newIndices.find( newVert );
 			if ( iter != newIndices.end() )
 			{
