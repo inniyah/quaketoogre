@@ -128,7 +128,7 @@ ReadMD5Model (const char *filename, struct md5_model_t *mdl)
 		  int quote = 0, j = 0;
 
 		  /* Copy the shader name whithout the quote marks */
-		  for (i = 0; i < sizeof (buff) && (quote < 2); ++i)
+		  for (unsigned int i = 0; i < sizeof (buff) && (quote < 2); ++i)
 		    {
 		      if (buff[i] == '\"')
 			quote++;

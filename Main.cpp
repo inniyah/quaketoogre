@@ -305,7 +305,7 @@ void processSubMesh( TiXmlElement *subMeshNode, MD5ModelToMesh &builder )
 	MD5ModelToMesh::SubMeshInfo &smInfo = builder.getSubMesh( index );
 
 	const char *name;
-	if ( name = subMeshNode->Attribute( "name" ) )
+	if ( (name = subMeshNode->Attribute( "name" )) )
 	{
 		smInfo.name = name;
 	}
@@ -386,7 +386,7 @@ void processMD5Skeleton( TiXmlElement *skelNode, MD5ModelToMesh &builder )
 	builder.setSkeletonName( name );
 
 	const char *originBone;
-	if ( originBone = skelNode->Attribute( "moveorigin" ) )
+	if ( (originBone = skelNode->Attribute( "moveorigin" )) )
 		builder.setOriginBone( originBone );
 
 	for ( TiXmlElement *node = skelNode->FirstChildElement(); node; node = node->NextSiblingElement() )

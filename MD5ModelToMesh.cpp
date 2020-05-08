@@ -111,10 +111,11 @@ void MD5ModelToMesh::buildMesh( const struct md5_model_t *mdl )
 	    mMeshWriter.closeTag();	// submeshname
     }
     
-    if ( submeshNamesNode->NoChildren() )
+    if ( submeshNamesNode->NoChildren() ) {
         mMeshWriter.cancelTag(); // submeshnames
-    else
+    } else {
         mMeshWriter.closeTag();	// submeshnames
+    }
 
 	mMeshWriter.closeTag();	// mesh
 }
